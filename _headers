@@ -1,0 +1,11 @@
+# Cloudflare Pages / Netlify 用セキュリティヘッダ
+# よろづやwebアプリ診断基準書 v2.2 Part H（モダンセキュリティヘッダ）・I-2-3 準拠。
+# Vercel にデプロイする場合は vercel.json 側が使われる（このファイルは無視される）。
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://esm.sh; connect-src 'self' https://dcxoouslwkfohdbacipa.supabase.co wss://dcxoouslwkfohdbacipa.supabase.co; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin

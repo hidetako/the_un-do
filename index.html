@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>一息 — Issoku｜オンライン座禅寺・坐雲堂</title>
+<!-- セキュリティ: よろづやwebアプリ診断基準書 Part H / A-5 / A-9 準拠（静的ホスト非依存のCSPフォールバック）。
+     frame-ancestors / HSTS / X-Frame-Options 等のヘッダ専用項目は vercel.json・_headers 側で付与する。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://esm.sh; connect-src 'self' https://dcxoouslwkfohdbacipa.supabase.co wss://dcxoouslwkfohdbacipa.supabase.co; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
@@ -550,7 +554,9 @@ const presence = (() => {
   function track(){ return channel && channel.track({ lat:me.lat, lng:me.lng, sitting }); }
   async function connect(){
     try{
-      const mod=await import('https://esm.sh/@supabase/supabase-js@2');
+      /* サプライチェーン対策（基準 G-2-1 / H-7）：浮動 @2 ではなく厳密バージョンへ固定。
+         esm.sh の依存もすべて同オリジン配下に解決される。更新時はバージョンを明示的に上げる。 */
+      const mod=await import('https://esm.sh/@supabase/supabase-js@2.108.2');
       me=myPos();
       client=mod.createClient(SB_URL, SB_KEY, { realtime:{ params:{ eventsPerSecond:2 } } });
       channel=client.channel(SB_CHANNEL, { config:{ presence:{ key:myId } } });
