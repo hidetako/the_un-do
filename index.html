@@ -119,10 +119,13 @@
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
-  .smoke{position:absolute; left:50%; bottom:70px; transform:translateX(-50%); width:140px; height:300px; pointer-events:none}
+  .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:420px; pointer-events:none}
   .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
   .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
-    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55)}
+    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55);
+    animation:emberglow 4.5s ease-in-out infinite}
+  @keyframes emberglow{0%,100%{opacity:.9; box-shadow:0 0 9px 2px rgba(224,99,43,.42)}
+    50%{opacity:1; box-shadow:0 0 14px 4px rgba(224,99,43,.62)}}
   .bowl{width:96px; height:20px; background:#2a2620; border-radius:0 0 50px 50px; margin-top:-3px}
   .bowl::before{content:""; display:block; width:96px; height:11px; background:#39342c; border-radius:50%; transform:translateY(-6px)}
   .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
@@ -230,7 +233,7 @@
     </div>
     <div class="censer">
       <div class="incense-wrap">
-        <canvas class="smoke" id="smoke" width="140" height="300"></canvas>
+        <canvas class="smoke" id="smoke" width="140" height="420"></canvas>
         <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
       </div>
       <div class="bowl"></div>
@@ -378,24 +381,28 @@ function bell(delay=0, gain=0.82){
 /* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
 function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
 
-/* ---------- smoke: gentle, swaying 余烟 ---------- */
+/* ---------- smoke: gentle, swaying 余烟 ----------
+   キャンバス下端＝線香の基部。火種（ember）は線香の高さぶん上にあり、燃え進むと下がる。
+   煙はその火種の先端から立ち上がり、線香が短くなるにつれて起点も静かに下がる。 */
 let smokeRAF, smokeOn=false;
 function startSmoke(){
-  const c=$('#smoke'); const x=c.getContext('2d'); smokeOn=true;
+  const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
   const W=c.width, H=c.height; const parts=[]; let last=performance.now(), acc=0;
+  /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
+  const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
   function loop(now){
     if(!smokeOn) return;
     const dt=Math.min(50, now-last); last=now; acc+=dt;
-    if(acc>150){ acc=0; parts.push({t:0, x0:W/2+(Math.random()*6-3), ph:Math.random()*6.28,
-      sway:10+Math.random()*8, life:5200+Math.random()*1800}); }
+    if(acc>150){ acc=0; parts.push({t:0, y0:emberY(), x0:W/2+(Math.random()*6-3), ph:Math.random()*6.28,
+      sway:9+Math.random()*7, rise:220+Math.random()*60, life:5200+Math.random()*1800}); }
     x.clearRect(0,0,W,H); x.shadowBlur=12;
     for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.t+=dt;
       const k=p.t/p.life; if(k>=1){ parts.splice(i,1); continue; }
-      const y = H-8 - k*(H-20);
+      const y = p.y0 - k*p.rise;
       const sway = p.sway*(0.25+k*1.1);
       const px = p.x0 + Math.sin(p.ph + k*5.2)*sway + Math.sin(p.ph*1.7 + k*2.6)*sway*0.35;
-      const r = 1.8 + k*8;
-      const a = Math.sin(Math.min(1,k*1.25)*Math.PI)*0.30;
+      const r = 1.6 + k*7.5;
+      const a = Math.sin(Math.min(1,k*1.25)*Math.PI)*0.28;
       const col='rgba(214,208,196,'+a.toFixed(3)+')';
       x.beginPath(); x.fillStyle=col; x.shadowColor=col;
       x.arc(px,y,r,0,6.2832); x.fill();
