@@ -30,6 +30,9 @@
     border:1px solid rgba(239,233,220,.3); border-radius:999px; padding:6px 14px;
     font-family:var(--serif); font-size:13px; letter-spacing:.12em; cursor:pointer; transition:opacity .4s}
   .bar button:hover{opacity:1}
+  .bar-left{display:flex; gap:10px}
+  .bar button.sound{font-size:15px; letter-spacing:0; padding:6px 13px}
+  .bar button.sound.off{opacity:.3; text-decoration:line-through}
   .exit{display:none}
 
   /* SPLASH */
@@ -139,7 +142,10 @@
 </head>
 <body>
 <div class="bar">
-  <button class="lang" id="langBtn">EN</button>
+  <div class="bar-left">
+    <button class="lang" id="langBtn">EN</button>
+    <button class="sound" id="soundBtn" aria-label="ambient sound">♪</button>
+  </div>
   <button class="exit" id="exitBtn">✕</button>
 </div>
 
@@ -289,6 +295,7 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
 let lang = store.get('issoku_lang') || 'ja';
+let soundOn = store.get('issoku_sound')!=='0';
 const sel = { posture:'floor', scene:'honden', time:5, orient:true };
 try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
 
@@ -325,9 +332,13 @@ function save(){ store.set('issoku_sel',JSON.stringify(sel)); }
 
 /* ---------- temple bell ---------- */
 let ac;
-function bell(delay=0, gain=0.82){
-  if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+function ensureCtx(){
+  if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
   if(ac.state==='suspended') ac.resume();
+  return ac;
+}
+function bell(delay=0, gain=0.82){
+  if(!ensureCtx()) return;
   const t0 = ac.currentTime + delay;
   /* [harmonic, gain, decay s] — long, deep, lingering 余韻 */
   const partials = [[1,1,9.5],[2.0,0.42,6.6],[2.74,0.27,4.2],[3.76,0.16,2.6],[5.2,0.09,1.6]];
@@ -373,12 +384,118 @@ function startSmoke(){
 function stopSmoke(){ smokeOn=false; cancelAnimationFrame(smokeRAF);
   const c=$('#smoke'); if(c) c.getContext('2d').clearRect(0,0,c.width,c.height); }
 
+/* ---------- soundscape: per-seat ambient, synthesized (環境音) ----------
+   座処ごとの環境音。Web Audioで合成し外部音源に依存しない（本物の収録音は将来差し替え）。
+   鐘より一段やわらかい「気配」の床。手放す・静けさの理念に合わせ最小限に保つ。 */
+const ambient = (() => {
+  let buf=null, master=null, started=[], timers=[], alive=false, killTimer=null;
+  function brown(){
+    if(buf) return buf;
+    const n=ac.sampleRate*4, b=ac.createBuffer(1,n,ac.sampleRate), d=b.getChannelData(0);
+    let last=0;
+    for(let i=0;i<n;i++){ const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.4; }
+    buf=b; return b;
+  }
+  function noise(){ const s=ac.createBufferSource(); s.buffer=brown(); s.loop=true; started.push(s); return s; }
+  /* sine LFO added onto an AudioParam (param value sums with connected signals) */
+  function mod(param, depth, freq){
+    const o=ac.createOscillator(); o.type='sine'; o.frequency.value=freq;
+    const g=ac.createGain(); g.gain.value=depth;
+    o.connect(g); g.connect(param); o.start(); started.push(o); return o;
+  }
+  function later(fn, ms){ timers.push(setTimeout(()=>{ if(alive) fn(); }, ms)); }
+
+  const builders = {
+    /* 本堂：深く暗い堂内のうなり。低く包み込む。 */
+    honden(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=140; lp.Q.value=0.6;
+      const g=ac.createGain(); g.gain.value=0.20; mod(g.gain,0.06,0.05);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    },
+    /* 枯山水：かすかな風＋折々の鹿威し（ししおどし）の「コーン」。 */
+    kare(){
+      const s=noise(), bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=0.7;
+      const g=ac.createGain(); g.gain.value=0.06; mod(g.gain,0.045,0.08); mod(bp.frequency,180,0.05);
+      s.connect(bp); bp.connect(g); g.connect(master); s.start();
+      const knock=()=>{ const t=ac.currentTime, o=ac.createOscillator(), e=ac.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(230,t); o.frequency.exponentialRampToValueAtTime(96,t+0.13);
+        e.gain.setValueAtTime(0.0001,t); e.gain.exponentialRampToValueAtTime(0.22,t+0.006);
+        e.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
+        o.connect(e); e.connect(master); o.start(t); o.stop(t+0.5);
+        later(knock,(15+Math.random()*9)*1000); };
+      later(knock,(7+Math.random()*6)*1000);
+    },
+    /* 海辺の岸壁：寄せて引く波。ゆっくり膨らみ、しずまる。 */
+    umi(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=0.4;
+      const g=ac.createGain(); g.gain.value=0.13; mod(g.gain,0.13,0.09); mod(g.gain,0.04,0.137); mod(lp.frequency,260,0.09);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    },
+    /* 夜の月：しずかな夜気＋まばらな虫の音（鈴虫）。 */
+    tsuki(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=200;
+      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.05);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+      const cricket=()=>{ const t=ac.currentTime, dur=0.5+Math.random()*0.5;
+        const o=ac.createOscillator(); o.type='sine'; o.frequency.value=4300+Math.random()*1000;
+        const tr=ac.createOscillator(); tr.type='square'; tr.frequency.value=26+Math.random()*10;
+        const trg=ac.createGain(); trg.gain.value=0.011;
+        const env=ac.createGain();
+        env.gain.setValueAtTime(0.0001,t); env.gain.linearRampToValueAtTime(0.011,t+0.05);
+        env.gain.setValueAtTime(0.011,t+dur-0.08); env.gain.linearRampToValueAtTime(0.0001,t+dur);
+        tr.connect(trg); trg.connect(env.gain); o.connect(env); env.connect(master);
+        o.start(t); tr.start(t); o.stop(t+dur); tr.stop(t+dur);
+        later(cricket,(2.2+Math.random()*3.6)*1000); };
+      later(cricket,(1.5+Math.random()*3)*1000);
+    },
+    /* 寝ている猫の横：ゆっくりした寝息（＝自然な調息のお手本）＋かすかな喉鳴り。 */
+    neko(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=360;
+      const g=ac.createGain(); g.gain.value=0.05; mod(g.gain,0.045,0.2);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+      const p=ac.createOscillator(); p.type='sawtooth'; p.frequency.value=52;
+      const plp=ac.createBiquadFilter(); plp.type='lowpass'; plp.frequency.value=170;
+      const pg=ac.createGain(); pg.gain.value=0.012; mod(pg.gain,0.012,22);
+      p.connect(plp); plp.connect(pg); pg.connect(master); p.start(); started.push(p);
+    },
+    /* 調息の額：ほぼ無音。簡素な床の間のかすかな空気。 */
+    cho(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=220;
+      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.04);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    }
+  };
+
+  function start(scene){
+    if(!ensureCtx()) return;
+    stop(0);
+    alive=true;
+    master=ac.createGain(); master.gain.value=0.0001; master.connect(ac.destination);
+    (builders[scene]||builders.honden)();
+    master.gain.exponentialRampToValueAtTime(0.9, ac.currentTime+2.2);
+  }
+  function stop(fade=1.4){
+    alive=false;
+    timers.forEach(clearTimeout); timers=[];
+    if(killTimer){ clearTimeout(killTimer); killTimer=null; }
+    const m=master, s=started; master=null; started=[];
+    if(!m) return;
+    const t=ac.currentTime;
+    try{ m.gain.cancelScheduledValues(t); m.gain.setValueAtTime(Math.max(0.0001,m.gain.value),t);
+      m.gain.exponentialRampToValueAtTime(0.0001, t+Math.max(0.05,fade)); }catch(e){}
+    killTimer=setTimeout(()=>{ s.forEach(n=>{ try{n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
+      try{ m.disconnect(); }catch(e){} }, Math.max(60, fade*1000+150));
+  }
+  return { start, stop };
+})();
+
 /* ---------- session flow ---------- */
 let timerRAF, timerActive=false;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
+  if(soundOn) ambient.start(sel.scene);
   if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
 }
 function runOrient(done){
@@ -408,13 +525,19 @@ function startIncense(durMs){
   timerRAF=requestAnimationFrame(loop);
 }
 function endSession(){ $('#status').classList.remove('show'); bell(0,0.9);
-  setTimeout(()=>{ stopSmoke(); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke();
+  setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); ambient.stop(0.4);
   $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
 $('#langBtn').onclick=()=>{ lang= lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
-$('#enterBtn').onclick=()=>{ if(!ac){ try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} } show('setup'); };
+$('#enterBtn').onclick=()=>{ ensureCtx(); show('setup'); };
+function refreshSoundBtn(){ const b=$('#soundBtn'); b.classList.toggle('off',!soundOn);
+  b.setAttribute('aria-label', soundOn?'ambient sound: on':'ambient sound: off'); b.title=b.getAttribute('aria-label'); }
+$('#soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('issoku_sound', soundOn?'1':'0'); refreshSoundBtn();
+  if(soundOn){ if($('#session').classList.contains('on')) ambient.start(sel.scene); }
+  else ambient.stop(0.4); };
+refreshSoundBtn();
 $('#beginBtn').onclick=enterSession;
 $('#exitBtn').onclick=abort;
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
