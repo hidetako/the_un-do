@@ -510,37 +510,64 @@ const ambient = (() => {
 
 /* ---------- world presence: 静かな共在感（地球の灯り）----------
    「いつもそこに座っている人がいる」を非言語で。位置はおおまかに・匿名。
-   実在のサーバー在室ではなく、地球の自転（実UTC時刻）に連動した“ありそうな”気配の
-   シミュレーション（プロトタイプ用＝企画書「在室はダミー」）。本物のプレゼンスは将来差し替え。 */
+   Supabase Realtime Presence で“いま堂にいる人”を実データ共有する（DBには何も書かない＝
+   揮発／気配のみ・保存しない）。接続できないときは数を偽らず「常時開放」の一言に静かに退く。 */
+const SB_URL='https://dcxoouslwkfohdbacipa.supabase.co';
+const SB_KEY='sb_publishable_TVhyuQa1ewXWL6XkMgr0nQ_x8WF_3F8';   /* 公開前提の publishable キー */
+const SB_CHANNEL='zaundo-hall';
 const presence = (() => {
   const D2R=Math.PI/180, rand=(a,b)=>a+Math.random()*(b-a);
-  /* [latMin,latMax, lngMin,lngMax, 重み（おおよその実践者の多さ）] ＝ おおまかな大陸 */
+  /* おおまかな大陸＝“地球の地”を描く淡い背景点（人ではない） */
   const REGIONS=[
     [34,58,-125,-72,14], [9,24,-104,-84,3], [-38,6,-76,-40,8], [40,60,-9,28,16],
     [-30,32,8,40,9], [14,38,35,60,6], [8,30,70,88,10], [24,45,103,142,18],
     [-8,18,96,121,6], [-40,-12,114,150,4], [52,64,42,135,5]
   ];
-  const pts=[];
-  REGIONS.forEach((r,ri)=>{ for(let i=0;i<r[4];i++){
-    pts.push({ lat:rand(r[0],r[1]), lng:rand(r[2],r[3]), ph:Math.random()*6.283, reg:ri, f:0 }); } });
-  let wander=0;
+  const land=[];
+  REGIONS.forEach(r=>{ for(let i=0;i<r[4];i++) land.push({ lat:rand(r[0],r[1]), lng:rand(r[2],r[3]) }); });
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  const circ=(a,b)=>{ let d=Math.abs(a-b)%24; return d>12?24-d:d; };
-  const bump=(h,c,w)=>Math.max(0,1-circ(h,c)/w);
-  function utcH(){ const d=new Date(); return d.getUTCHours()+d.getUTCMinutes()/60; }
-  /* その経度の現地時刻が、夜明け（〜6時）か夕暮れ（〜20時）の坐りやすい刻なら灯る */
-  function factor(lng,uh){ let h=(uh+lng/15)%24; if(h<0)h+=24; return Math.max(bump(h,6.2,2.0),bump(h,20.2,2.4))*0.9; }
+  /* 匿名・おおまかな現在地（タイムゾーンから推定。位置情報APIは使わない＝企画書「位置はおおまかに」） */
+  function myPos(){
+    let lng=(-new Date().getTimezoneOffset())/4 + rand(-5,5);
+    lng=Math.max(-179,Math.min(179,lng));
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+    const reg=(tz.split('/')[0])||'';
+    const LAT={Asia:32,Europe:50,America:38,Africa:4,Australia:-30,Pacific:-8,Atlantic:38,Indian:-12,Antarctica:-72,Arctic:72};
+    const lat=(LAT[reg]!=null?LAT[reg]:24)+rand(-9,9);
+    return { lat, lng };
+  }
+
+  /* ---- live presence（実データ・Supabase Realtime） ---- */
+  let client=null, channel=null, live=false, members=[], me=null, sitting=false, onChange=()=>{};
+  const myId='k'+Math.random().toString(36).slice(2,9);
+  function sync(){
+    try{ members=Object.values(channel.presenceState()).flat()
+      .map(m=>({ lat:+m.lat, lng:+m.lng, sitting:!!m.sitting })); }
+    catch(e){ members=[]; }
+    onChange();
+  }
+  function track(){ return channel && channel.track({ lat:me.lat, lng:me.lng, sitting }); }
+  async function connect(){
+    try{
+      const mod=await import('https://esm.sh/@supabase/supabase-js@2');
+      me=myPos();
+      client=mod.createClient(SB_URL, SB_KEY, { realtime:{ params:{ eventsPerSecond:2 } } });
+      channel=client.channel(SB_CHANNEL, { config:{ presence:{ key:myId } } });
+      channel.on('presence', { event:'sync' }, sync);
+      channel.subscribe(async (st)=>{ if(st==='SUBSCRIBED'){ live=true; await track(); sync(); } });
+    }catch(e){ live=false; onChange(); }
+  }
+  function setSitting(b){ sitting=b; if(live){ try{ track(); }catch(e){} } }
+  function leave(){ try{ channel && channel.untrack(); client && client.removeChannel(channel); }catch(e){} }
 
   function compute(){
-    const uh=utcH(); let active=0; const regs=new Set();
-    for(const p of pts){ p.f=factor(p.lng,uh); if(p.f>0.22){ active++; regs.add(p.reg); } }
-    const people=Math.max(8, Math.round(active*1.7 + wander));
-    const countries=Math.max(3, Math.round(regs.size*1.8 + (people>42?3:0)));
-    return { people, countries };
+    const people=members.length, sit=members.filter(m=>m.sitting).length;
+    const regs=new Set(members.map(m=>Math.round((m.lng+180)/30)+(m.lat>=0?'n':'s')));
+    return { live, people, sitting:sit, countries:regs.size };
   }
-  function drift(){ wander += rand(-1,1); wander=Math.max(-4,Math.min(7,wander)); }
 
+  /* ---- globe ---- */
   let raf=null, cv=null, x=null, rot=0, last=0;
   function startGlobe(canvas){
     cv=canvas; x=canvas.getContext('2d'); cancelAnimationFrame(raf); last=performance.now();
@@ -549,6 +576,10 @@ const presence = (() => {
     raf=requestAnimationFrame(loop);
   }
   function stopGlobe(){ cancelAnimationFrame(raf); raf=null; }
+  function project(lat,lng,cx,cy,R){
+    const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
+    return { sx:cx+R*cl*Math.sin(lo), sy:cy-R*Math.sin(la), z };
+  }
   function draw(t){
     const W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.42;
     x.clearRect(0,0,W,H);
@@ -556,30 +587,29 @@ const presence = (() => {
     g.addColorStop(0,'rgba(64,84,100,0.34)'); g.addColorStop(0.7,'rgba(28,40,54,0.30)'); g.addColorStop(1,'rgba(12,18,26,0.04)');
     x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.fillStyle=g; x.fill();
     x.lineWidth=1; x.strokeStyle='rgba(180,200,210,0.10)'; x.stroke();
-    for(const p of pts){
-      const la=p.lat*D2R, lo=p.lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
-      if(z<=0) continue;
-      const sx=cx+R*cl*Math.sin(lo), sy=cy-R*Math.sin(la), depth=0.45+0.55*z;
-      if(p.f>0.22){
-        const tw=reduced?1:(0.72+0.28*Math.sin(t*0.0024+p.ph));
-        const a=Math.min(1,p.f*tw*depth);
-        x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
-        x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=6;
-        x.arc(sx,sy,1.5+1.6*p.f,0,6.2832); x.fill();
-      } else {
-        x.beginPath(); x.shadowBlur=0; x.fillStyle='rgba(150,170,180,'+(0.05+0.10*depth).toFixed(3)+')';
-        x.arc(sx,sy,0.9,0,6.2832); x.fill();
-      }
-    }
+    /* 地球の地（淡い背景点・人ではない） */
+    x.shadowBlur=0;
+    for(const p of land){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
+      const depth=0.45+0.55*q.z;
+      x.beginPath(); x.fillStyle='rgba(150,170,180,'+(0.05+0.10*depth).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
+    /* いまこの堂にいる人（実データ・金の灯り。坐っている人はより明るく） */
+    for(const m of members){ const q=project(m.lat,m.lng,cx,cy,R); if(q.z<=0) continue;
+      const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0024+(m.lng+m.lat)));
+      const a=Math.min(1,(m.sitting?0.95:0.62)*tw*depth);
+      x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
+      x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=m.sitting?10:5;
+      x.arc(q.sx,q.sy,m.sitting?2.4:1.6,0,6.2832); x.fill(); }
     x.shadowBlur=0;
   }
-  return { compute, drift, startGlobe, stopGlobe };
+  return { connect, setSitting, leave, compute, startGlobe, stopGlobe, onChange:(f)=>{onChange=f;} };
 })();
 function presenceText(){
   const p=presence.compute(), nf=new Intl.NumberFormat(lang==='ja'?'ja-JP':'en-US');
+  if(!p.live) return lang==='ja' ? '世界の坐雲堂は、いつでも開いています' : 'The hall is open — anywhere, anytime';
+  if(p.people<=1) return lang==='ja' ? 'いま この堂にいるのは あなたひとり' : 'You are the only one in the hall right now';
   return lang==='ja'
-    ? `いま ${nf.format(p.countries)} の国と地域で、${nf.format(p.people)}人が坐っています`
-    : `${nf.format(p.people)} people across ${nf.format(p.countries)} places are sitting now`;
+    ? `いま ${nf.format(p.countries)} の地域から、${nf.format(p.people)}人がこの堂に`
+    : `${nf.format(p.people)} people from ${nf.format(p.countries)} regions are in the hall now`;
 }
 function updatePresence(){ const txt=presenceText();
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
@@ -590,6 +620,7 @@ function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
+  presence.setSitting(true);
   if(soundOn) ambient.start(sel.scene);
   if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
 }
@@ -619,9 +650,9 @@ function startIncense(durMs){
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ $('#status').classList.remove('show'); bell(0,0.9);
+function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); ambient.stop(0.4);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
@@ -643,8 +674,10 @@ const timeRange=$('#timeRange'), timeNum=$('#timeNum');
 timeRange.value=sel.time; timeNum.textContent=sel.time;
 timeRange.oninput=()=>{ sel.time=+timeRange.value; timeNum.textContent=sel.time; save(); };
 
-/* 人の出入りをそっと反映（数だけ静かに揺れる・通知はしない） */
-setInterval(()=>{ presence.drift(); updatePresence(); }, 5200);
+/* 在室の気配を実データで（入退室は通知せず、数だけ静かに反映） */
+presence.onChange(updatePresence);
+presence.connect();
+window.addEventListener('pagehide', ()=>presence.leave());
 
 applyLang();
 </script>
