@@ -6,121 +6,134 @@
 <title>一息 — Issoku｜オンライン座禅寺・坐雲堂</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;600&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;600&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;500;600&display=swap"></noscript>
 <style>
   :root{
-    --ink:#15120e; --paper:#f3ede0; --paper2:#e7dfcc; --gold:#b8924a; --vermilion:#b5392c;
-    --smoke:#cfc8ba; --ember:#e0631f; --muted:#8a8170;
+    --bg:#14110d; --ink:#171310; --paper:#efe9dc; --paper-2:#d9cfba; --soft:#b6aa92;
+    --gold:#c2a35e; --gold-2:#9a834d; --vermilion:#b04a39; --muted:#8a8170; --smoke:214,208,196;
     --serif:'Shippori Mincho',serif; --brush:'Yuji Boku','Shippori Mincho',serif;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  body{
-    font-family:var(--serif); color:var(--ink); background:#0e0c09;
-    -webkit-font-smoothing:antialiased; overflow:hidden;
-  }
-  .app{position:fixed; inset:0; display:flex; align-items:center; justify-content:center}
-  .screen{position:absolute; inset:0; display:none; flex-direction:column;
-    align-items:center; justify-content:center; padding:24px; text-align:center;
-    opacity:0; transition:opacity .9s ease}
+  body{font-family:var(--serif); color:var(--paper); background:var(--bg);
+    -webkit-font-smoothing:antialiased; overflow:hidden; font-weight:400}
+  .app{position:fixed; inset:0}
+  .screen{position:absolute; inset:0; display:none; flex-direction:column; align-items:center;
+    justify-content:center; padding:28px; text-align:center; opacity:0; transition:opacity 1.4s ease}
   .screen.on{display:flex; opacity:1}
 
   /* top bar */
   .bar{position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between;
-    align-items:center; padding:14px 18px; z-index:20; pointer-events:none}
-  .bar button{pointer-events:auto}
-  .lang, .exit{background:rgba(243,237,224,.14); color:var(--paper); border:1px solid rgba(243,237,224,.28);
-    border-radius:999px; padding:6px 14px; font-family:var(--serif); font-size:14px; cursor:pointer; backdrop-filter:blur(4px)}
+    align-items:center; padding:16px 20px; z-index:30; pointer-events:none}
+  .bar button{pointer-events:auto; background:transparent; color:var(--paper); opacity:.55;
+    border:1px solid rgba(239,233,220,.3); border-radius:999px; padding:6px 14px;
+    font-family:var(--serif); font-size:13px; letter-spacing:.12em; cursor:pointer; transition:opacity .4s}
+  .bar button:hover{opacity:1}
   .exit{display:none}
 
-  /* splash */
-  #splash{background:radial-gradient(circle at 50% 38%, #2a2118 0%, #14110c 70%, #0d0b08 100%)}
-  .plaque{width:min(78vw,460px); margin-bottom:6px; filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+  /* SPLASH */
+  #splash{background:
+    radial-gradient(120% 90% at 50% 32%, #2a2118 0%, #181410 55%, #100d09 100%)}
+  .breathe{animation:breathe 9s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.96} 50%{transform:scale(1.025);opacity:1}}
+  .plaque{width:min(64vw,300px); margin-bottom:30px;
+    filter:drop-shadow(0 14px 36px rgba(0,0,0,.45))}
   .plaque svg,.slot svg{width:100%;height:auto;display:block}
-  .brandk{font-family:var(--brush); font-size:clamp(56px,12vw,104px); color:var(--paper);
-    line-height:1; margin:10px 0 2px; letter-spacing:.06em}
-  .brandsub{color:var(--gold); letter-spacing:.5em; font-size:13px; margin-bottom:4px}
-  .tagline{color:#cdbfa6; font-size:14px; opacity:.8; margin:0 0 30px}
-  .enter{font-family:var(--serif); font-size:18px; color:var(--ink); background:var(--paper);
-    border:none; border-radius:999px; padding:14px 38px; cursor:pointer; transition:transform .3s, background .3s}
-  .enter:hover{transform:translateY(-2px); background:#fff}
+  .brandk{font-family:var(--brush); font-size:clamp(52px,11vw,92px); line-height:1;
+    margin:0; letter-spacing:.08em; color:var(--paper)}
+  .brandsub{color:var(--gold); letter-spacing:.62em; font-size:12px; margin:14px 0 0; padding-left:.62em}
+  .tagline{color:var(--soft); font-size:14.5px; line-height:1.9; opacity:.85; margin:26px 0 40px; max-width:300px; font-weight:400}
+  .enter{font-family:var(--serif); font-size:16px; letter-spacing:.18em; color:var(--paper);
+    background:transparent; border:1px solid rgba(239,233,220,.45); border-radius:999px;
+    padding:15px 40px; cursor:pointer; transition:all .5s ease}
+  .enter:hover{background:var(--paper); color:var(--ink); border-color:var(--paper); letter-spacing:.24em}
 
-  /* setup */
-  #setup{background:linear-gradient(160deg,#1b1712,#100d0a); color:var(--paper); overflow-y:auto; justify-content:flex-start; padding-top:64px}
-  #setup h2{font-family:var(--brush); font-weight:400; font-size:30px; color:var(--paper); margin:8px 0 2px}
-  .group{width:min(92vw,560px); margin:16px 0}
-  .glabel{font-size:13px; color:var(--gold); letter-spacing:.25em; margin-bottom:10px; text-align:left}
+  /* SETUP */
+  #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
+  #setup .title{font-family:var(--brush); font-size:30px; color:var(--paper); margin:0 0 4px; letter-spacing:.08em}
+  #setup .title small{display:block; font-family:var(--serif); font-size:11px; letter-spacing:.5em; color:var(--gold); margin-top:8px; padding-left:.5em}
+  .group{width:min(92vw,540px); margin:26px 0 0}
+  .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:14px; text-align:center; opacity:.9}
   .opts{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
-  .opt{flex:1 1 auto; min-width:96px; background:rgba(243,237,224,.06); color:var(--paper);
-    border:1px solid rgba(243,237,224,.2); border-radius:14px; padding:14px 12px; cursor:pointer;
-    font-family:var(--serif); font-size:15px; transition:all .25s}
-  .opt small{display:block; opacity:.6; font-size:12px; margin-top:3px}
-  .opt:hover{border-color:rgba(243,237,224,.5)}
+  .opt{flex:0 1 auto; min-width:104px; background:rgba(239,233,220,.04); color:var(--paper);
+    border:1px solid rgba(239,233,220,.16); border-radius:14px; padding:14px 16px; cursor:pointer;
+    font-family:var(--serif); font-size:15px; letter-spacing:.04em; transition:all .35s ease}
+  .opt small{display:block; opacity:.5; font-size:11.5px; margin-top:4px; letter-spacing:.06em}
+  .opt:hover{border-color:rgba(239,233,220,.42); background:rgba(239,233,220,.07)}
   .opt.sel{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+  .opt.sel small{opacity:.55}
 
   /* time slider */
-  .timewrap{width:min(86vw,420px); margin:4px auto 0}
-  .timeval{font-family:var(--brush); font-size:48px; color:var(--paper); line-height:1; text-align:center}
-  .timeunit{font-family:var(--serif); font-size:18px; color:var(--gold); margin-left:8px}
-  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:4px; margin-top:18px;
-    border-radius:2px; background:rgba(243,237,224,.22); outline:none; cursor:pointer}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:26px; height:26px; border-radius:50%;
-    background:var(--gold); border:3px solid #1b1712; cursor:pointer}
-  input[type=range]::-moz-range-thumb{width:26px; height:26px; border-radius:50%;
-    background:var(--gold); border:3px solid #1b1712; cursor:pointer}
-  .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:8px}
+  .timewrap{width:min(86vw,400px); margin:2px auto 0}
+  .timeval{font-family:var(--brush); font-size:52px; color:var(--paper); line-height:1; text-align:center; letter-spacing:.04em}
+  .timeunit{font-family:var(--serif); font-size:16px; color:var(--gold); margin-left:10px; letter-spacing:.1em}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin-top:22px;
+    border-radius:2px; background:rgba(239,233,220,.2); outline:none; cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; border-radius:50%;
+    background:var(--gold); border:4px solid #1a1610; cursor:pointer; box-shadow:0 0 0 1px rgba(194,163,94,.4)}
+  input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:50%;
+    background:var(--gold); border:4px solid #1a1610; cursor:pointer}
+  .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:10px; letter-spacing:.05em}
 
-  .begin{margin:26px 0 50px; font-size:18px; color:var(--ink); background:var(--gold);
-    border:none; border-radius:999px; padding:14px 44px; cursor:pointer; font-family:var(--serif)}
-  .begin:hover{background:#c9a259}
+  .begin{margin:40px 0 20px; font-family:var(--serif); font-size:16px; letter-spacing:.2em; color:var(--ink);
+    background:var(--gold); border:none; border-radius:999px; padding:15px 48px; cursor:pointer; transition:all .4s}
+  .begin:hover{background:#d2b572; letter-spacing:.26em}
 
-  /* session */
-  #session{justify-content:center}
-  #scene{position:absolute; inset:0; z-index:-1; transition:background 1.2s ease}
-  .scene-honden{background:radial-gradient(circle at 50% 42%, #4a3a28, #1c140d 75%)}
-  .scene-kare{background:linear-gradient(165deg,#e6dfce,#cbc1aa)}
-  .scene-umi{background:linear-gradient(180deg,#21405b 0%,#3d6178 55%,#88a7b6 56%,#a9c0cb 100%)}
-  .scene-tsuki{background:radial-gradient(circle at 72% 28%, #2a3a63 0%, #131d3a 55%, #0a1124 100%)}
-  .scene-neko{background:linear-gradient(165deg,#e0d2b2,#bda078)}
-  .scene-cho{background:linear-gradient(160deg,#efe7d6,#d9cdb4)}
-  .moon{position:absolute; top:14%; right:20%; width:90px; height:90px; border-radius:50%;
-    background:#f3edda; box-shadow:0 0 60px 12px rgba(243,237,218,.35); display:none}
+  /* SESSION */
+  #session{justify-content:center; padding:0}
+  #scene{position:absolute; inset:0; z-index:-1; transition:background 1.6s ease}
+  #scene::after{content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(130% 100% at 50% 45%, transparent 52%, rgba(0,0,0,.32) 100%)}
+  .scene-honden{background:radial-gradient(110% 90% at 50% 40%, #4a3a28, #221913 70%, #14100b 100%)}
+  .scene-kare{background:linear-gradient(165deg,#e7e0cf 0%,#d3c9b2 60%,#c3b89f 100%)}
+  .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
+  .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
+  .scene-neko{background:linear-gradient(168deg,#e3d6b8 0%,#c9ad84 100%)}
+  .scene-cho{background:linear-gradient(165deg,#efe7d6 0%,#dccfb6 100%)}
+  .moon{position:absolute; top:13%; right:19%; width:84px; height:84px; border-radius:50%;
+    background:#f4eeda; box-shadow:0 0 70px 16px rgba(244,238,218,.32); display:none}
   .scene-tsuki .moon{display:block}
-  .slot{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); display:none;
-    width:min(70vw,300px)}
-  .scene-cho .slot{display:block}
+  .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
+  .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
 
-  /* incense */
-  .censer{position:relative; display:flex; flex-direction:column; align-items:center; z-index:2}
-  .smoke{position:absolute; bottom:62%; left:50%; width:40px; height:140px; transform:translateX(-50%); pointer-events:none}
-  .incense-wrap{width:60px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
-  .stick{width:6px; background:linear-gradient(180deg,#8a7252,#6f5a3f); border-radius:3px; position:relative; transition:height .25s linear}
-  .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:10px; height:10px;
-    border-radius:50%; background:var(--ember); box-shadow:0 0 14px 4px rgba(224,99,43,.6)}
-  .bowl{width:120px; height:26px; background:#2b2723; border-radius:0 0 60px 60px; margin-top:-4px}
-  .bowl::before{content:""; display:block; width:120px; height:14px; background:#3a342d; border-radius:50%; transform:translateY(-7px)}
-  .status{position:absolute; bottom:8%; left:0; right:0; text-align:center; color:rgba(243,237,224,.75);
-    font-size:15px; letter-spacing:.3em; z-index:3}
-  .scene-kare .status,.scene-cho .status,.scene-neko .status{color:rgba(40,32,22,.6)}
+  /* incense — tucked into the corner, understated */
+  .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
+    display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
+  .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
+  .smoke{position:absolute; left:50%; bottom:70px; transform:translateX(-50%); width:140px; height:300px; pointer-events:none}
+  .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
+  .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
+    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55)}
+  .bowl{width:96px; height:20px; background:#2a2620; border-radius:0 0 50px 50px; margin-top:-3px}
+  .bowl::before{content:""; display:block; width:96px; height:11px; background:#39342c; border-radius:50%; transform:translateY(-6px)}
+  .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
+    letter-spacing:.5em; padding-left:.5em; color:rgba(239,233,220,.7); z-index:3; opacity:0; transition:opacity 2.5s ease}
+  .status.show{opacity:1}
+  .scene-kare .status,.scene-cho .status,.scene-neko .status{color:rgba(40,32,22,.55)}
 
-  /* orientation overlay */
-  #orient{position:absolute; inset:0; background:rgba(12,10,8,.86); color:var(--paper);
-    display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; z-index:10}
-  #orient .lines{max-width:560px; font-size:clamp(16px,2.4vw,20px); line-height:2.1; min-height:120px}
-  #orient .lines b{font-family:var(--brush); font-weight:400; color:var(--gold); font-size:1.15em}
-  .obtn{margin-top:30px; background:var(--paper); color:var(--ink); border:none; border-radius:999px;
-    padding:13px 38px; font-family:var(--serif); font-size:17px; cursor:pointer}
+  /* orientation */
+  #orient{position:absolute; inset:0; background:rgba(16,13,9,.9); display:none;
+    flex-direction:column; align-items:center; justify-content:center; padding:34px; z-index:10}
+  #orient .lines{max-width:540px; font-size:clamp(17px,2.5vw,21px); line-height:2.3; min-height:120px;
+    color:var(--paper); font-weight:400; transition:opacity .6s}
+  #orient .lines b{font-family:var(--brush); font-weight:400; color:var(--gold); font-size:1.2em; letter-spacing:.05em}
+  .obtn{margin-top:36px; background:transparent; color:var(--paper); border:1px solid rgba(239,233,220,.45);
+    border-radius:999px; padding:13px 38px; font-family:var(--serif); font-size:16px; letter-spacing:.16em; cursor:pointer; transition:all .4s}
+  .obtn:hover{background:var(--paper); color:var(--ink)}
 
-  /* end */
-  #end{background:radial-gradient(circle at 50% 45%, #241c14, #100d0a)}
-  #end .ek{font-family:var(--brush); font-size:48px; color:var(--paper); margin-bottom:10px}
-  #end p{color:#cdbfa6; font-size:16px; line-height:2; max-width:420px}
-  .endbtns{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center}
-  .endbtns button{font-family:var(--serif); font-size:16px; border-radius:999px; padding:12px 30px; cursor:pointer; border:1px solid var(--paper)}
-  .again{background:var(--paper); color:var(--ink)}
-  .out{background:transparent; color:var(--paper)}
+  /* END */
+  #end{background:radial-gradient(120% 90% at 50% 42%, #241c14, #120e0a 100%)}
+  #end .ek{font-family:var(--brush); font-size:46px; color:var(--paper); margin-bottom:18px; letter-spacing:.1em}
+  #end p{color:var(--soft); font-size:15.5px; line-height:2.2; max-width:380px; white-space:pre-line}
+  .endbtns{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap; justify-content:center}
+  .endbtns button{font-family:var(--serif); font-size:15px; letter-spacing:.16em; border-radius:999px;
+    padding:13px 32px; cursor:pointer; transition:all .4s}
+  .again{background:var(--paper); color:var(--ink); border:1px solid var(--paper)}
+  .out{background:transparent; color:var(--paper); border:1px solid rgba(239,233,220,.4)}
+  .out:hover{background:rgba(239,233,220,.1)}
 
+  @media (max-width:520px){ .censer{right:2vw; transform:scale(.66)} }
   @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
 </style>
 </head>
@@ -134,24 +147,24 @@
 
   <!-- SPLASH -->
   <section class="screen on" id="splash">
-    <div class="plaque">
+    <div class="plaque breathe">
       <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
-        <rect x="24" y="12" width="632" height="392" rx="3" fill="#f3ede0" stroke="#ddd6c8" stroke-width="1"/>
-        <text x="208" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">調</text>
-        <text x="470" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">息</text>
-        <rect x="600" y="346" width="34" height="34" rx="4" fill="#b5392c"/>
-        <circle cx="617" cy="363" r="10" fill="none" stroke="#f3ede0" stroke-width="2.6"/>
+        <rect x="24" y="12" width="632" height="392" rx="3" fill="#efe9dc" stroke="#d8cdb6" stroke-width="1"/>
+        <text x="208" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">調</text>
+        <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
+        <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
+        <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
       </svg>
     </div>
-    <div class="brandk">一息</div>
+    <h1 class="brandk">一息</h1>
     <div class="brandsub">ISSOKU</div>
-    <p class="tagline" data-t="tagline">24時間、世界のどこからでも。ひと息、入れる。</p>
+    <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
   </section>
 
   <!-- SETUP -->
   <section class="screen" id="setup">
-    <h2>坐雲堂</h2>
+    <div class="title">坐雲堂<small>THE UN-DO</small></div>
     <div class="group">
       <div class="glabel" data-t="g_posture">姿勢</div>
       <div class="opts" id="postureOpts"></div>
@@ -181,17 +194,17 @@
       <div class="moon"></div>
       <div class="slot">
         <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
-          <rect x="24" y="12" width="632" height="392" rx="3" fill="#f3ede0" stroke="#ddd6c8" stroke-width="1"/>
-          <text x="208" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">調</text>
-          <text x="470" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">息</text>
-          <rect x="600" y="346" width="34" height="34" rx="4" fill="#b5392c"/>
-          <circle cx="617" cy="363" r="10" fill="none" stroke="#f3ede0" stroke-width="2.6"/>
+          <rect x="24" y="12" width="632" height="392" rx="3" fill="#efe9dc" stroke="#d8cdb6" stroke-width="1"/>
+          <text x="208" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">調</text>
+          <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
+          <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
+          <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
         </svg>
       </div>
     </div>
     <div class="censer">
       <div class="incense-wrap">
-        <canvas class="smoke" id="smoke" width="80" height="280"></canvas>
+        <canvas class="smoke" id="smoke" width="140" height="300"></canvas>
         <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
       </div>
       <div class="bowl"></div>
@@ -221,44 +234,40 @@
 /* ---------- i18n ---------- */
 const T = {
   ja:{
-    tagline:"24時間、世界のどこからでも。ひと息、入れる。",
+    tagline:"24時間、世界のどこからでも。<br>ひと息、入れる。",
     enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
     g_orient:"オリエンテーション", begin:"はじめる",
     floor:"床座禅", floor_s:"結跏趺坐 / 半跏", chair:"椅子座禅", chair_s:"いす坐禅",
     on:"流す", off:"スキップ", min:"分",
-    sitting:"ただ、座る", begin_btn:"用意ができたら",
+    sitting:"ただ、座る", next:"次へ", ring:"鐘を鳴らす",
     endmsg:"からだを左右にやさしくゆらし、足をほぐして、合掌一礼。\nまた、いつでも。",
     again:"もう一度", out:"堂を出る",
     scenes:{honden:"本堂",kare:"枯山水",umi:"海辺の岸壁",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
   en:{
-    tagline:"Anytime, from anywhere in the world. Take one breath.",
+    tagline:"Anytime, from anywhere.<br>Take one breath.",
     enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
     g_orient:"Orientation", begin:"Begin",
     floor:"Floor", floor_s:"cross-legged", chair:"Chair", chair_s:"chair zazen",
     on:"Play", off:"Skip", min:"min",
-    sitting:"just sit", begin_btn:"When you are ready",
+    sitting:"just sit", next:"Next", ring:"Ring the bell",
     endmsg:"Gently sway side to side, loosen your legs, and bow with palms together.\nReturn anytime.",
     again:"Once more", out:"Leave the Hall",
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Sea cliff",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
   }
 };
-
-/* orientation scripts (lines) */
 const ORIENT = {
   floor:{
     ja:["お好きな座処で、楽な姿勢を。","坐布の形を整え、向きを変えて二度、合掌一礼。",
         "右の腿に左の腿をのせ、結跏趺坐を組みます。難しければ椅子でも。",
         "両肩を持ち上げ、息を吐きながらすとんと落とす。","左右にゆれて、中心を探す。",
         "目は半分、開けたまま。","——ここから、息を調えます。<b>調息</b>。",
-        "鼻から吸い、口から吐く。ゆっくり、調えていきます。",
-        "肩と耳、鼻と丹田が一直線に。"],
+        "鼻から吸い、口から吐く。ゆっくり、調えていきます。","肩と耳、鼻と丹田が一直線に。"],
     en:["Settle into your seat, at ease.","Arrange your cushion; bow twice, palms together.",
         "Left leg over right — cross-legged. A chair is fine too.",
         "Lift the shoulders, drop them as you exhale.","Sway side to side; find the center.",
         "Eyes half-open.","— Now, regulate the breath. <b>Chosoku</b>.",
-        "In through the nose, out through the mouth. Slowly settle it.",
-        "Shoulders & ears, nose & navel — in one line."]
+        "In through the nose, out through the mouth. Slowly settle it.","Shoulders & ears, nose & navel — in one line."]
   },
   chair:{
     ja:["椅子に浅く腰かけ、背もたれには寄りかからない。","両足は肩幅、足の裏を床にぴたり。",
@@ -274,7 +283,7 @@ const ORIENT = {
   }
 };
 
-/* safe storage: sandboxed iframes can throw on localStorage access */
+/* ---------- safe storage ---------- */
 const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
@@ -283,25 +292,23 @@ let lang = store.get('issoku_lang') || 'ja';
 const sel = { posture:'floor', scene:'honden', time:5, orient:true };
 try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
 
-/* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
-const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none'; };
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none'; }
 
 function applyLang(){
-  const t = T[lang];
-  document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t'); if(t[k]) el.textContent=t[k]; });
+  const t=T[lang];
+  document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t');
+    if(t[k]!==undefined){ if(k==='tagline') el.innerHTML=t[k]; else el.textContent=t[k]; } });
   $('#langBtn').textContent = lang==='ja' ? 'EN' : 'あ';
   document.documentElement.lang = lang;
   buildOpts();
 }
 
-/* ---------- build setup options ---------- */
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
-
 function chip(label,sub,selected,onclick){
   const b=document.createElement('button'); b.className='opt'+(selected?' sel':'');
-  b.innerHTML = label + (sub?`<small>${sub}</small>`:''); b.onclick=onclick; return b;
+  b.innerHTML=label+(sub?`<small>${sub}</small>`:''); b.onclick=onclick; return b;
 }
 function buildOpts(){
   const t=T[lang];
@@ -316,103 +323,107 @@ function buildOpts(){
 }
 function save(){ store.set('issoku_sel',JSON.stringify(sel)); }
 
-/* ---------- audio: temple bell ---------- */
+/* ---------- temple bell ---------- */
 let ac;
-function bell(delay=0, gain=0.9){
+function bell(delay=0, gain=0.82){
   if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
   if(ac.state==='suspended') ac.resume();
   const t0 = ac.currentTime + delay;
-  /* [harmonic, gain, decay seconds] — fundamental lingers longest for a deep, slow 余韻 */
-  const partials = [[1,1,7.6],[2.0,0.45,5.6],[2.74,0.3,3.6],[3.76,0.18,2.2],[5.2,0.1,1.4]];
+  /* [harmonic, gain, decay s] — long, deep, lingering 余韻 */
+  const partials = [[1,1,9.5],[2.0,0.42,6.6],[2.74,0.27,4.2],[3.76,0.16,2.6],[5.2,0.09,1.6]];
   const out = ac.createGain(); out.gain.value = gain; out.connect(ac.destination);
   partials.forEach(([mult,g,dec])=>{
     const o=ac.createOscillator(), ge=ac.createGain();
-    o.type='sine'; o.frequency.value=160*mult;
+    o.type='sine'; o.frequency.value=158*mult;
     ge.gain.setValueAtTime(0.0001,t0);
-    ge.gain.exponentialRampToValueAtTime(g,t0+0.012);
+    ge.gain.exponentialRampToValueAtTime(g,t0+0.015);
     ge.gain.exponentialRampToValueAtTime(0.0001,t0+dec);
     o.connect(ge); ge.connect(out); o.start(t0); o.stop(t0+dec+0.2);
   });
 }
-/* 鐘三声：約3.6秒間隔、余韻を重ねながらゆっくり */
-function ring3(then){ bell(0); bell(3.6); bell(7.2); setTimeout(then, 10600); }
+/* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
+function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
 
-/* ---------- smoke animation ---------- */
+/* ---------- smoke: gentle, swaying 余烟 ---------- */
 let smokeRAF, smokeOn=false;
 function startSmoke(){
-  const c=$('#smoke'), x=c.getContext('2d'); smokeOn=true;
-  const puffs=[]; let last=performance.now();
+  const c=$('#smoke'); const x=c.getContext('2d'); smokeOn=true;
+  const W=c.width, H=c.height; const parts=[]; let last=performance.now(), acc=0;
   function loop(now){
     if(!smokeOn) return;
-    if(now-last>180){ puffs.push({y:c.height,o:0.5,x:c.width/2,t:0}); last=now; }
-    x.clearRect(0,0,c.width,c.height);
-    puffs.forEach(p=>{ p.t+=0.016; p.y-=0.5; p.o-=0.0025; p.x=c.width/2+Math.sin(p.t*2+p.y*0.02)*9;
-      if(p.o>0){ x.beginPath(); x.fillStyle=`rgba(207,200,186,${Math.max(0,p.o)})`;
-        x.arc(p.x,p.y,2.4,0,7); x.fill(); } });
-    for(let i=puffs.length-1;i>=0;i--) if(puffs[i].o<=0||puffs[i].y<0) puffs.splice(i,1);
+    const dt=Math.min(50, now-last); last=now; acc+=dt;
+    if(acc>150){ acc=0; parts.push({t:0, x0:W/2+(Math.random()*6-3), ph:Math.random()*6.28,
+      sway:10+Math.random()*8, life:5200+Math.random()*1800}); }
+    x.clearRect(0,0,W,H); x.shadowBlur=12;
+    for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.t+=dt;
+      const k=p.t/p.life; if(k>=1){ parts.splice(i,1); continue; }
+      const y = H-8 - k*(H-20);
+      const sway = p.sway*(0.25+k*1.1);
+      const px = p.x0 + Math.sin(p.ph + k*5.2)*sway + Math.sin(p.ph*1.7 + k*2.6)*sway*0.35;
+      const r = 1.8 + k*8;
+      const a = Math.sin(Math.min(1,k*1.25)*Math.PI)*0.30;
+      const col='rgba(214,208,196,'+a.toFixed(3)+')';
+      x.beginPath(); x.fillStyle=col; x.shadowColor=col;
+      x.arc(px,y,r,0,6.2832); x.fill();
+    }
     smokeRAF=requestAnimationFrame(loop);
   }
   smokeRAF=requestAnimationFrame(loop);
 }
-function stopSmoke(){ smokeOn=false; cancelAnimationFrame(smokeRAF); }
+function stopSmoke(){ smokeOn=false; cancelAnimationFrame(smokeRAF);
+  const c=$('#smoke'); if(c) c.getContext('2d').clearRect(0,0,c.width,c.height); }
 
-/* ---------- session ---------- */
+/* ---------- session flow ---------- */
 let timerRAF, timerActive=false;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
-  $('#status').textContent='';
+  $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
-  if(sel.orient){ runOrient(()=> beginSitting()); }
-  else { beginSitting(); }
+  if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
 }
 function runOrient(done){
-  const lines = ORIENT[sel.posture][lang];
-  const box=$('#orientLines'), wrap=$('#orient'), btn=$('#orientNext');
+  const lines=ORIENT[sel.posture][lang], box=$('#orientLines'), wrap=$('#orient'), btn=$('#orientNext');
   wrap.style.display='flex'; let i=0;
-  function render(){ box.innerHTML = lines[i]; btn.textContent = (i<lines.length-1)
-     ? (lang==='ja'?'次へ':'Next') : (lang==='ja'?'鐘を鳴らす':'Ring the bell'); }
+  function render(){ box.style.opacity=0;
+    setTimeout(()=>{ box.innerHTML=lines[i];
+      btn.textContent = (i<lines.length-1)? T[lang].next : T[lang].ring; box.style.opacity=1; }, 260); }
   render();
-  btn.onclick=()=>{ i++; if(i<lines.length){ render(); }
-    else { wrap.style.display='none'; done(); } };
+  btn.onclick=()=>{ i++; if(i<lines.length){ render(); } else { wrap.style.display='none'; done(); } };
 }
 function beginSitting(){
   if(ac && ac.state==='suspended') ac.resume();
-  const t=T[lang];
-  $('#status').textContent = t.sitting;
+  $('#status').textContent=T[lang].sitting;
+  setTimeout(()=>$('#status').classList.add('show'), 400);
   startSmoke();
   ring3(()=> startIncense(sel.time*60*1000));
 }
 function startIncense(durMs){
-  const stick=$('#stick'); const full=280; const start=performance.now();
-  timerActive=true;
-  function loop(now){
-    if(!timerActive) return;
+  const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
+  function loop(now){ if(!timerActive) return;
     let p=(now-start)/durMs; if(p>1)p=1;
-    stick.style.height = (full*(1-p))+'px';
+    stick.style.height=(full*(1-p))+'px';
     if(p>=1){ timerActive=false; endSession(); return; }
     timerRAF=requestAnimationFrame(loop);
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){
-  stopSmoke(); bell(0,1);
-  setTimeout(()=>{ show('end'); }, 2600);
-}
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); $('#orient').style.display='none'; show('splash'); }
+function endSession(){ $('#status').classList.remove('show'); bell(0,0.9);
+  setTimeout(()=>{ stopSmoke(); show('end'); }, 4000); }
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke();
+  $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
-$('#langBtn').onclick=()=>{ lang = lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
+$('#langBtn').onclick=()=>{ lang= lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
 $('#enterBtn').onclick=()=>{ if(!ac){ try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} } show('setup'); };
 $('#beginBtn').onclick=enterSession;
 $('#exitBtn').onclick=abort;
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
 $('#outBtn').onclick=()=>{ $('#stick').style.height='280px'; show('splash'); };
 
-/* time slider (1–60 min, no direct number entry) */
 sel.time = Math.min(60, Math.max(1, parseInt(sel.time,10)||5));
 const timeRange=$('#timeRange'), timeNum=$('#timeNum');
-timeRange.value = sel.time; timeNum.textContent = sel.time;
-timeRange.oninput=()=>{ sel.time = +timeRange.value; timeNum.textContent = sel.time; save(); };
+timeRange.value=sel.time; timeNum.textContent=sel.time;
+timeRange.oninput=()=>{ sel.time=+timeRange.value; timeNum.textContent=sel.time; save(); };
 
 applyLang();
 </script>
