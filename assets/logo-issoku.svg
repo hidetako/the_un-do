@@ -1,0 +1,9 @@
+<svg width="680" height="360" viewBox="0 0 680 360" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>一息（Issoku）ロゴ</title>
+<desc>円相（開いた一円相）を一本の息／煙が通り抜ける、一息のロゴ。円＝空・世界、煙＝ひと息。墨色は #141414（暗背景用に #f2ede2 へ差し替え可）。</desc>
+<g transform="rotate(-42 340 120)"><circle cx="340" cy="120" r="68" fill="none" stroke="#141414" stroke-width="10" stroke-linecap="round" stroke-dasharray="372 68"/></g>
+<path d="M340 196 C 353 168, 327 150, 345 122 C 359 100, 333 84, 346 58" fill="none" stroke="#9a8f7d" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/>
+<circle cx="340" cy="198" r="3.4" fill="#e0631f"/>
+<text x="340" y="274" text-anchor="middle" font-family="'Yuji Boku','Yu Mincho','Hiragino Mincho ProN','MS Mincho',serif" font-size="60" fill="#141414">一息</text>
+<text x="340" y="306" text-anchor="middle" font-family="sans-serif" font-size="15" letter-spacing="3" fill="#6b6358">ISSOKU · one breath</text>
+</svg>

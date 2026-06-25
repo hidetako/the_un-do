@@ -1,0 +1,20 @@
+<svg width="680" height="492" viewBox="0 0 680 492" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>調息 — 一息／坐雲堂 コンセプト扁額</title>
+<desc>オリジナルの筆書きによる「調息（ちょうそく）」の扁額。下に一本の線香と、立ちのぼる一筋の煙。常楽寺の筆跡は複製していない独自制作の第一案。</desc>
+<rect x="128" y="38" width="424" height="166" rx="7" fill="#33251a"/>
+<rect x="128" y="38" width="424" height="166" rx="7" fill="none" stroke="#5d4a32" stroke-width="1"/>
+<rect x="138" y="48" width="404" height="146" rx="5" fill="#6b5436"/>
+<rect x="148" y="58" width="384" height="126" rx="3" fill="#15120e"/>
+<rect x="158" y="68" width="364" height="106" rx="2" fill="none" stroke="#8a7449" stroke-width="1" opacity="0.6"/>
+<text x="271" y="156" text-anchor="middle" font-family="'Yu Mincho','YuMincho','Hiragino Mincho ProN','MS Mincho',serif" font-size="98" fill="#ece3cc">調</text>
+<text x="411" y="156" text-anchor="middle" font-family="'Yu Mincho','YuMincho','Hiragino Mincho ProN','MS Mincho',serif" font-size="98" fill="#ece3cc">息</text>
+<rect x="487" y="140" width="30" height="30" rx="4" fill="#b5392c"/>
+<circle cx="502" cy="155" r="8.5" fill="none" stroke="#f4eede" stroke-width="2.4"/>
+<path d="M338 250 C 350 236, 328 224, 343 211" fill="none" stroke="#d8d2c6" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
+<line x1="340" y1="426" x2="340" y2="252" stroke="#6f5f49" stroke-width="3" stroke-linecap="round"/>
+<circle cx="340" cy="251" r="4.5" fill="#e0631f"/>
+<circle cx="340" cy="251" r="2" fill="#ffba7a"/>
+<path d="M296 432 Q 340 472 384 432 Z" fill="#2b2723"/>
+<ellipse cx="340" cy="432" rx="44" ry="9" fill="#3a342d"/>
+<text x="340" y="466" text-anchor="middle" font-family="'Yu Mincho','YuMincho','Hiragino Mincho ProN','MS Mincho',serif" font-size="13" fill="#9a8f7d">調息 ・ ちょうそく ・ regulating the breath</text>
+</svg>

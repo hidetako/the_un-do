@@ -1,0 +1,33 @@
+<svg width="680" height="410" viewBox="0 0 680 410" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>調息 — 白紙に墨書（飛白・画面いっぱい）</title>
+<desc>白い和紙に乾いた筆で画面いっぱいに揮毫した「調息」。墨が激しく掠れて白く割れる飛白（かすれ）。独自制作。</desc>
+<style>@import url('https://fonts.googleapis.com/css2?family=Yuji+Boku&display=swap');.k{font-family:'Yuji Boku','Yu Mincho','Hiragino Mincho ProN','MS Mincho',serif;}</style>
+<defs><clipPath id="ink2"><text x="208" y="302" text-anchor="middle" class="k" font-size="258">調</text><text x="470" y="302" text-anchor="middle" class="k" font-size="258">息</text></clipPath></defs>
+<rect x="24" y="12" width="632" height="392" rx="2" fill="#f8f5ee" stroke="#ddd6c8" stroke-width="1"/>
+<text x="208" y="302" text-anchor="middle" class="k" font-size="258" fill="#141414" stroke="#141414" stroke-width="3" paint-order="stroke">調</text>
+<text x="470" y="302" text-anchor="middle" class="k" font-size="258" fill="#141414" stroke="#141414" stroke-width="3" paint-order="stroke">息</text>
+<g clip-path="url(#ink2)" stroke="#f8f5ee" stroke-linecap="round" fill="none">
+<line x1="120" y1="120" x2="300" y2="118" stroke-width="1.5" opacity="0.5"/><line x1="380" y1="120" x2="470" y2="118" stroke-width="1.5" opacity="0.45"/>
+<line x1="100" y1="134" x2="340" y2="132" stroke-width="1.5" opacity="0.6"/><line x1="370" y1="134" x2="500" y2="132" stroke-width="1.5" opacity="0.55"/>
+<line x1="110" y1="148" x2="345" y2="146" stroke-width="2" opacity="0.65"/><line x1="375" y1="148" x2="510" y2="146" stroke-width="2" opacity="0.6"/>
+<line x1="95" y1="162" x2="350" y2="160" stroke-width="2" opacity="0.7"/><line x1="368" y1="162" x2="520" y2="160" stroke-width="2" opacity="0.65"/>
+<line x1="105" y1="176" x2="340" y2="174" stroke-width="2.5" opacity="0.75"/><line x1="372" y1="176" x2="515" y2="174" stroke-width="2" opacity="0.7"/>
+<line x1="90" y1="190" x2="355" y2="188" stroke-width="2.5" opacity="0.8"/><line x1="366" y1="190" x2="525" y2="188" stroke-width="2.5" opacity="0.75"/>
+<line x1="100" y1="204" x2="350" y2="202" stroke-width="3" opacity="0.85"/><line x1="370" y1="204" x2="520" y2="202" stroke-width="2.5" opacity="0.8"/>
+<line x1="95" y1="218" x2="358" y2="216" stroke-width="3" opacity="0.85"/><line x1="368" y1="218" x2="528" y2="216" stroke-width="3" opacity="0.8"/>
+<line x1="90" y1="232" x2="355" y2="230" stroke-width="3.5" opacity="0.9"/><line x1="366" y1="232" x2="525" y2="230" stroke-width="3" opacity="0.85"/>
+<line x1="100" y1="246" x2="360" y2="244" stroke-width="3.5" opacity="0.9"/><line x1="370" y1="246" x2="530" y2="244" stroke-width="3.5" opacity="0.9"/>
+<line x1="88" y1="260" x2="358" y2="258" stroke-width="4" opacity="0.95"/><line x1="366" y1="260" x2="528" y2="258" stroke-width="3.5" opacity="0.9"/>
+<line x1="95" y1="274" x2="362" y2="272" stroke-width="4" opacity="1"/><line x1="368" y1="274" x2="532" y2="272" stroke-width="4" opacity="0.95"/>
+<line x1="90" y1="288" x2="360" y2="286" stroke-width="4.5" opacity="1"/><line x1="366" y1="288" x2="530" y2="286" stroke-width="4" opacity="1"/>
+<line x1="98" y1="302" x2="360" y2="300" stroke-width="4" opacity="0.95"/><line x1="370" y1="302" x2="528" y2="300" stroke-width="4" opacity="0.95"/>
+<line x1="92" y1="316" x2="358" y2="314" stroke-width="4.5" opacity="1"/><line x1="368" y1="316" x2="530" y2="314" stroke-width="4.5" opacity="1"/>
+<line x1="100" y1="330" x2="355" y2="328" stroke-width="4" opacity="1"/><line x1="372" y1="330" x2="525" y2="328" stroke-width="4" opacity="1"/>
+<line x1="150" y1="95" x2="158" y2="350" stroke-width="1.5" opacity="0.5"/><line x1="250" y1="95" x2="256" y2="350" stroke-width="1.5" opacity="0.45"/>
+<line x1="330" y1="95" x2="334" y2="350" stroke-width="1.5" opacity="0.4"/><line x1="420" y1="95" x2="426" y2="350" stroke-width="1.5" opacity="0.5"/>
+<line x1="500" y1="95" x2="506" y2="350" stroke-width="1.5" opacity="0.45"/><line x1="560" y1="95" x2="564" y2="350" stroke-width="1.5" opacity="0.4"/>
+<line x1="120" y1="250" x2="360" y2="248" stroke-width="7" opacity="1"/><line x1="370" y1="278" x2="540" y2="276" stroke-width="7" opacity="1"/><line x1="110" y1="300" x2="300" y2="298" stroke-width="6" opacity="1"/>
+</g>
+<rect x="600" y="346" width="34" height="34" rx="4" fill="#b5392c"/>
+<circle cx="617" cy="363" r="10" fill="none" stroke="#f7f1e6" stroke-width="2.6"/>
+</svg>

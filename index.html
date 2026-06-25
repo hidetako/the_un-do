@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一息 — Issoku｜オンライン座禅寺・坐雲堂</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;600&display=swap"></noscript>
+<style>
+  :root{
+    --ink:#15120e; --paper:#f3ede0; --paper2:#e7dfcc; --gold:#b8924a; --vermilion:#b5392c;
+    --smoke:#cfc8ba; --ember:#e0631f; --muted:#8a8170;
+    --serif:'Shippori Mincho',serif; --brush:'Yuji Boku','Shippori Mincho',serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:var(--serif); color:var(--ink); background:#0e0c09;
+    -webkit-font-smoothing:antialiased; overflow:hidden;
+  }
+  .app{position:fixed; inset:0; display:flex; align-items:center; justify-content:center}
+  .screen{position:absolute; inset:0; display:none; flex-direction:column;
+    align-items:center; justify-content:center; padding:24px; text-align:center;
+    opacity:0; transition:opacity .9s ease}
+  .screen.on{display:flex; opacity:1}
+
+  /* top bar */
+  .bar{position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between;
+    align-items:center; padding:14px 18px; z-index:20; pointer-events:none}
+  .bar button{pointer-events:auto}
+  .lang, .exit{background:rgba(243,237,224,.14); color:var(--paper); border:1px solid rgba(243,237,224,.28);
+    border-radius:999px; padding:6px 14px; font-family:var(--serif); font-size:14px; cursor:pointer; backdrop-filter:blur(4px)}
+  .exit{display:none}
+
+  /* splash */
+  #splash{background:radial-gradient(circle at 50% 38%, #2a2118 0%, #14110c 70%, #0d0b08 100%)}
+  .plaque{width:min(78vw,460px); margin-bottom:6px; filter:drop-shadow(0 10px 30px rgba(0,0,0,.5))}
+  .plaque svg,.slot svg{width:100%;height:auto;display:block}
+  .brandk{font-family:var(--brush); font-size:clamp(56px,12vw,104px); color:var(--paper);
+    line-height:1; margin:10px 0 2px; letter-spacing:.06em}
+  .brandsub{color:var(--gold); letter-spacing:.5em; font-size:13px; margin-bottom:4px}
+  .tagline{color:#cdbfa6; font-size:14px; opacity:.8; margin:0 0 30px}
+  .enter{font-family:var(--serif); font-size:18px; color:var(--ink); background:var(--paper);
+    border:none; border-radius:999px; padding:14px 38px; cursor:pointer; transition:transform .3s, background .3s}
+  .enter:hover{transform:translateY(-2px); background:#fff}
+
+  /* setup */
+  #setup{background:linear-gradient(160deg,#1b1712,#100d0a); color:var(--paper); overflow-y:auto; justify-content:flex-start; padding-top:64px}
+  #setup h2{font-family:var(--brush); font-weight:400; font-size:30px; color:var(--paper); margin:8px 0 2px}
+  .group{width:min(92vw,560px); margin:16px 0}
+  .glabel{font-size:13px; color:var(--gold); letter-spacing:.25em; margin-bottom:10px; text-align:left}
+  .opts{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+  .opt{flex:1 1 auto; min-width:96px; background:rgba(243,237,224,.06); color:var(--paper);
+    border:1px solid rgba(243,237,224,.2); border-radius:14px; padding:14px 12px; cursor:pointer;
+    font-family:var(--serif); font-size:15px; transition:all .25s}
+  .opt small{display:block; opacity:.6; font-size:12px; margin-top:3px}
+  .opt:hover{border-color:rgba(243,237,224,.5)}
+  .opt.sel{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+
+  /* time slider */
+  .timewrap{width:min(86vw,420px); margin:4px auto 0}
+  .timeval{font-family:var(--brush); font-size:48px; color:var(--paper); line-height:1; text-align:center}
+  .timeunit{font-family:var(--serif); font-size:18px; color:var(--gold); margin-left:8px}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:4px; margin-top:18px;
+    border-radius:2px; background:rgba(243,237,224,.22); outline:none; cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:var(--gold); border:3px solid #1b1712; cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:26px; height:26px; border-radius:50%;
+    background:var(--gold); border:3px solid #1b1712; cursor:pointer}
+  .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:8px}
+
+  .begin{margin:26px 0 50px; font-size:18px; color:var(--ink); background:var(--gold);
+    border:none; border-radius:999px; padding:14px 44px; cursor:pointer; font-family:var(--serif)}
+  .begin:hover{background:#c9a259}
+
+  /* session */
+  #session{justify-content:center}
+  #scene{position:absolute; inset:0; z-index:-1; transition:background 1.2s ease}
+  .scene-honden{background:radial-gradient(circle at 50% 42%, #4a3a28, #1c140d 75%)}
+  .scene-kare{background:linear-gradient(165deg,#e6dfce,#cbc1aa)}
+  .scene-umi{background:linear-gradient(180deg,#21405b 0%,#3d6178 55%,#88a7b6 56%,#a9c0cb 100%)}
+  .scene-tsuki{background:radial-gradient(circle at 72% 28%, #2a3a63 0%, #131d3a 55%, #0a1124 100%)}
+  .scene-neko{background:linear-gradient(165deg,#e0d2b2,#bda078)}
+  .scene-cho{background:linear-gradient(160deg,#efe7d6,#d9cdb4)}
+  .moon{position:absolute; top:14%; right:20%; width:90px; height:90px; border-radius:50%;
+    background:#f3edda; box-shadow:0 0 60px 12px rgba(243,237,218,.35); display:none}
+  .scene-tsuki .moon{display:block}
+  .slot{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); display:none;
+    width:min(70vw,300px)}
+  .scene-cho .slot{display:block}
+
+  /* incense */
+  .censer{position:relative; display:flex; flex-direction:column; align-items:center; z-index:2}
+  .smoke{position:absolute; bottom:62%; left:50%; width:40px; height:140px; transform:translateX(-50%); pointer-events:none}
+  .incense-wrap{width:60px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
+  .stick{width:6px; background:linear-gradient(180deg,#8a7252,#6f5a3f); border-radius:3px; position:relative; transition:height .25s linear}
+  .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:10px; height:10px;
+    border-radius:50%; background:var(--ember); box-shadow:0 0 14px 4px rgba(224,99,43,.6)}
+  .bowl{width:120px; height:26px; background:#2b2723; border-radius:0 0 60px 60px; margin-top:-4px}
+  .bowl::before{content:""; display:block; width:120px; height:14px; background:#3a342d; border-radius:50%; transform:translateY(-7px)}
+  .status{position:absolute; bottom:8%; left:0; right:0; text-align:center; color:rgba(243,237,224,.75);
+    font-size:15px; letter-spacing:.3em; z-index:3}
+  .scene-kare .status,.scene-cho .status,.scene-neko .status{color:rgba(40,32,22,.6)}
+
+  /* orientation overlay */
+  #orient{position:absolute; inset:0; background:rgba(12,10,8,.86); color:var(--paper);
+    display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; z-index:10}
+  #orient .lines{max-width:560px; font-size:clamp(16px,2.4vw,20px); line-height:2.1; min-height:120px}
+  #orient .lines b{font-family:var(--brush); font-weight:400; color:var(--gold); font-size:1.15em}
+  .obtn{margin-top:30px; background:var(--paper); color:var(--ink); border:none; border-radius:999px;
+    padding:13px 38px; font-family:var(--serif); font-size:17px; cursor:pointer}
+
+  /* end */
+  #end{background:radial-gradient(circle at 50% 45%, #241c14, #100d0a)}
+  #end .ek{font-family:var(--brush); font-size:48px; color:var(--paper); margin-bottom:10px}
+  #end p{color:#cdbfa6; font-size:16px; line-height:2; max-width:420px}
+  .endbtns{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center}
+  .endbtns button{font-family:var(--serif); font-size:16px; border-radius:999px; padding:12px 30px; cursor:pointer; border:1px solid var(--paper)}
+  .again{background:var(--paper); color:var(--ink)}
+  .out{background:transparent; color:var(--paper)}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+</style>
+</head>
+<body>
+<div class="bar">
+  <button class="lang" id="langBtn">EN</button>
+  <button class="exit" id="exitBtn">✕</button>
+</div>
+
+<div class="app">
+
+  <!-- SPLASH -->
+  <section class="screen on" id="splash">
+    <div class="plaque">
+      <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
+        <rect x="24" y="12" width="632" height="392" rx="3" fill="#f3ede0" stroke="#ddd6c8" stroke-width="1"/>
+        <text x="208" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">調</text>
+        <text x="470" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">息</text>
+        <rect x="600" y="346" width="34" height="34" rx="4" fill="#b5392c"/>
+        <circle cx="617" cy="363" r="10" fill="none" stroke="#f3ede0" stroke-width="2.6"/>
+      </svg>
+    </div>
+    <div class="brandk">一息</div>
+    <div class="brandsub">ISSOKU</div>
+    <p class="tagline" data-t="tagline">24時間、世界のどこからでも。ひと息、入れる。</p>
+    <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
+  </section>
+
+  <!-- SETUP -->
+  <section class="screen" id="setup">
+    <h2>坐雲堂</h2>
+    <div class="group">
+      <div class="glabel" data-t="g_posture">姿勢</div>
+      <div class="opts" id="postureOpts"></div>
+    </div>
+    <div class="group">
+      <div class="glabel" data-t="g_scene">座処</div>
+      <div class="opts" id="sceneOpts"></div>
+    </div>
+    <div class="group">
+      <div class="glabel" data-t="g_time">時間</div>
+      <div class="timewrap">
+        <div class="timeval"><span id="timeNum">5</span><span class="timeunit" data-t="min">分</span></div>
+        <input type="range" id="timeRange" min="1" max="60" step="1" value="5" aria-label="時間（分）">
+        <div class="timeticks"><span>1</span><span>15</span><span>30</span><span>45</span><span>60</span></div>
+      </div>
+    </div>
+    <div class="group">
+      <div class="glabel" data-t="g_orient">オリエンテーション</div>
+      <div class="opts" id="orientOpts"></div>
+    </div>
+    <button class="begin" id="beginBtn" data-t="begin">はじめる</button>
+  </section>
+
+  <!-- SESSION -->
+  <section class="screen" id="session">
+    <div id="scene">
+      <div class="moon"></div>
+      <div class="slot">
+        <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
+          <rect x="24" y="12" width="632" height="392" rx="3" fill="#f3ede0" stroke="#ddd6c8" stroke-width="1"/>
+          <text x="208" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">調</text>
+          <text x="470" y="302" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="252" fill="#15120e">息</text>
+          <rect x="600" y="346" width="34" height="34" rx="4" fill="#b5392c"/>
+          <circle cx="617" cy="363" r="10" fill="none" stroke="#f3ede0" stroke-width="2.6"/>
+        </svg>
+      </div>
+    </div>
+    <div class="censer">
+      <div class="incense-wrap">
+        <canvas class="smoke" id="smoke" width="80" height="280"></canvas>
+        <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
+      </div>
+      <div class="bowl"></div>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div id="orient">
+      <div class="lines" id="orientLines"></div>
+      <button class="obtn" id="orientNext"></button>
+    </div>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="end">
+    <div class="ek">一息</div>
+    <p data-t="endmsg">からだを左右にやさしくゆらし、足をほぐして、合掌一礼。
+また、いつでも。</p>
+    <div class="endbtns">
+      <button class="again" id="againBtn" data-t="again">もう一度</button>
+      <button class="out" id="outBtn" data-t="out">堂を出る</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- i18n ---------- */
+const T = {
+  ja:{
+    tagline:"24時間、世界のどこからでも。ひと息、入れる。",
+    enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
+    g_orient:"オリエンテーション", begin:"はじめる",
+    floor:"床座禅", floor_s:"結跏趺坐 / 半跏", chair:"椅子座禅", chair_s:"いす坐禅",
+    on:"流す", off:"スキップ", min:"分",
+    sitting:"ただ、座る", begin_btn:"用意ができたら",
+    endmsg:"からだを左右にやさしくゆらし、足をほぐして、合掌一礼。\nまた、いつでも。",
+    again:"もう一度", out:"堂を出る",
+    scenes:{honden:"本堂",kare:"枯山水",umi:"海辺の岸壁",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
+  },
+  en:{
+    tagline:"Anytime, from anywhere in the world. Take one breath.",
+    enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
+    g_orient:"Orientation", begin:"Begin",
+    floor:"Floor", floor_s:"cross-legged", chair:"Chair", chair_s:"chair zazen",
+    on:"Play", off:"Skip", min:"min",
+    sitting:"just sit", begin_btn:"When you are ready",
+    endmsg:"Gently sway side to side, loosen your legs, and bow with palms together.\nReturn anytime.",
+    again:"Once more", out:"Leave the Hall",
+    scenes:{honden:"Main hall",kare:"Dry garden",umi:"Sea cliff",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
+  }
+};
+
+/* orientation scripts (lines) */
+const ORIENT = {
+  floor:{
+    ja:["お好きな座処で、楽な姿勢を。","坐布の形を整え、向きを変えて二度、合掌一礼。",
+        "右の腿に左の腿をのせ、結跏趺坐を組みます。難しければ椅子でも。",
+        "両肩を持ち上げ、息を吐きながらすとんと落とす。","左右にゆれて、中心を探す。",
+        "目は半分、開けたまま。","——ここから、息を調えます。<b>調息</b>。",
+        "鼻から吸い、口から吐く。ゆっくり、調えていきます。",
+        "肩と耳、鼻と丹田が一直線に。"],
+    en:["Settle into your seat, at ease.","Arrange your cushion; bow twice, palms together.",
+        "Left leg over right — cross-legged. A chair is fine too.",
+        "Lift the shoulders, drop them as you exhale.","Sway side to side; find the center.",
+        "Eyes half-open.","— Now, regulate the breath. <b>Chosoku</b>.",
+        "In through the nose, out through the mouth. Slowly settle it.",
+        "Shoulders & ears, nose & navel — in one line."]
+  },
+  chair:{
+    ja:["椅子に浅く腰かけ、背もたれには寄りかからない。","両足は肩幅、足の裏を床にぴたり。",
+        "坐骨に上体をのせ、骨盤をまっすぐ立てる。","背骨を一つずつ積み上げ、頭をそっとのせる。",
+        "手は法界定印、またはそのまま膝の上に。","左右にゆれて、中心を探す。",
+        "目は半分、一・五メートル先の床へ。","——ここから、息を調えます。<b>調息</b>。",
+        "鼻から、自然に。ただ出入りにまかせながら、調えていく。"],
+    en:["Sit forward on the chair; don't lean back.","Feet shoulder-width, soles flat on the floor.",
+        "Rest on your sitting bones; pelvis upright.","Stack the spine; let the head settle on top.",
+        "Hands in the cosmic mudra, or simply on your knees.","Sway side to side; find the center.",
+        "Eyes half-open, gaze ~1.5m ahead.","— Now, regulate the breath. <b>Chosoku</b>.",
+        "Through the nose, naturally. Let it come and go, and settle."]
+  }
+};
+
+/* safe storage: sandboxed iframes can throw on localStorage access */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+};
+let lang = store.get('issoku_lang') || 'ja';
+const sel = { posture:'floor', scene:'honden', time:5, orient:true };
+try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none'; };
+
+function applyLang(){
+  const t = T[lang];
+  document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t'); if(t[k]) el.textContent=t[k]; });
+  $('#langBtn').textContent = lang==='ja' ? 'EN' : 'あ';
+  document.documentElement.lang = lang;
+  buildOpts();
+}
+
+/* ---------- build setup options ---------- */
+const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
+
+function chip(label,sub,selected,onclick){
+  const b=document.createElement('button'); b.className='opt'+(selected?' sel':'');
+  b.innerHTML = label + (sub?`<small>${sub}</small>`:''); b.onclick=onclick; return b;
+}
+function buildOpts(){
+  const t=T[lang];
+  const po=$('#postureOpts'); po.innerHTML='';
+  po.append(chip(t.floor,t.floor_s,sel.posture==='floor',()=>{sel.posture='floor';save();buildOpts();}));
+  po.append(chip(t.chair,t.chair_s,sel.posture==='chair',()=>{sel.posture='chair';save();buildOpts();}));
+  const so=$('#sceneOpts'); so.innerHTML='';
+  SCENES.forEach(s=> so.append(chip(t.scenes[s],'',sel.scene===s,()=>{sel.scene=s;save();buildOpts();})));
+  const oo=$('#orientOpts'); oo.innerHTML='';
+  oo.append(chip(t.on,'',sel.orient===true,()=>{sel.orient=true;save();buildOpts();}));
+  oo.append(chip(t.off,'',sel.orient===false,()=>{sel.orient=false;save();buildOpts();}));
+}
+function save(){ store.set('issoku_sel',JSON.stringify(sel)); }
+
+/* ---------- audio: temple bell ---------- */
+let ac;
+function bell(delay=0, gain=0.9){
+  if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+  if(ac.state==='suspended') ac.resume();
+  const t0 = ac.currentTime + delay;
+  /* [harmonic, gain, decay seconds] — fundamental lingers longest for a deep, slow 余韻 */
+  const partials = [[1,1,7.6],[2.0,0.45,5.6],[2.74,0.3,3.6],[3.76,0.18,2.2],[5.2,0.1,1.4]];
+  const out = ac.createGain(); out.gain.value = gain; out.connect(ac.destination);
+  partials.forEach(([mult,g,dec])=>{
+    const o=ac.createOscillator(), ge=ac.createGain();
+    o.type='sine'; o.frequency.value=160*mult;
+    ge.gain.setValueAtTime(0.0001,t0);
+    ge.gain.exponentialRampToValueAtTime(g,t0+0.012);
+    ge.gain.exponentialRampToValueAtTime(0.0001,t0+dec);
+    o.connect(ge); ge.connect(out); o.start(t0); o.stop(t0+dec+0.2);
+  });
+}
+/* 鐘三声：約3.6秒間隔、余韻を重ねながらゆっくり */
+function ring3(then){ bell(0); bell(3.6); bell(7.2); setTimeout(then, 10600); }
+
+/* ---------- smoke animation ---------- */
+let smokeRAF, smokeOn=false;
+function startSmoke(){
+  const c=$('#smoke'), x=c.getContext('2d'); smokeOn=true;
+  const puffs=[]; let last=performance.now();
+  function loop(now){
+    if(!smokeOn) return;
+    if(now-last>180){ puffs.push({y:c.height,o:0.5,x:c.width/2,t:0}); last=now; }
+    x.clearRect(0,0,c.width,c.height);
+    puffs.forEach(p=>{ p.t+=0.016; p.y-=0.5; p.o-=0.0025; p.x=c.width/2+Math.sin(p.t*2+p.y*0.02)*9;
+      if(p.o>0){ x.beginPath(); x.fillStyle=`rgba(207,200,186,${Math.max(0,p.o)})`;
+        x.arc(p.x,p.y,2.4,0,7); x.fill(); } });
+    for(let i=puffs.length-1;i>=0;i--) if(puffs[i].o<=0||puffs[i].y<0) puffs.splice(i,1);
+    smokeRAF=requestAnimationFrame(loop);
+  }
+  smokeRAF=requestAnimationFrame(loop);
+}
+function stopSmoke(){ smokeOn=false; cancelAnimationFrame(smokeRAF); }
+
+/* ---------- session ---------- */
+let timerRAF, timerActive=false;
+function enterSession(){
+  $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
+  $('#status').textContent='';
+  show('session');
+  if(sel.orient){ runOrient(()=> beginSitting()); }
+  else { beginSitting(); }
+}
+function runOrient(done){
+  const lines = ORIENT[sel.posture][lang];
+  const box=$('#orientLines'), wrap=$('#orient'), btn=$('#orientNext');
+  wrap.style.display='flex'; let i=0;
+  function render(){ box.innerHTML = lines[i]; btn.textContent = (i<lines.length-1)
+     ? (lang==='ja'?'次へ':'Next') : (lang==='ja'?'鐘を鳴らす':'Ring the bell'); }
+  render();
+  btn.onclick=()=>{ i++; if(i<lines.length){ render(); }
+    else { wrap.style.display='none'; done(); } };
+}
+function beginSitting(){
+  if(ac && ac.state==='suspended') ac.resume();
+  const t=T[lang];
+  $('#status').textContent = t.sitting;
+  startSmoke();
+  ring3(()=> startIncense(sel.time*60*1000));
+}
+function startIncense(durMs){
+  const stick=$('#stick'); const full=280; const start=performance.now();
+  timerActive=true;
+  function loop(now){
+    if(!timerActive) return;
+    let p=(now-start)/durMs; if(p>1)p=1;
+    stick.style.height = (full*(1-p))+'px';
+    if(p>=1){ timerActive=false; endSession(); return; }
+    timerRAF=requestAnimationFrame(loop);
+  }
+  timerRAF=requestAnimationFrame(loop);
+}
+function endSession(){
+  stopSmoke(); bell(0,1);
+  setTimeout(()=>{ show('end'); }, 2600);
+}
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); $('#orient').style.display='none'; show('splash'); }
+
+/* ---------- wire up ---------- */
+$('#langBtn').onclick=()=>{ lang = lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
+$('#enterBtn').onclick=()=>{ if(!ac){ try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} } show('setup'); };
+$('#beginBtn').onclick=enterSession;
+$('#exitBtn').onclick=abort;
+$('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
+$('#outBtn').onclick=()=>{ $('#stick').style.height='280px'; show('splash'); };
+
+/* time slider (1–60 min, no direct number entry) */
+sel.time = Math.min(60, Math.max(1, parseInt(sel.time,10)||5));
+const timeRange=$('#timeRange'), timeNum=$('#timeNum');
+timeRange.value = sel.time; timeNum.textContent = sel.time;
+timeRange.oninput=()=>{ sel.time = +timeRange.value; timeNum.textContent = sel.time; save(); };
+
+applyLang();
+</script>
+</body>
+</html>
