@@ -52,6 +52,17 @@
     padding:15px 40px; cursor:pointer; transition:all .5s ease}
   .enter:hover{background:var(--paper); color:var(--ink); border-color:var(--paper); letter-spacing:.24em}
 
+  /* world presence — 静かな共在感（地球の灯り） */
+  .presence{font-size:12px; letter-spacing:.12em; line-height:1.7; color:var(--soft); opacity:.82;
+    display:flex; align-items:center; justify-content:center; gap:9px; margin:0; max-width:330px}
+  .presence .pdot{flex:none; width:6px; height:6px; border-radius:50%; background:var(--gold);
+    box-shadow:0 0 9px 2px rgba(194,163,94,.55); animation:pdotpulse 3.4s ease-in-out infinite}
+  @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
+  .presence-splash{margin:0 0 34px}
+  .lobby{width:min(86vw,360px); margin:24px auto 6px; display:flex; flex-direction:column; align-items:center; gap:14px}
+  .lobby canvas{width:196px; height:196px; display:block}
+  @media (max-width:520px){ .lobby canvas{width:166px; height:166px} }
+
   /* SETUP */
   #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
   #setup .title{font-family:var(--brush); font-size:30px; color:var(--paper); margin:0 0 4px; letter-spacing:.08em}
@@ -165,12 +176,17 @@
     <h1 class="brandk">一息</h1>
     <div class="brandsub">ISSOKU</div>
     <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
+    <div class="presence presence-splash" id="presenceSplash"><span class="pdot"></span><span class="ptext"></span></div>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
   </section>
 
   <!-- SETUP -->
   <section class="screen" id="setup">
     <div class="title">坐雲堂<small>THE UN-DO</small></div>
+    <div class="lobby">
+      <canvas id="globe" width="360" height="360" aria-hidden="true"></canvas>
+      <div class="presence" id="presenceHall"><span class="pdot"></span><span class="ptext"></span></div>
+    </div>
     <div class="group">
       <div class="glabel" data-t="g_posture">姿勢</div>
       <div class="opts" id="postureOpts"></div>
@@ -301,7 +317,9 @@ try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
 
 const $ = s => document.querySelector(s);
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none'; }
+  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none';
+  if(id==='setup'){ const c=$('#globe'); if(c) presence.startGlobe(c); } else { presence.stopGlobe(); }
+  updatePresence(); }
 
 function applyLang(){
   const t=T[lang];
@@ -310,6 +328,7 @@ function applyLang(){
   $('#langBtn').textContent = lang==='ja' ? 'EN' : 'あ';
   document.documentElement.lang = lang;
   buildOpts();
+  updatePresence();
 }
 
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
@@ -489,6 +508,82 @@ const ambient = (() => {
   return { start, stop };
 })();
 
+/* ---------- world presence: 静かな共在感（地球の灯り）----------
+   「いつもそこに座っている人がいる」を非言語で。位置はおおまかに・匿名。
+   実在のサーバー在室ではなく、地球の自転（実UTC時刻）に連動した“ありそうな”気配の
+   シミュレーション（プロトタイプ用＝企画書「在室はダミー」）。本物のプレゼンスは将来差し替え。 */
+const presence = (() => {
+  const D2R=Math.PI/180, rand=(a,b)=>a+Math.random()*(b-a);
+  /* [latMin,latMax, lngMin,lngMax, 重み（おおよその実践者の多さ）] ＝ おおまかな大陸 */
+  const REGIONS=[
+    [34,58,-125,-72,14], [9,24,-104,-84,3], [-38,6,-76,-40,8], [40,60,-9,28,16],
+    [-30,32,8,40,9], [14,38,35,60,6], [8,30,70,88,10], [24,45,103,142,18],
+    [-8,18,96,121,6], [-40,-12,114,150,4], [52,64,42,135,5]
+  ];
+  const pts=[];
+  REGIONS.forEach((r,ri)=>{ for(let i=0;i<r[4];i++){
+    pts.push({ lat:rand(r[0],r[1]), lng:rand(r[2],r[3]), ph:Math.random()*6.283, reg:ri, f:0 }); } });
+  let wander=0;
+  const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const circ=(a,b)=>{ let d=Math.abs(a-b)%24; return d>12?24-d:d; };
+  const bump=(h,c,w)=>Math.max(0,1-circ(h,c)/w);
+  function utcH(){ const d=new Date(); return d.getUTCHours()+d.getUTCMinutes()/60; }
+  /* その経度の現地時刻が、夜明け（〜6時）か夕暮れ（〜20時）の坐りやすい刻なら灯る */
+  function factor(lng,uh){ let h=(uh+lng/15)%24; if(h<0)h+=24; return Math.max(bump(h,6.2,2.0),bump(h,20.2,2.4))*0.9; }
+
+  function compute(){
+    const uh=utcH(); let active=0; const regs=new Set();
+    for(const p of pts){ p.f=factor(p.lng,uh); if(p.f>0.22){ active++; regs.add(p.reg); } }
+    const people=Math.max(8, Math.round(active*1.7 + wander));
+    const countries=Math.max(3, Math.round(regs.size*1.8 + (people>42?3:0)));
+    return { people, countries };
+  }
+  function drift(){ wander += rand(-1,1); wander=Math.max(-4,Math.min(7,wander)); }
+
+  let raf=null, cv=null, x=null, rot=0, last=0;
+  function startGlobe(canvas){
+    cv=canvas; x=canvas.getContext('2d'); cancelAnimationFrame(raf); last=performance.now();
+    const loop=(t)=>{ const dt=Math.min(60,t-last); last=t; if(!reduced) rot+=dt*0.00007; draw(t);
+      raf=requestAnimationFrame(loop); };
+    raf=requestAnimationFrame(loop);
+  }
+  function stopGlobe(){ cancelAnimationFrame(raf); raf=null; }
+  function draw(t){
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.42;
+    x.clearRect(0,0,W,H);
+    const g=x.createRadialGradient(cx-R*0.32,cy-R*0.32,R*0.15,cx,cy,R);
+    g.addColorStop(0,'rgba(64,84,100,0.34)'); g.addColorStop(0.7,'rgba(28,40,54,0.30)'); g.addColorStop(1,'rgba(12,18,26,0.04)');
+    x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.fillStyle=g; x.fill();
+    x.lineWidth=1; x.strokeStyle='rgba(180,200,210,0.10)'; x.stroke();
+    for(const p of pts){
+      const la=p.lat*D2R, lo=p.lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
+      if(z<=0) continue;
+      const sx=cx+R*cl*Math.sin(lo), sy=cy-R*Math.sin(la), depth=0.45+0.55*z;
+      if(p.f>0.22){
+        const tw=reduced?1:(0.72+0.28*Math.sin(t*0.0024+p.ph));
+        const a=Math.min(1,p.f*tw*depth);
+        x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
+        x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=6;
+        x.arc(sx,sy,1.5+1.6*p.f,0,6.2832); x.fill();
+      } else {
+        x.beginPath(); x.shadowBlur=0; x.fillStyle='rgba(150,170,180,'+(0.05+0.10*depth).toFixed(3)+')';
+        x.arc(sx,sy,0.9,0,6.2832); x.fill();
+      }
+    }
+    x.shadowBlur=0;
+  }
+  return { compute, drift, startGlobe, stopGlobe };
+})();
+function presenceText(){
+  const p=presence.compute(), nf=new Intl.NumberFormat(lang==='ja'?'ja-JP':'en-US');
+  return lang==='ja'
+    ? `いま ${nf.format(p.countries)} の国と地域で、${nf.format(p.people)}人が坐っています`
+    : `${nf.format(p.people)} people across ${nf.format(p.countries)} places are sitting now`;
+}
+function updatePresence(){ const txt=presenceText();
+  document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
+
 /* ---------- session flow ---------- */
 let timerRAF, timerActive=false;
 function enterSession(){
@@ -547,6 +642,9 @@ sel.time = Math.min(60, Math.max(1, parseInt(sel.time,10)||5));
 const timeRange=$('#timeRange'), timeNum=$('#timeNum');
 timeRange.value=sel.time; timeNum.textContent=sel.time;
 timeRange.oninput=()=>{ sel.time=+timeRange.value; timeNum.textContent=sel.time; save(); };
+
+/* 人の出入りをそっと反映（数だけ静かに揺れる・通知はしない） */
+setInterval(()=>{ presence.drift(); updatePresence(); }, 5200);
 
 applyLang();
 </script>
