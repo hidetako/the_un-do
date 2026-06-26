@@ -109,9 +109,16 @@
   .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
   .scene-neko{background:linear-gradient(168deg,#e3d6b8 0%,#c9ad84 100%)}
   .scene-cho{background:linear-gradient(165deg,#efe7d6 0%,#dccfb6 100%)}
-  .moon{position:absolute; top:13%; right:19%; width:84px; height:84px; border-radius:50%;
-    background:#f4eeda; box-shadow:0 0 70px 16px rgba(244,238,218,.32); display:none}
+  .moon{position:absolute; top:12%; right:15%; width:96px; height:96px; display:none}
   .scene-tsuki .moon{display:block}
+  .moon svg{width:100%; height:100%; overflow:visible; display:block;
+    filter:drop-shadow(0 0 9px rgba(244,238,218,.42)) drop-shadow(0 0 24px rgba(244,238,218,.20))}
+  .moon .cloud{position:absolute; pointer-events:none; border-radius:50%; filter:blur(4px);
+    background:radial-gradient(ellipse at center, rgba(206,212,222,.30), rgba(206,212,222,.12) 52%, transparent 74%)}
+  .moon .cloud1{width:128px; height:32px; left:-22px; top:40px; animation:cloud1 27s ease-in-out infinite}
+  .moon .cloud2{width:92px; height:22px; left:14px; top:20px; opacity:.7; animation:cloud2 35s ease-in-out infinite}
+  @keyframes cloud1{0%,100%{transform:translateX(-7px)} 50%{transform:translateX(11px)}}
+  @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
   .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
   .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
 
@@ -132,6 +139,18 @@
     letter-spacing:.5em; padding-left:.5em; color:rgba(239,233,220,.7); z-index:3; opacity:0; transition:opacity 2.5s ease}
   .status.show{opacity:1}
   .scene-kare .status,.scene-cho .status,.scene-neko .status{color:rgba(40,32,22,.55)}
+
+  /* 坐禅中の中断/継続 確認 */
+  #confirm{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(16,13,9,.66); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:12; padding:34px}
+  #confirm.show{display:flex}
+  #confirm .cmsg{font-family:var(--brush); font-size:24px; color:var(--paper); letter-spacing:.08em; margin-bottom:30px; text-align:center}
+  #confirm .cbtns{display:flex; gap:14px; justify-content:center; flex-wrap:wrap}
+  #confirm button{font-family:var(--serif); font-size:15px; letter-spacing:.16em; border-radius:999px;
+    padding:13px 34px; cursor:pointer; transition:all .35s}
+  #confirm .cont{background:var(--paper); color:var(--ink); border:1px solid var(--paper)}
+  #confirm .stop{background:transparent; color:var(--paper); border:1px solid rgba(239,233,220,.45)}
+  #confirm .stop:hover{background:rgba(239,233,220,.1)}
 
   /* orientation */
   #orient{position:absolute; inset:0; background:rgba(16,13,9,.9); display:none;
@@ -220,7 +239,20 @@
   <!-- SESSION -->
   <section class="screen" id="session">
     <div id="scene">
-      <div class="moon"></div>
+      <div class="moon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <mask id="crescent">
+              <rect width="100" height="100" fill="#000"/>
+              <circle cx="50" cy="52" r="33" fill="#fff"/>
+              <circle cx="63" cy="45" r="30" fill="#000"/>
+            </mask>
+          </defs>
+          <circle cx="50" cy="52" r="33" fill="#f4eeda" mask="url(#crescent)"/>
+        </svg>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+      </div>
       <div class="slot">
         <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
           <rect x="24" y="12" width="632" height="392" rx="3" fill="#efe9dc" stroke="#d8cdb6" stroke-width="1"/>
@@ -243,6 +275,16 @@
     <div id="orient">
       <div class="lines" id="orientLines"></div>
       <button class="obtn" id="orientNext"></button>
+    </div>
+
+    <div id="confirm">
+      <div>
+        <div class="cmsg" id="confirmMsg"></div>
+        <div class="cbtns">
+          <button class="cont" id="contBtn"></button>
+          <button class="stop" id="stopBtn"></button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -379,7 +421,7 @@ function bell(delay=0, gain=0.82){
   });
 }
 /* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
-function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
+function ring3(then){ bell(0); bell(4.6); bell(9.2); ringTimer=setTimeout(then, 13200); }
 
 /* ---------- smoke: one stalk that may split (余烟) ----------
    火種からまず一本（層流）で立ちのぼり、「不定の高さ（破断高 hb）」で太さ・揺れが増し、
@@ -691,7 +733,7 @@ function updatePresence(){ const txt=presenceText();
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
 
 /* ---------- session flow ---------- */
-let timerRAF, timerActive=false;
+let timerRAF, timerActive=false, ringTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#status').textContent=''; $('#status').classList.remove('show');
@@ -728,8 +770,8 @@ function startIncense(durMs){
 }
 function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
-  $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+  $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
 $('#langBtn').onclick=()=>{ lang= lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
@@ -742,6 +784,23 @@ $('#soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('issoku_sound', soundOn
 refreshSoundBtn();
 $('#beginBtn').onclick=enterSession;
 $('#exitBtn').onclick=abort;
+/* 坐禅中に画面をクリック → 中断/継続の確認（やめる＝初期画面へ） */
+function showConfirm(){
+  if(!$('#session').classList.contains('on')) return;
+  if($('#orient').style.display==='flex') return;      // オリエン中は出さない
+  if($('#confirm').classList.contains('show')) return;
+  const ja=lang==='ja';
+  $('#confirmMsg').textContent = ja?'坐を、つづけますか？':'Continue sitting?';
+  $('#contBtn').textContent = ja?'つづける':'Continue';
+  $('#stopBtn').textContent = ja?'やめる':'End';
+  $('#confirm').classList.add('show');
+}
+$('#contBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); };
+$('#stopBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); abort(); };
+$('#session').addEventListener('click',(e)=>{
+  if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')) return;
+  showConfirm();
+});
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
 $('#outBtn').onclick=()=>{ $('#stick').style.height='280px'; show('splash'); };
 
