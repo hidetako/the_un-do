@@ -37,24 +37,23 @@
 - 【LIVE】The Un-do — sit with me ｜ zen bell & ambience（24/7）
 
 ### 概要欄テンプレ
-> 世界のどこかの誰かと、黙って同じ時に坐る。坐雲堂（The Un-do）の常時ライブです。
-> 眺めるだけでも、一緒に坐っても。実際に坐る（姿勢・座処・鐘・線香・在室の灯り）はアプリで。
+> 一息（Issoku）— 24時間ひらく、世界の坐禅堂「坐雲堂（The Un-do）」。
+> 世界のどこかの誰かと、黙って、同じ時に坐る。眺めるだけでも、一緒に坐っても。
 >
-> ▶ 坐るアプリ（一息 Issoku）: https://the-un-do.vercel.app/
-> ・24時間、世界のどこからでも。ひと息、入れる。
-> ・記録で競わせない。手放す（只管打坐）。
+> ▶ 坐るアプリ → https://the-un-do.vercel.app/
+> 　姿勢・座処・鐘・線香・在室の灯り。記録で競わせない、手放す坐。
 >
-> Sit quietly, at the same time as someone, somewhere. The full practice (posture, seats, bell, incense, live presence) is in the app:
+> Sit quietly, with someone, somewhere — anytime. Full practice in the app:
 > ▶ https://the-un-do.vercel.app/
 >
 > Presented by よろづソリューションズ / Yorozu Solutions
-> #zazen #meditation #studywithme #坐禅 #瞑想 #作業用
+> #坐禅 #瞑想 #studywithme #zazen #meditation #作業用 #asmr
 
 ### 固定コメント
 > ▶ 実際に坐るアプリはこちら → https://the-un-do.vercel.app/ ｜ 24時間ひらいています。一息、どうぞ。
 
 ### 画面オーバーレイ（下帯・常時表示）
-> 一息 issoku｜坐るアプリは概要欄から → the-un-do.vercel.app
+> 坐雲堂 The Un-do ｜ 坐るアプリ → the-un-do.vercel.app
 
 ---
 
