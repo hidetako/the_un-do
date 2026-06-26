@@ -126,7 +126,7 @@
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
-  .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:420px; pointer-events:none}
+  .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:486px; pointer-events:none}
   .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
   .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
     border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55);
@@ -265,7 +265,7 @@
     </div>
     <div class="censer">
       <div class="incense-wrap">
-        <canvas class="smoke" id="smoke" width="140" height="420"></canvas>
+        <canvas class="smoke" id="smoke" width="140" height="486"></canvas>
         <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
       </div>
       <div class="bowl"></div>
@@ -475,7 +475,7 @@ function startSmoke(){
     if(!smokeOn) return;
     const dt=Math.min(50, now-last); last=now; if(!reduced) t += dt*0.001;
     x.clearRect(0,0,W,H);
-    const baseX=W/2, y0=emberY(), rise=Math.min(300, y0-8);
+    const baseX=W/2, y0=emberY(), rise=Math.min(450, y0-8);  // 煙の全体長（旧300→1.5倍）
     if(rise>24){
       x.lineJoin='round'; x.lineCap='round';
       /* 幹の破断高（不定の高さ）。これより上で揺れ・太さが増す */
