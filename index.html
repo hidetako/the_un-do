@@ -381,51 +381,85 @@ function bell(delay=0, gain=0.82){
 /* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
 function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
 
-/* ---------- smoke: a single rising ribbon (余烟) ----------
-   煙は「◯の集合」ではなく、火種から立ちのぼる一筋の帯。下ほど細くまっすぐ（層流）、
-   上ほどゆらいで広がり、淡く溶ける。全体がゆるく揺れる（たゆみ）。位相が時間とともに
-   上へ流れることで“立ちのぼり”を表す。線香が燃え下がると起点も静かに下がる。
-   描画は連続パス（quadraticCurveTo）＋縦方向グラデで溶かす＋多層のぼかしで柔らかく。 */
+/* ---------- smoke: delicate, evolving strands (余烟) ----------
+   煙は固定本数ではない。火種では一筋（層流）、上で乱れて 1〜数本に分かれたり、
+   また一本へ戻ったりする。各筋は太さも濃さも刻々と変わり、上ほど広がって淡く溶ける。
+   各筋を「中心線＋可変半幅のリボン（塗り）」として描き、強度ノイズで本数を揺らす。
+   筋0＝中心の主筋（ほぼ常在）、筋1・2＝時おり立つ副次。燃え下がると起点も下がる。 */
 let smokeRAF, smokeOn=false;
 function startSmoke(){
   const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
   const W=c.width, H=c.height; let last=performance.now(), t=0;
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const seed = Math.random()*6.283, N=28;
   /* 背景の明暗で煙色を変える：暗い座処＝淡い白煙／明るい座処＝淡いねずみ色（同化を防ぐ） */
   const RGB = (sel.scene==='honden' || sel.scene==='tsuki') ? '221,215,203' : '78,66,54';
   /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
   const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
+  const R=(a,b)=>a+Math.random()*(b-a);
+  /* 3筋ぶんの個体差（毎セッション乱択） */
+  const strands=[0,1,2].map(i=>({
+    p1:R(0,6.28), p2:R(0,6.28), p3:R(0,6.28),
+    f1:2.3+R(0,1.3), f2:4.8+R(0,2.0), v1:0.75+R(0,0.5), v2:1.25+R(0,0.7),
+    baseW:i===0?R(3.4,4.6):R(2.0,3.6),               // 太さの個体差
+    div:(i===0?R(1,3):R(7,15)), side:(i%2?1:-1)*R(0.7,1.2),
+    iA:R(0,6.28), iB:R(0,6.28), if1:0.07+R(0,0.06), if2:0.13+R(0,0.10),
+    floor:i===0?0.55:0.0,                            // 主筋は途切れにくい
+    wf:3.2+R(0,2.2), wph:R(0,6.28)
+  }));
+  const M=24;
+  function inten(s){
+    const v=0.5 + 0.5*Math.sin(t*s.if1*6.28 + s.iA) + 0.32*Math.sin(t*s.if2*6.28 + s.iB);
+    return Math.max(s.floor*0.8, Math.max(0,Math.min(1,(v-0.35)/0.7))); // しばしば0＝その筋は消える
+  }
   function loop(now){
     if(!smokeOn) return;
     const dt=Math.min(50, now-last); last=now; if(!reduced) t += dt*0.001;
     x.clearRect(0,0,W,H);
     const baseX=W/2, y0=emberY(), rise=Math.min(300, y0-8);
     if(rise>24){
-      const pts=[];
-      for(let i=0;i<=N;i++){
-        const h=i/N, y=y0 - h*rise;
-        const amp = 1.0 + h*h*15;                              // 下は直線的、上ほど大きくゆらぐ
-        const wx = Math.sin(h*3.1 - t*1.05 + seed)*amp
-                 + Math.sin(h*6.7 - t*1.70 + seed*1.7)*amp*0.32;
-        const drift = Math.sin(t*0.45 + seed)*3*h;             // 帯全体のゆるい揺れ（たゆみ）
-        pts.push([baseX + wx + drift, y]);
+      x.lineJoin='round'; x.lineCap='round';
+      for(const s of strands){
+        const I=reduced?(0.4+s.floor*0.4):inten(s);
+        if(I<0.05) continue;
+        const cen=[], hw=[];
+        for(let i=0;i<=M;i++){
+          const h=i/M, y=y0 - h*rise;
+          const amp=0.8 + h*h*13;                                  // 下は直線的、上ほど大きくゆらぐ
+          const wander=Math.sin(h*s.f1 - t*s.v1 + s.p1)*amp + Math.sin(h*s.f2 - t*s.v2 + s.p2)*amp*0.32;
+          const diverge=s.side*s.div*Math.pow(h,1.3)*(1+0.25*Math.sin(t*0.3+s.p3)); // 上で扇状に分かれる
+          cen.push([baseX+wander+diverge, y]);
+          const env=Math.sin(Math.min(1,h*1.05)*Math.PI);          // 0両端・中ほどふくらむ
+          const undu=0.65+0.35*Math.sin(h*s.wf - t*0.9 + s.wph);   // 太さ・濃淡のゆらぎ
+          hw.push(Math.max(0.35, s.baseW*(0.16+0.95*env)*undu));
+        }
+        const ribbon=(scaleW,aMul,blur)=>{
+          x.beginPath();
+          for(let i=0;i<=M;i++){
+            const a=cen[Math.min(M,i+1)], b=cen[Math.max(0,i-1)];
+            const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+            const nx=-(dy/L)*hw[i]*scaleW, ny=(dx/L)*hw[i]*scaleW;
+            if(i===0) x.moveTo(cen[i][0]+nx,cen[i][1]+ny); else x.lineTo(cen[i][0]+nx,cen[i][1]+ny);
+          }
+          for(let i=M;i>=0;i--){
+            const a=cen[Math.min(M,i+1)], b=cen[Math.max(0,i-1)];
+            const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+            const nx=-(dy/L)*hw[i]*scaleW, ny=(dx/L)*hw[i]*scaleW;
+            x.lineTo(cen[i][0]-nx, cen[i][1]-ny);
+          }
+          x.closePath();
+          const base=0.17*I*aMul;
+          const g=x.createLinearGradient(0,y0,0,y0-rise);
+          g.addColorStop(0.00,'rgba('+RGB+','+(base*0.65).toFixed(3)+')');
+          g.addColorStop(0.16,'rgba('+RGB+','+base.toFixed(3)+')');
+          g.addColorStop(0.60,'rgba('+RGB+','+(base*0.55).toFixed(3)+')');
+          g.addColorStop(1.00,'rgba('+RGB+',0)');
+          x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(base*0.8).toFixed(3)+')'; x.shadowBlur=blur;
+          x.fill();
+        };
+        ribbon(1.8,0.55,11);   // 柔らかいかさ（ハロー）
+        ribbon(1.0,1.0,4);     // 芯
       }
-      /* 縦グラデ：火種で立ち、低〜中ほどが濃く、上へ向けて淡く消える */
-      const grad=x.createLinearGradient(0,y0,0,y0-rise);
-      grad.addColorStop(0.00,'rgba('+RGB+',0.11)');
-      grad.addColorStop(0.14,'rgba('+RGB+',0.20)');
-      grad.addColorStop(0.55,'rgba('+RGB+',0.12)');
-      grad.addColorStop(1.00,'rgba('+RGB+',0.00)');
-      x.lineCap='round'; x.lineJoin='round'; x.strokeStyle=grad; x.shadowColor='rgba('+RGB+',0.45)';
-      for(const ps of [{w:8.0,blur:12,al:0.5},{w:3.4,blur:6,al:0.8},{w:1.3,blur:3,al:1.0}]){
-        x.globalAlpha=ps.al; x.lineWidth=ps.w; x.shadowBlur=ps.blur;
-        x.beginPath(); x.moveTo(pts[0][0],pts[0][1]);
-        for(let i=1;i<N;i++){ const mx=(pts[i][0]+pts[i+1][0])/2, my=(pts[i][1]+pts[i+1][1])/2;
-          x.quadraticCurveTo(pts[i][0],pts[i][1],mx,my); }
-        x.stroke();
-      }
-      x.globalAlpha=1; x.shadowBlur=0;
+      x.shadowBlur=0;
     }
     smokeRAF=requestAnimationFrame(loop);
   }
