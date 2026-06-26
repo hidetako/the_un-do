@@ -121,6 +121,13 @@
   @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
   .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
   .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
+  /* 座処の作画（枯山水＝石組＋砂紋／猫＝丸まって眠る） */
+  .garden,.cat{position:absolute; inset:0; display:none; pointer-events:none}
+  .garden svg,.cat svg{width:100%; height:100%; display:block}
+  .scene-kare .garden{display:block}
+  .scene-neko .cat{display:block}
+  .cat .catg{transform-box:fill-box; transform-origin:50% 92%; animation:catbreath 5.5s ease-in-out infinite}
+  @keyframes catbreath{0%,100%{transform:scale(1)} 50%{transform:scale(1.018)}}
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -233,6 +240,10 @@
       <div class="glabel" data-t="g_orient">オリエンテーション</div>
       <div class="opts" id="orientOpts"></div>
     </div>
+    <div class="group">
+      <div class="glabel" data-t="g_sound">環境音</div>
+      <div class="opts" id="soundOpts"></div>
+    </div>
     <button class="begin" id="beginBtn" data-t="begin">はじめる</button>
   </section>
 
@@ -260,6 +271,48 @@
           <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
           <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
           <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
+        </svg>
+      </div>
+      <div class="garden">
+        <svg viewBox="0 0 412 880" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="stoneA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6856"/><stop offset="1" stop-color="#433d2c"/></linearGradient>
+            <linearGradient id="stoneB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7259"/><stop offset="1" stop-color="#4d4631"/></linearGradient>
+          </defs>
+          <g fill="none" stroke="#a99a78" stroke-opacity="0.42" stroke-width="1.3">
+            <ellipse cx="150" cy="704" rx="52" ry="21"/>
+            <ellipse cx="150" cy="704" rx="86" ry="34"/>
+            <ellipse cx="150" cy="704" rx="120" ry="48"/>
+            <ellipse cx="150" cy="704" rx="156" ry="62"/>
+            <ellipse cx="150" cy="704" rx="194" ry="77"/>
+            <ellipse cx="150" cy="704" rx="234" ry="93"/>
+            <ellipse cx="150" cy="704" rx="276" ry="110"/>
+            <ellipse cx="150" cy="704" rx="320" ry="128"/>
+            <ellipse cx="150" cy="704" rx="366" ry="146"/>
+            <ellipse cx="150" cy="704" rx="414" ry="165"/>
+          </g>
+          <ellipse cx="156" cy="724" rx="80" ry="13" fill="#3a3324" opacity="0.16"/>
+          <path d="M112,704 C108,676 128,658 152,660 C178,662 192,680 190,700 C189,714 168,722 148,722 C128,722 116,718 112,704 Z" fill="url(#stoneA)"/>
+          <path d="M188,712 C186,696 200,686 216,688 C232,690 240,702 236,712 C233,720 218,724 206,723 C196,722 189,720 188,712 Z" fill="url(#stoneB)"/>
+        </svg>
+      </div>
+      <div class="cat">
+        <svg viewBox="0 0 412 880" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="catfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6c4f"/><stop offset="1" stop-color="#5b4d35"/></linearGradient>
+          </defs>
+          <ellipse cx="186" cy="824" rx="142" ry="18" fill="#48402a" opacity="0.16"/>
+          <g class="catg" fill="url(#catfill)">
+            <!-- 丸まった胴 -->
+            <path d="M64,820 C52,768 80,706 146,696 C214,686 286,702 318,744 C340,774 334,808 300,820 C246,830 116,830 64,820 Z"/>
+            <!-- 前左にうずめた頭 -->
+            <circle cx="98" cy="800" r="46"/>
+            <!-- 耳 -->
+            <path d="M70,766 L60,732 L94,758 Z"/>
+            <path d="M112,758 L122,726 L138,760 Z"/>
+            <!-- 右に巻いた尾 -->
+            <path d="M298,812 C342,814 354,784 326,774 C302,766 284,784 296,800 C300,805 299,808 298,812 Z"/>
+          </g>
         </svg>
       </div>
     </div>
@@ -307,7 +360,7 @@ const T = {
   ja:{
     tagline:"24時間、世界のどこからでも。<br>ひと息、入れる。",
     enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
-    g_orient:"オリエンテーション", begin:"はじめる",
+    g_orient:"オリエンテーション", g_sound:"環境音", snd_on:"流す", snd_off:"消す", begin:"はじめる",
     floor:"床座禅", floor_s:"結跏趺坐 / 半跏", chair:"椅子座禅", chair_s:"いす坐禅",
     on:"流す", off:"スキップ", min:"分",
     sitting:"ただ、座る", next:"次へ", ring:"鐘を鳴らす",
@@ -318,7 +371,7 @@ const T = {
   en:{
     tagline:"Anytime, from anywhere.<br>Take one breath.",
     enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
-    g_orient:"Orientation", begin:"Begin",
+    g_orient:"Orientation", g_sound:"Nature sound", snd_on:"On", snd_off:"Off", begin:"Begin",
     floor:"Floor", floor_s:"cross-legged", chair:"Chair", chair_s:"chair zazen",
     on:"Play", off:"Skip", min:"min",
     sitting:"just sit", next:"Next", ring:"Ring the bell",
@@ -395,6 +448,10 @@ function buildOpts(){
   const oo=$('#orientOpts'); oo.innerHTML='';
   oo.append(chip(t.on,'',sel.orient===true,()=>{sel.orient=true;save();buildOpts();}));
   oo.append(chip(t.off,'',sel.orient===false,()=>{sel.orient=false;save();buildOpts();}));
+  const noo=$('#soundOpts'); if(noo){ noo.innerHTML='';
+    noo.append(chip(t.snd_on,'',soundOn===true,()=>{soundOn=true;store.set('issoku_sound','1');refreshSoundBtn();buildOpts();}));
+    noo.append(chip(t.snd_off,'',soundOn===false,()=>{soundOn=false;store.set('issoku_sound','0');refreshSoundBtn();buildOpts();}));
+  }
 }
 function save(){ store.set('issoku_sel',JSON.stringify(sel)); }
 
@@ -781,6 +838,7 @@ $('#enterBtn').onclick=()=>{ ensureCtx(); show('setup'); };
 function refreshSoundBtn(){ const b=$('#soundBtn'); b.classList.toggle('off',!soundOn);
   b.setAttribute('aria-label', soundOn?'ambient sound: on':'ambient sound: off'); b.title=b.getAttribute('aria-label'); }
 $('#soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('issoku_sound', soundOn?'1':'0'); refreshSoundBtn();
+  if($('#setup').classList.contains('on')) buildOpts();   // 設定画面の環境音チップと同期
   if(soundOn){ if($('#session').classList.contains('on')) ambient.start(sel.scene); }
   else ambient.stop(0.4); };
 refreshSoundBtn();
