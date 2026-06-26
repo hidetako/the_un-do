@@ -1,0 +1,43 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  html,body{margin:0;width:2560px;height:1440px;overflow:hidden}
+  .b{width:2560px;height:1440px;position:relative;display:flex;align-items:center;justify-content:center;
+     background:radial-gradient(115% 130% at 50% 26%, #2e2519 0%, #181410 54%, #0c0905 100%);
+     font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP',serif; overflow:hidden}
+  /* 三日月（やや雲がかかる） */
+  .moon{position:absolute; top:300px; left:1820px; width:300px; height:300px}
+  .moon svg{width:100%;height:100%;filter:drop-shadow(0 0 26px rgba(244,238,218,.4)) drop-shadow(0 0 60px rgba(244,238,218,.18))}
+  .cloud{position:absolute; border-radius:50%; filter:blur(10px);
+    background:radial-gradient(ellipse at center, rgba(206,212,222,.22), rgba(206,212,222,.08) 55%, transparent 75%)}
+  .cl1{width:520px;height:120px;left:1700px;top:430px}
+  /* セーフエリア内の本文 */
+  .row{display:flex;align-items:center;gap:120px;z-index:2}
+  .enso svg{display:block}
+  .h{color:#efe9dc;font-size:170px;letter-spacing:.05em;line-height:1;font-weight:500}
+  .h .lat{display:block;color:#d8cdb6;font-size:66px;letter-spacing:.22em;margin-top:26px;padding-left:.22em}
+  .s{color:#c2a35e;font-size:44px;letter-spacing:.2em;margin-top:34px;padding-left:.2em}
+  .u{color:#e8c87a;font-size:46px;letter-spacing:.14em;margin-top:30px;padding-left:.14em}
+</style></head><body>
+<div class="b">
+  <div class="moon">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><mask id="cr"><rect width="100" height="100" fill="#000"/><circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="63" cy="45" r="30" fill="#000"/></mask></defs>
+      <circle cx="50" cy="52" r="33" fill="#f4eeda" mask="url(#cr)"/>
+    </svg>
+  </div>
+  <div class="cloud cl1"></div>
+  <div class="row">
+    <div class="enso">
+      <svg width="300" height="300" viewBox="0 0 372 372" xmlns="http://www.w3.org/2000/svg">
+        <g transform="rotate(-42 186 178)"><circle cx="186" cy="178" r="122" fill="none" stroke="#efe9dc" stroke-width="14" stroke-linecap="round" stroke-dasharray="652 114"/></g>
+        <path d="M186 312 C 210 260, 162 222, 196 168 C 222 126, 174 96, 198 48" fill="none" stroke="#c2a35e" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+        <g transform="translate(258 256)"><rect width="42" height="42" rx="6" fill="#b04a39"/><circle cx="21" cy="21" r="11.5" fill="none" stroke="#efe9dc" stroke-width="3.2"/></g>
+      </svg>
+    </div>
+    <div class="txt">
+      <div class="h">坐雲堂<span class="lat">THE&nbsp;UN-DO</span></div>
+      <div class="s">一息 ISSOKU ｜ 24時間ひらく、世界の坐禅堂</div>
+      <div class="u">the-un-do.vercel.app</div>
+    </div>
+  </div>
+</div>
+</body></html>
