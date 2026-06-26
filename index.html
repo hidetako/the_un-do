@@ -145,7 +145,8 @@
   .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
     letter-spacing:.5em; padding-left:.5em; color:rgba(239,233,220,.7); z-index:3; opacity:0; transition:opacity 2.5s ease}
   .status.show{opacity:1}
-  .scene-kare .status,.scene-cho .status,.scene-neko .status{color:rgba(40,32,22,.55)}
+  #session[data-scene="kare"] #status,#session[data-scene="cho"] #status,#session[data-scene="neko"] #status{color:rgba(40,32,22,.6)}
+  #session[data-scene="neko"] #status{bottom:22%}   /* 眠る猫と文字が重ならないよう上へ逃がす */
 
   /* 坐禅中の中断/継続 確認 */
   #confirm{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
@@ -299,23 +300,23 @@
       <div class="cat">
         <svg viewBox="0 0 412 880" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <clipPath id="catbody"><path d="M42,822 C20,766 46,702 112,692 C140,688 168,690 194,700 C254,720 278,756 268,792 C260,816 230,826 190,827 C130,829 66,830 42,822 Z"/></clipPath>
+            <clipPath id="catbody"><path d="M38,824 C24,794 42,748 102,738 C140,732 178,734 210,744 C262,758 282,786 272,808 C262,822 226,828 184,829 C118,830 62,830 38,824 Z"/></clipPath>
           </defs>
-          <ellipse cx="152" cy="826" rx="138" ry="17" fill="#48402a" opacity="0.16"/>
+          <ellipse cx="150" cy="828" rx="136" ry="16" fill="#48402a" opacity="0.16"/>
           <g class="catg">
-            <!-- 背中ごしに覗くふたつの耳（先を丸く）。片方は黒、片方は茶＝三毛 -->
-            <path d="M124,701 C126,684 132,674 139,672 C146,674 152,686 156,701 Z" fill="#3a2f26"/>
-            <path d="M160,700 C162,683 168,673 176,671 C184,673 190,685 192,701 Z" fill="#be7e3a"/>
-            <!-- 丸まった背中（白地） -->
-            <path d="M42,822 C20,766 46,702 112,692 C140,688 168,690 194,700 C254,720 278,756 268,792 C260,816 230,826 190,827 C130,829 66,830 42,822 Z" fill="#efe7d6" stroke="#b6a684" stroke-opacity="0.45" stroke-width="1.4"/>
+            <!-- 背ごしに覗くふたつの耳（先を丸く）。片方は黒、片方は茶＝三毛 -->
+            <path d="M120,734 C122,722 128,714 134,712 C140,714 145,723 148,734 Z" fill="#3a2f26"/>
+            <path d="M156,733 C158,721 163,712 170,710 C177,712 182,722 184,733 Z" fill="#be7e3a"/>
+            <!-- 丸まった背中（白地・低め＝loaf） -->
+            <path d="M38,824 C24,794 42,748 102,738 C140,732 178,734 210,744 C262,758 282,786 272,808 C262,822 226,828 184,829 C118,830 62,830 38,824 Z" fill="#efe7d6" stroke="#b6a684" stroke-opacity="0.45" stroke-width="1.4"/>
             <!-- 三毛の斑（胴にクリップ）：茶と黒 -->
             <g clip-path="url(#catbody)">
-              <path d="M52,748 C76,728 116,730 132,758 C140,776 128,800 100,802 C74,804 46,790 46,766 C45,756 46,752 52,748 Z" fill="#3a2f26"/>
-              <path d="M160,716 C194,706 240,716 258,748 C266,768 250,796 218,798 C188,800 162,784 158,756 C156,740 150,722 160,716 Z" fill="#be7e3a"/>
-              <path d="M112,700 C132,694 152,700 156,716 C144,712 128,712 116,718 C106,710 104,704 112,700 Z" fill="#be7e3a"/>
+              <path d="M46,778 C66,762 102,764 116,786 C124,800 114,820 88,822 C64,824 40,812 40,792 C39,784 40,782 46,778 Z" fill="#3a2f26"/>
+              <path d="M156,752 C188,744 230,752 248,778 C256,796 242,818 212,820 C184,822 160,808 156,784 C154,770 148,758 156,752 Z" fill="#be7e3a"/>
+              <path d="M108,736 C128,730 148,736 152,750 C140,746 124,746 112,752 C102,744 100,740 108,736 Z" fill="#be7e3a"/>
             </g>
             <!-- 巻いた尾（茶） -->
-            <path d="M262,806 C296,800 304,768 278,760 C258,754 248,772 260,784 C267,792 264,800 262,806 Z" fill="#be7e3a"/>
+            <path d="M260,812 C292,806 300,778 276,770 C258,764 248,780 258,792 C265,800 262,806 260,812 Z" fill="#be7e3a"/>
           </g>
         </svg>
       </div>
@@ -799,6 +800,7 @@ function updatePresence(){ const txt=presenceText();
 let timerRAF, timerActive=false, ringTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
+  $('#session').setAttribute('data-scene', sel.scene);   // 背景は付けず、文字位置/色の出し分け用
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
   presence.setSitting(true);
