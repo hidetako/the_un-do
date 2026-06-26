@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>一息 — Issoku｜オンライン座禅寺・坐雲堂</title>
+<!-- セキュリティ: よろづやwebアプリ診断基準書 Part H / A-5 / A-9 準拠（静的ホスト非依存のCSPフォールバック）。
+     frame-ancestors / HSTS / X-Frame-Options 等のヘッダ専用項目は vercel.json・_headers 側で付与する。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://esm.sh; connect-src 'self' https://dcxoouslwkfohdbacipa.supabase.co wss://dcxoouslwkfohdbacipa.supabase.co; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yuji+Boku&family=Shippori+Mincho:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
@@ -30,6 +34,9 @@
     border:1px solid rgba(239,233,220,.3); border-radius:999px; padding:6px 14px;
     font-family:var(--serif); font-size:13px; letter-spacing:.12em; cursor:pointer; transition:opacity .4s}
   .bar button:hover{opacity:1}
+  .bar-left{display:flex; gap:10px}
+  .bar button.sound{font-size:15px; letter-spacing:0; padding:6px 13px}
+  .bar button.sound.off{opacity:.3; text-decoration:line-through}
   .exit{display:none}
 
   /* SPLASH */
@@ -48,6 +55,17 @@
     background:transparent; border:1px solid rgba(239,233,220,.45); border-radius:999px;
     padding:15px 40px; cursor:pointer; transition:all .5s ease}
   .enter:hover{background:var(--paper); color:var(--ink); border-color:var(--paper); letter-spacing:.24em}
+
+  /* world presence — 静かな共在感（地球の灯り） */
+  .presence{font-size:12px; letter-spacing:.12em; line-height:1.7; color:var(--soft); opacity:.82;
+    display:flex; align-items:center; justify-content:center; gap:9px; margin:0; max-width:330px}
+  .presence .pdot{flex:none; width:6px; height:6px; border-radius:50%; background:var(--gold);
+    box-shadow:0 0 9px 2px rgba(194,163,94,.55); animation:pdotpulse 3.4s ease-in-out infinite}
+  @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
+  .presence-splash{margin:0 0 34px}
+  .lobby{width:min(86vw,360px); margin:24px auto 6px; display:flex; flex-direction:column; align-items:center; gap:14px}
+  .lobby canvas{width:196px; height:196px; display:block}
+  @media (max-width:520px){ .lobby canvas{width:166px; height:166px} }
 
   /* SETUP */
   #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
@@ -101,10 +119,13 @@
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
-  .smoke{position:absolute; left:50%; bottom:70px; transform:translateX(-50%); width:140px; height:300px; pointer-events:none}
+  .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:420px; pointer-events:none}
   .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
   .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
-    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55)}
+    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55);
+    animation:emberglow 4.5s ease-in-out infinite}
+  @keyframes emberglow{0%,100%{opacity:.9; box-shadow:0 0 9px 2px rgba(224,99,43,.42)}
+    50%{opacity:1; box-shadow:0 0 14px 4px rgba(224,99,43,.62)}}
   .bowl{width:96px; height:20px; background:#2a2620; border-radius:0 0 50px 50px; margin-top:-3px}
   .bowl::before{content:""; display:block; width:96px; height:11px; background:#39342c; border-radius:50%; transform:translateY(-6px)}
   .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
@@ -139,7 +160,10 @@
 </head>
 <body>
 <div class="bar">
-  <button class="lang" id="langBtn">EN</button>
+  <div class="bar-left">
+    <button class="lang" id="langBtn">EN</button>
+    <button class="sound" id="soundBtn" aria-label="ambient sound">♪</button>
+  </div>
   <button class="exit" id="exitBtn">✕</button>
 </div>
 
@@ -159,12 +183,17 @@
     <h1 class="brandk">一息</h1>
     <div class="brandsub">ISSOKU</div>
     <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
+    <div class="presence presence-splash" id="presenceSplash"><span class="pdot"></span><span class="ptext"></span></div>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
   </section>
 
   <!-- SETUP -->
   <section class="screen" id="setup">
     <div class="title">坐雲堂<small>THE UN-DO</small></div>
+    <div class="lobby">
+      <canvas id="globe" width="360" height="360" aria-hidden="true"></canvas>
+      <div class="presence" id="presenceHall"><span class="pdot"></span><span class="ptext"></span></div>
+    </div>
     <div class="group">
       <div class="glabel" data-t="g_posture">姿勢</div>
       <div class="opts" id="postureOpts"></div>
@@ -204,7 +233,7 @@
     </div>
     <div class="censer">
       <div class="incense-wrap">
-        <canvas class="smoke" id="smoke" width="140" height="300"></canvas>
+        <canvas class="smoke" id="smoke" width="140" height="420"></canvas>
         <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
       </div>
       <div class="bowl"></div>
@@ -289,12 +318,15 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
 let lang = store.get('issoku_lang') || 'ja';
+let soundOn = store.get('issoku_sound')!=='0';
 const sel = { posture:'floor', scene:'honden', time:5, orient:true };
 try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
 
 const $ = s => document.querySelector(s);
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none'; }
+  $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none';
+  if(id==='setup'){ const c=$('#globe'); if(c) presence.startGlobe(c); } else { presence.stopGlobe(); }
+  updatePresence(); }
 
 function applyLang(){
   const t=T[lang];
@@ -303,6 +335,7 @@ function applyLang(){
   $('#langBtn').textContent = lang==='ja' ? 'EN' : 'あ';
   document.documentElement.lang = lang;
   buildOpts();
+  updatePresence();
 }
 
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
@@ -325,9 +358,13 @@ function save(){ store.set('issoku_sel',JSON.stringify(sel)); }
 
 /* ---------- temple bell ---------- */
 let ac;
-function bell(delay=0, gain=0.82){
-  if(!ac) ac = new (window.AudioContext||window.webkitAudioContext)();
+function ensureCtx(){
+  if(!ac){ try{ ac = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
   if(ac.state==='suspended') ac.resume();
+  return ac;
+}
+function bell(delay=0, gain=0.82){
+  if(!ensureCtx()) return;
   const t0 = ac.currentTime + delay;
   /* [harmonic, gain, decay s] — long, deep, lingering 余韻 */
   const partials = [[1,1,9.5],[2.0,0.42,6.6],[2.74,0.27,4.2],[3.76,0.16,2.6],[5.2,0.09,1.6]];
@@ -344,27 +381,94 @@ function bell(delay=0, gain=0.82){
 /* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
 function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
 
-/* ---------- smoke: gentle, swaying 余烟 ---------- */
+/* ---------- smoke: one stalk that may split (余烟) ----------
+   火種からまず一本（層流）で立ちのぼり、「不定の高さ（破断高 hb）」で太さ・揺れが増し、
+   時おりそこから枝が分かれて二本になり、また一本へ戻る（最大2本）。上ほど淡く溶ける。
+   幹を1本、枝を最大1本（強度ノイズで出没）として中心線＋可変半幅のリボン（塗り）で描く。 */
 let smokeRAF, smokeOn=false;
 function startSmoke(){
-  const c=$('#smoke'); const x=c.getContext('2d'); smokeOn=true;
-  const W=c.width, H=c.height; const parts=[]; let last=performance.now(), acc=0;
+  const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
+  const W=c.width, H=c.height; let last=performance.now(), t=0;
+  const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  /* 背景の明暗で煙色を変える：暗い座処＝淡い白煙／明るい座処＝淡いねずみ色（同化を防ぐ） */
+  const RGB = (sel.scene==='honden' || sel.scene==='tsuki') ? '221,215,203' : '78,66,54';
+  /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
+  const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
+  const R=(a,b)=>a+Math.random()*(b-a);
+  /* 毎セッション乱択の個体差。TR＝幹、BR＝枝 */
+  const TR={ f1:1.9+R(0,0.9), f2:4.0+R(0,1.5), v1:0.65+R(0,0.4), v2:1.05+R(0,0.5),
+             p1:R(0,6.28), p2:R(0,6.28), baseW:R(3.0,4.2), wf:2.6+R(0,2.0), wph:R(0,6.28),
+             hbP:R(0,6.28), hbf:0.16+R(0,0.10) };               // 幹の破断高ドリフト
+  const BR={ side:(Math.random()<0.5?1:-1), spread:7+R(0,7), f1:2.6+R(0,1.8), v1:0.9+R(0,0.6),
+             p1:R(0,6.28), iA:R(0,6.28), iB:R(0,6.28), if1:0.05+R(0,0.05), if2:0.11+R(0,0.08),
+             hoff:0.06+R(0,0.12), hjit:R(0,6.28), wscale:0.55+R(0,0.2) };
+  const M=26, lerp=(a,b,u)=>a+(b-a)*u;
+  /* 中心線 pts と半幅 hws から、上へ淡く溶ける柔らかいリボンを塗る */
+  function ribbon(pts, hws, baseA, blur){
+    if(pts.length<3 || baseA<=0.002) return;
+    let yTop=pts[0][1], yBot=pts[0][1];
+    for(const p of pts){ if(p[1]<yTop)yTop=p[1]; if(p[1]>yBot)yBot=p[1]; }
+    const lastI=pts.length-1;
+    x.beginPath();
+    for(let i=0;i<=lastI;i++){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
+      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
+      if(i===0) x.moveTo(pts[i][0]+nx,pts[i][1]+ny); else x.lineTo(pts[i][0]+nx,pts[i][1]+ny); }
+    for(let i=lastI;i>=0;i--){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
+      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
+      x.lineTo(pts[i][0]-nx, pts[i][1]-ny); }
+    x.closePath();
+    const g=x.createLinearGradient(0,yBot,0,yTop);
+    g.addColorStop(0.00,'rgba('+RGB+','+(baseA*0.6).toFixed(3)+')');
+    g.addColorStop(0.18,'rgba('+RGB+','+baseA.toFixed(3)+')');
+    g.addColorStop(0.65,'rgba('+RGB+','+(baseA*0.5).toFixed(3)+')');
+    g.addColorStop(1.00,'rgba('+RGB+',0)');
+    x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(baseA*0.8).toFixed(3)+')'; x.shadowBlur=blur;
+    x.fill();
+  }
   function loop(now){
     if(!smokeOn) return;
-    const dt=Math.min(50, now-last); last=now; acc+=dt;
-    if(acc>150){ acc=0; parts.push({t:0, x0:W/2+(Math.random()*6-3), ph:Math.random()*6.28,
-      sway:10+Math.random()*8, life:5200+Math.random()*1800}); }
-    x.clearRect(0,0,W,H); x.shadowBlur=12;
-    for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.t+=dt;
-      const k=p.t/p.life; if(k>=1){ parts.splice(i,1); continue; }
-      const y = H-8 - k*(H-20);
-      const sway = p.sway*(0.25+k*1.1);
-      const px = p.x0 + Math.sin(p.ph + k*5.2)*sway + Math.sin(p.ph*1.7 + k*2.6)*sway*0.35;
-      const r = 1.8 + k*8;
-      const a = Math.sin(Math.min(1,k*1.25)*Math.PI)*0.30;
-      const col='rgba(214,208,196,'+a.toFixed(3)+')';
-      x.beginPath(); x.fillStyle=col; x.shadowColor=col;
-      x.arc(px,y,r,0,6.2832); x.fill();
+    const dt=Math.min(50, now-last); last=now; if(!reduced) t += dt*0.001;
+    x.clearRect(0,0,W,H);
+    const baseX=W/2, y0=emberY(), rise=Math.min(300, y0-8);
+    if(rise>24){
+      x.lineJoin='round'; x.lineCap='round';
+      /* 幹の破断高（不定の高さ）。これより上で揺れ・太さが増す */
+      const hb0=Math.max(0.12,Math.min(0.62, 0.34+0.16*Math.sin(t*TR.hbf*6.28+TR.hbP)+0.06*Math.sin(t*0.5+TR.hbP)));
+      /* 幹（一本）：層流（下）→破断高で乱流（上）。途中から太さが変わる */
+      const cenT=[], hwT=[];
+      for(let i=0;i<=M;i++){
+        const h=i/M, y=y0-h*rise;
+        const lam=0.4+0.8*h;                                // 層流：細く、ほぼ真っ直ぐ
+        const turb=h>hb0?(2.5+9*(h-hb0)):0;                 // 破断高より上で乱れる
+        const amp=lam+turb;
+        const wander=Math.sin(h*TR.f1 - t*TR.v1 + TR.p1)*amp + Math.sin(h*TR.f2 - t*TR.v2 + TR.p2)*amp*0.3;
+        cenT.push([baseX+wander, y]);
+        const env=0.2+0.85*Math.sin(Math.min(1,h*1.05)*Math.PI);
+        const undu=0.7+0.3*Math.sin(h*TR.wf - t*0.9 + TR.wph); // 太さの変化
+        hwT.push(Math.max(0.35, TR.baseW*env*undu));
+      }
+      ribbon(cenT, hwT.map(w=>w*1.7), 0.055, 12);   // 幹のかさ（ハロー）
+      ribbon(cenT, hwT, 0.175, 5);                  // 幹の芯
+      /* 枝（最大1本）：強度ノイズで出没。出れば二本、消えれば一本へ */
+      const Ib = reduced?0.0 : Math.max(0,Math.min(1,(0.5+0.5*Math.sin(t*BR.if1*6.28+BR.iA)+0.32*Math.sin(t*BR.if2*6.28+BR.iB)-0.5)/0.55));
+      if(Ib>0.06){
+        const hb=Math.max(0.2,Math.min(0.82, hb0+BR.hoff+0.05*Math.sin(t*0.4+BR.hjit)));
+        const fi=hb*M, i0=Math.min(M-1,Math.floor(fi)), u0=fi-i0;
+        const xA=lerp(cenT[i0][0], cenT[i0+1][0], u0), wA=lerp(hwT[i0], hwT[i0+1], u0)*BR.wscale;
+        const pts=[], hws=[], ST=16;
+        for(let j=0;j<=ST;j++){
+          const u=j/ST, h=hb+(1-hb)*u, y=y0-h*rise;
+          const wander=Math.sin(u*BR.f1*3.0 - t*BR.v1 + BR.p1)*(2+8*u);
+          const diverge=BR.side*BR.spread*Math.pow(u,1.25);   // 分岐点から徐々に離れる
+          pts.push([xA+diverge+wander, y]);
+          hws.push(Math.max(0.3, wA*(0.18+0.95*(1-u))));      // 分岐点で太く、上ほど細く
+        }
+        ribbon(pts, hws.map(w=>w*1.7), 0.05*Ib, 11);
+        ribbon(pts, hws, 0.16*Ib, 5);
+      }
+      x.shadowBlur=0;
     }
     smokeRAF=requestAnimationFrame(loop);
   }
@@ -373,12 +477,227 @@ function startSmoke(){
 function stopSmoke(){ smokeOn=false; cancelAnimationFrame(smokeRAF);
   const c=$('#smoke'); if(c) c.getContext('2d').clearRect(0,0,c.width,c.height); }
 
+/* ---------- soundscape: per-seat ambient, synthesized (環境音) ----------
+   座処ごとの環境音。Web Audioで合成し外部音源に依存しない（本物の収録音は将来差し替え）。
+   鐘より一段やわらかい「気配」の床。手放す・静けさの理念に合わせ最小限に保つ。 */
+const ambient = (() => {
+  let buf=null, master=null, started=[], timers=[], alive=false, killTimer=null;
+  function brown(){
+    if(buf) return buf;
+    const n=ac.sampleRate*4, b=ac.createBuffer(1,n,ac.sampleRate), d=b.getChannelData(0);
+    let last=0;
+    for(let i=0;i<n;i++){ const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.4; }
+    buf=b; return b;
+  }
+  function noise(){ const s=ac.createBufferSource(); s.buffer=brown(); s.loop=true; started.push(s); return s; }
+  /* sine LFO added onto an AudioParam (param value sums with connected signals) */
+  function mod(param, depth, freq){
+    const o=ac.createOscillator(); o.type='sine'; o.frequency.value=freq;
+    const g=ac.createGain(); g.gain.value=depth;
+    o.connect(g); g.connect(param); o.start(); started.push(o); return o;
+  }
+  function later(fn, ms){ timers.push(setTimeout(()=>{ if(alive) fn(); }, ms)); }
+
+  const builders = {
+    /* 本堂：深く暗い堂内のうなり。低く包み込む。 */
+    honden(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=140; lp.Q.value=0.6;
+      const g=ac.createGain(); g.gain.value=0.20; mod(g.gain,0.06,0.05);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    },
+    /* 枯山水：かすかな風＋折々の鹿威し（ししおどし）の「コーン」。 */
+    kare(){
+      const s=noise(), bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=0.7;
+      const g=ac.createGain(); g.gain.value=0.06; mod(g.gain,0.045,0.08); mod(bp.frequency,180,0.05);
+      s.connect(bp); bp.connect(g); g.connect(master); s.start();
+      const knock=()=>{ const t=ac.currentTime, o=ac.createOscillator(), e=ac.createGain();
+        o.type='sine'; o.frequency.setValueAtTime(230,t); o.frequency.exponentialRampToValueAtTime(96,t+0.13);
+        e.gain.setValueAtTime(0.0001,t); e.gain.exponentialRampToValueAtTime(0.22,t+0.006);
+        e.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
+        o.connect(e); e.connect(master); o.start(t); o.stop(t+0.5);
+        later(knock,(15+Math.random()*9)*1000); };
+      later(knock,(7+Math.random()*6)*1000);
+    },
+    /* 海辺の岸壁：寄せて引く波。ゆっくり膨らみ、しずまる。 */
+    umi(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=0.4;
+      const g=ac.createGain(); g.gain.value=0.13; mod(g.gain,0.13,0.09); mod(g.gain,0.04,0.137); mod(lp.frequency,260,0.09);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    },
+    /* 夜の月：しずかな夜気＋まばらな虫の音（鈴虫）。 */
+    tsuki(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=200;
+      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.05);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+      const cricket=()=>{ const t=ac.currentTime, dur=0.5+Math.random()*0.5;
+        const o=ac.createOscillator(); o.type='sine'; o.frequency.value=4300+Math.random()*1000;
+        const tr=ac.createOscillator(); tr.type='square'; tr.frequency.value=26+Math.random()*10;
+        const trg=ac.createGain(); trg.gain.value=0.011;
+        const env=ac.createGain();
+        env.gain.setValueAtTime(0.0001,t); env.gain.linearRampToValueAtTime(0.011,t+0.05);
+        env.gain.setValueAtTime(0.011,t+dur-0.08); env.gain.linearRampToValueAtTime(0.0001,t+dur);
+        tr.connect(trg); trg.connect(env.gain); o.connect(env); env.connect(master);
+        o.start(t); tr.start(t); o.stop(t+dur); tr.stop(t+dur);
+        later(cricket,(2.2+Math.random()*3.6)*1000); };
+      later(cricket,(1.5+Math.random()*3)*1000);
+    },
+    /* 寝ている猫の横：ゆっくりした寝息（＝自然な調息のお手本）＋かすかな喉鳴り。 */
+    neko(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=360;
+      const g=ac.createGain(); g.gain.value=0.05; mod(g.gain,0.045,0.2);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+      const p=ac.createOscillator(); p.type='sawtooth'; p.frequency.value=52;
+      const plp=ac.createBiquadFilter(); plp.type='lowpass'; plp.frequency.value=170;
+      const pg=ac.createGain(); pg.gain.value=0.012; mod(pg.gain,0.012,22);
+      p.connect(plp); plp.connect(pg); pg.connect(master); p.start(); started.push(p);
+    },
+    /* 調息の額：ほぼ無音。簡素な床の間のかすかな空気。 */
+    cho(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=220;
+      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.04);
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    }
+  };
+
+  function start(scene){
+    if(!ensureCtx()) return;
+    stop(0);
+    alive=true;
+    master=ac.createGain(); master.gain.value=0.0001; master.connect(ac.destination);
+    (builders[scene]||builders.honden)();
+    master.gain.exponentialRampToValueAtTime(0.9, ac.currentTime+2.2);
+  }
+  function stop(fade=1.4){
+    alive=false;
+    timers.forEach(clearTimeout); timers=[];
+    if(killTimer){ clearTimeout(killTimer); killTimer=null; }
+    const m=master, s=started; master=null; started=[];
+    if(!m) return;
+    const t=ac.currentTime;
+    try{ m.gain.cancelScheduledValues(t); m.gain.setValueAtTime(Math.max(0.0001,m.gain.value),t);
+      m.gain.exponentialRampToValueAtTime(0.0001, t+Math.max(0.05,fade)); }catch(e){}
+    killTimer=setTimeout(()=>{ s.forEach(n=>{ try{n.stop();}catch(e){} try{n.disconnect();}catch(e){} });
+      try{ m.disconnect(); }catch(e){} }, Math.max(60, fade*1000+150));
+  }
+  return { start, stop };
+})();
+
+/* ---------- world presence: 静かな共在感（地球の灯り）----------
+   「いつもそこに座っている人がいる」を非言語で。位置はおおまかに・匿名。
+   Supabase Realtime Presence で“いま堂にいる人”を実データ共有する（DBには何も書かない＝
+   揮発／気配のみ・保存しない）。接続できないときは数を偽らず「常時開放」の一言に静かに退く。 */
+const SB_URL='https://dcxoouslwkfohdbacipa.supabase.co';
+const SB_KEY='sb_publishable_TVhyuQa1ewXWL6XkMgr0nQ_x8WF_3F8';   /* 公開前提の publishable キー */
+const SB_CHANNEL='zaundo-hall';
+const presence = (() => {
+  const D2R=Math.PI/180, rand=(a,b)=>a+Math.random()*(b-a);
+  /* おおまかな大陸＝“地球の地”を描く淡い背景点（人ではない） */
+  const REGIONS=[
+    [34,58,-125,-72,14], [9,24,-104,-84,3], [-38,6,-76,-40,8], [40,60,-9,28,16],
+    [-30,32,8,40,9], [14,38,35,60,6], [8,30,70,88,10], [24,45,103,142,18],
+    [-8,18,96,121,6], [-40,-12,114,150,4], [52,64,42,135,5]
+  ];
+  const land=[];
+  REGIONS.forEach(r=>{ for(let i=0;i<r[4];i++) land.push({ lat:rand(r[0],r[1]), lng:rand(r[2],r[3]) }); });
+  const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  /* 匿名・おおまかな現在地（タイムゾーンから推定。位置情報APIは使わない＝企画書「位置はおおまかに」） */
+  function myPos(){
+    let lng=(-new Date().getTimezoneOffset())/4 + rand(-5,5);
+    lng=Math.max(-179,Math.min(179,lng));
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+    const reg=(tz.split('/')[0])||'';
+    const LAT={Asia:32,Europe:50,America:38,Africa:4,Australia:-30,Pacific:-8,Atlantic:38,Indian:-12,Antarctica:-72,Arctic:72};
+    const lat=(LAT[reg]!=null?LAT[reg]:24)+rand(-9,9);
+    return { lat, lng };
+  }
+
+  /* ---- live presence（実データ・Supabase Realtime） ---- */
+  let client=null, channel=null, live=false, members=[], me=null, sitting=false, onChange=()=>{};
+  const myId='k'+Math.random().toString(36).slice(2,9);
+  function sync(){
+    try{ members=Object.values(channel.presenceState()).flat()
+      .map(m=>({ lat:+m.lat, lng:+m.lng, sitting:!!m.sitting })); }
+    catch(e){ members=[]; }
+    onChange();
+  }
+  function track(){ return channel && channel.track({ lat:me.lat, lng:me.lng, sitting }); }
+  async function connect(){
+    try{
+      /* サプライチェーン対策（基準 G-2-1 / H-7）：浮動 @2 ではなく厳密バージョンへ固定。
+         esm.sh の依存もすべて同オリジン配下に解決される。更新時はバージョンを明示的に上げる。 */
+      const mod=await import('https://esm.sh/@supabase/supabase-js@2.108.2');
+      me=myPos();
+      client=mod.createClient(SB_URL, SB_KEY, { realtime:{ params:{ eventsPerSecond:2 } } });
+      channel=client.channel(SB_CHANNEL, { config:{ presence:{ key:myId } } });
+      channel.on('presence', { event:'sync' }, sync);
+      channel.subscribe(async (st)=>{ if(st==='SUBSCRIBED'){ live=true; await track(); sync(); } });
+    }catch(e){ live=false; onChange(); }
+  }
+  function setSitting(b){ sitting=b; if(live){ try{ track(); }catch(e){} } }
+  function leave(){ try{ channel && channel.untrack(); client && client.removeChannel(channel); }catch(e){} }
+
+  function compute(){
+    const people=members.length, sit=members.filter(m=>m.sitting).length;
+    const regs=new Set(members.map(m=>Math.round((m.lng+180)/30)+(m.lat>=0?'n':'s')));
+    return { live, people, sitting:sit, countries:regs.size };
+  }
+
+  /* ---- globe ---- */
+  let raf=null, cv=null, x=null, rot=0, last=0;
+  function startGlobe(canvas){
+    cv=canvas; x=canvas.getContext('2d'); cancelAnimationFrame(raf); last=performance.now();
+    const loop=(t)=>{ const dt=Math.min(60,t-last); last=t; if(!reduced) rot+=dt*0.00007; draw(t);
+      raf=requestAnimationFrame(loop); };
+    raf=requestAnimationFrame(loop);
+  }
+  function stopGlobe(){ cancelAnimationFrame(raf); raf=null; }
+  function project(lat,lng,cx,cy,R){
+    const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
+    return { sx:cx+R*cl*Math.sin(lo), sy:cy-R*Math.sin(la), z };
+  }
+  function draw(t){
+    const W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.42;
+    x.clearRect(0,0,W,H);
+    const g=x.createRadialGradient(cx-R*0.32,cy-R*0.32,R*0.15,cx,cy,R);
+    g.addColorStop(0,'rgba(64,84,100,0.34)'); g.addColorStop(0.7,'rgba(28,40,54,0.30)'); g.addColorStop(1,'rgba(12,18,26,0.04)');
+    x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.fillStyle=g; x.fill();
+    x.lineWidth=1; x.strokeStyle='rgba(180,200,210,0.10)'; x.stroke();
+    /* 地球の地（淡い背景点・人ではない） */
+    x.shadowBlur=0;
+    for(const p of land){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
+      const depth=0.45+0.55*q.z;
+      x.beginPath(); x.fillStyle='rgba(150,170,180,'+(0.05+0.10*depth).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
+    /* いまこの堂にいる人（実データ・金の灯り。坐っている人はより明るく） */
+    for(const m of members){ const q=project(m.lat,m.lng,cx,cy,R); if(q.z<=0) continue;
+      const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0024+(m.lng+m.lat)));
+      const a=Math.min(1,(m.sitting?0.95:0.62)*tw*depth);
+      x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
+      x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=m.sitting?10:5;
+      x.arc(q.sx,q.sy,m.sitting?2.4:1.6,0,6.2832); x.fill(); }
+    x.shadowBlur=0;
+  }
+  return { connect, setSitting, leave, compute, startGlobe, stopGlobe, onChange:(f)=>{onChange=f;} };
+})();
+function presenceText(){
+  const p=presence.compute(), nf=new Intl.NumberFormat(lang==='ja'?'ja-JP':'en-US');
+  if(!p.live) return lang==='ja' ? '世界の坐雲堂は、いつでも開いています' : 'The hall is open — anywhere, anytime';
+  if(p.people<=1) return lang==='ja' ? 'いま この堂にいるのは あなたひとり' : 'You are the only one in the hall right now';
+  return lang==='ja'
+    ? `いま ${nf.format(p.countries)} の地域から、${nf.format(p.people)}人がこの堂に`
+    : `${nf.format(p.people)} people from ${nf.format(p.countries)} regions are in the hall now`;
+}
+function updatePresence(){ const txt=presenceText();
+  document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
+
 /* ---------- session flow ---------- */
 let timerRAF, timerActive=false;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
+  presence.setSitting(true);
+  if(soundOn) ambient.start(sel.scene);
   if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
 }
 function runOrient(done){
@@ -407,14 +726,20 @@ function startIncense(durMs){
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ $('#status').classList.remove('show'); bell(0,0.9);
-  setTimeout(()=>{ stopSmoke(); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke();
+function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
+  setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
 $('#langBtn').onclick=()=>{ lang= lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
-$('#enterBtn').onclick=()=>{ if(!ac){ try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} } show('setup'); };
+$('#enterBtn').onclick=()=>{ ensureCtx(); show('setup'); };
+function refreshSoundBtn(){ const b=$('#soundBtn'); b.classList.toggle('off',!soundOn);
+  b.setAttribute('aria-label', soundOn?'ambient sound: on':'ambient sound: off'); b.title=b.getAttribute('aria-label'); }
+$('#soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('issoku_sound', soundOn?'1':'0'); refreshSoundBtn();
+  if(soundOn){ if($('#session').classList.contains('on')) ambient.start(sel.scene); }
+  else ambient.stop(0.4); };
+refreshSoundBtn();
 $('#beginBtn').onclick=enterSession;
 $('#exitBtn').onclick=abort;
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
@@ -424,6 +749,11 @@ sel.time = Math.min(60, Math.max(1, parseInt(sel.time,10)||5));
 const timeRange=$('#timeRange'), timeNum=$('#timeNum');
 timeRange.value=sel.time; timeNum.textContent=sel.time;
 timeRange.oninput=()=>{ sel.time=+timeRange.value; timeNum.textContent=sel.time; save(); };
+
+/* 在室の気配を実データで（入退室は通知せず、数だけ静かに反映） */
+presence.onChange(updatePresence);
+presence.connect();
+window.addEventListener('pagehide', ()=>presence.leave());
 
 applyLang();
 </script>
