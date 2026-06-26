@@ -449,7 +449,15 @@ const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
-let lang = store.get('issoku_lang') || 'ja';
+/* 初回は閲覧者の言語を尊重：日本語環境は ja、それ以外は en。手動切替は localStorage に記憶。 */
+function detectLang(){
+  try{
+    const ls = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language||''];
+    for(const l of ls){ if(/^ja\b/i.test(l)) return 'ja'; }
+    return ls.some(Boolean) ? 'en' : 'ja';
+  }catch(e){ return 'ja'; }
+}
+let lang = store.get('issoku_lang') || detectLang();
 let soundOn = store.get('issoku_sound')!=='0';
 const sel = { posture:'floor', scene:'honden', time:5, orient:true };
 try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
