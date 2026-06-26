@@ -1,0 +1,6 @@
+# 公開サイトに不要なファイルはデプロイ対象から除外（リポジトリには残す）
+企画書.md
+README.md
+SECURITY.md
+_headers
+.claude
