@@ -63,6 +63,14 @@
     box-shadow:0 0 9px 2px rgba(194,163,94,.55); animation:pdotpulse 3.4s ease-in-out infinite}
   @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
   .presence-splash{margin:0 0 34px}
+  /* YouTube表口への導線（飛び先URLが入った時だけ表示） */
+  .ytlink{font-family:var(--serif); font-size:12.5px; letter-spacing:.1em; color:var(--gold); opacity:.72;
+    text-decoration:none; border-bottom:1px solid rgba(194,163,94,.3); padding-bottom:2px; transition:opacity .4s}
+  .ytlink:hover{opacity:1}
+  .ytlink[hidden]{display:none}
+  /* よろづソリューションズ クレジット（控えめ） */
+  .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
+    letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
   .lobby{width:min(86vw,360px); margin:24px auto 6px; display:flex; flex-direction:column; align-items:center; gap:14px}
   .lobby canvas{width:196px; height:196px; display:block}
   @media (max-width:520px){ .lobby canvas{width:166px; height:166px} }
@@ -212,6 +220,7 @@
     <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
     <div class="presence presence-splash" id="presenceSplash"><span class="pdot"></span><span class="ptext"></span></div>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
+    <div class="credit" data-t="credit">よろづソリューションズ</div>
   </section>
 
   <!-- SETUP -->
@@ -220,6 +229,7 @@
     <div class="lobby">
       <canvas id="globe" width="360" height="360" aria-hidden="true"></canvas>
       <div class="presence" id="presenceHall"><span class="pdot"></span><span class="ptext"></span></div>
+      <a class="ytlink" id="ytLink" data-t="yt_watch" target="_blank" rel="noopener noreferrer" hidden></a>
     </div>
     <div class="group">
       <div class="glabel" data-t="g_posture">姿勢</div>
@@ -382,6 +392,7 @@ const T = {
     tagline:"24時間、世界のどこからでも。<br>ひと息、入れる。",
     enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
     g_orient:"オリエンテーション", g_sound:"環境音", snd_on:"流す", snd_off:"消す", begin:"はじめる",
+    yt_watch:"▶ いま、世界の堂を眺める（YouTubeライブ）", credit:"よろづソリューションズ",
     floor:"床座禅", floor_s:"結跏趺坐 / 半跏", chair:"椅子座禅", chair_s:"いす坐禅",
     on:"流す", off:"スキップ", min:"分",
     sitting:"ただ、座る", next:"次へ", ring:"鐘を鳴らす",
@@ -393,6 +404,7 @@ const T = {
     tagline:"Anytime, from anywhere.<br>Take one breath.",
     enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
     g_orient:"Orientation", g_sound:"Nature sound", snd_on:"On", snd_off:"Off", begin:"Begin",
+    yt_watch:"▶ Watch the hall live on YouTube", credit:"Yorozu Solutions",
     floor:"Floor", floor_s:"cross-legged", chair:"Chair", chair_s:"chair zazen",
     on:"Play", off:"Skip", min:"min",
     sitting:"just sit", next:"Next", ring:"Ring the bell",
@@ -444,6 +456,9 @@ function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.r
   if(id==='setup'){ const c=$('#globe'); if(c) presence.startGlobe(c); } else { presence.stopGlobe(); }
   updatePresence(); }
 
+/* YouTube表口（ライブ/チャンネル）URL。設定すると入口に導線が出る。未設定なら非表示。
+   将来 issoku 専用チャンネルのライブURLを入れる（例：https://www.youtube.com/@issoku/live）。 */
+const YT_LIVE_URL = '';
 function applyLang(){
   const t=T[lang];
   document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t');
@@ -452,6 +467,7 @@ function applyLang(){
   document.documentElement.lang = lang;
   buildOpts();
   updatePresence();
+  const yl=$('#ytLink'); if(yl){ if(YT_LIVE_URL){ yl.href=YT_LIVE_URL; yl.hidden=false; } else { yl.hidden=true; } }
 }
 
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
