@@ -64,10 +64,13 @@
   @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
   .presence-splash{margin:0 0 34px}
   /* YouTube表口への導線（飛び先URLが入った時だけ表示） */
-  .ytlink{font-family:var(--serif); font-size:12.5px; letter-spacing:.1em; color:var(--gold); opacity:.72;
-    text-decoration:none; border-bottom:1px solid rgba(194,163,94,.3); padding-bottom:2px; transition:opacity .4s}
+  .ytlink{display:inline-flex; align-items:center; gap:7px; font-family:var(--serif); font-size:12.5px; letter-spacing:.1em;
+    color:var(--gold); opacity:.78; text-decoration:none; border-bottom:1px solid rgba(194,163,94,.28); padding-bottom:2px; transition:opacity .4s}
+  .ytlink::before{content:''; width:22px; height:16px; flex:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 20'%3E%3Crect width='28' height='20' rx='5' fill='%23b04a39'/%3E%3Cpath d='M11,5.5 L20,10 L11,14.5 Z' fill='%23efe9dc'/%3E%3C/svg%3E") no-repeat center/contain}
   .ytlink:hover{opacity:1}
   .ytlink[hidden]{display:none}
+  .ytlink.end{margin-top:24px}
   /* よろづソリューションズ クレジット（控えめ） */
   .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
     letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
@@ -381,6 +384,7 @@
       <button class="again" id="againBtn" data-t="again">もう一度</button>
       <button class="out" id="outBtn" data-t="out">堂を出る</button>
     </div>
+    <a class="ytlink end" id="ytLinkEnd" data-t="yt_watch" target="_blank" rel="noopener noreferrer" hidden></a>
   </section>
 
 </div>
@@ -392,7 +396,7 @@ const T = {
     tagline:"24時間、世界のどこからでも。<br>ひと息、入れる。",
     enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
     g_orient:"オリエンテーション", g_sound:"環境音", snd_on:"流す", snd_off:"消す", begin:"はじめる",
-    yt_watch:"▶ YouTubeでも、坐雲堂", credit:"よろづソリューションズ",
+    yt_watch:"YouTubeでも、坐雲堂", credit:"よろづソリューションズ",
     floor:"床座禅", floor_s:"結跏趺坐 / 半跏", chair:"椅子座禅", chair_s:"いす坐禅",
     on:"流す", off:"スキップ", min:"分",
     sitting:"ただ、座る", next:"次へ", ring:"鐘を鳴らす",
@@ -404,7 +408,7 @@ const T = {
     tagline:"Anytime, from anywhere.<br>Take one breath.",
     enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
     g_orient:"Orientation", g_sound:"Nature sound", snd_on:"On", snd_off:"Off", begin:"Begin",
-    yt_watch:"▶ The Un-do on YouTube", credit:"Yorozu Solutions",
+    yt_watch:"The Un-do on YouTube", credit:"Yorozu Solutions",
     floor:"Floor", floor_s:"cross-legged", chair:"Chair", chair_s:"chair zazen",
     on:"Play", off:"Skip", min:"min",
     sitting:"just sit", next:"Next", ring:"Ring the bell",
@@ -467,7 +471,7 @@ function applyLang(){
   document.documentElement.lang = lang;
   buildOpts();
   updatePresence();
-  const yl=$('#ytLink'); if(yl){ if(YT_LIVE_URL){ yl.href=YT_LIVE_URL; yl.hidden=false; } else { yl.hidden=true; } }
+  document.querySelectorAll('.ytlink').forEach(a=>{ if(YT_LIVE_URL){ a.href=YT_LIVE_URL; a.hidden=false; } else { a.hidden=true; } });
 }
 
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
