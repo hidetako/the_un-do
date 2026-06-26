@@ -16,15 +16,15 @@
 - ライブ/チャンネルのURLを入れると、入口に「**▶ いま、世界の堂を眺める（YouTubeライブ）**／▶ Watch the hall live on YouTube」が表示され、**別タブで開く**（`rel="noopener"`）。
 - 外部リンクのみのため **CSPの緩和は不要**（動画を埋め込まない＝広告もアプリ内に出ない）。
 
-**有効化手順**: `const YT_LIVE_URL = '';` に配信URL（例 `https://www.youtube.com/@issoku/live`）を入れてデプロイするだけ。
+**現状**: `YT_LIVE_URL = 'https://www.youtube.com/@The-un_do'` を設定済み＝入口に導線「▶ YouTubeでも、坐雲堂」が表示される。ライブを常設したら飛び先を `…/live` に、文言を「いま一緒に坐る（ライブ）」へ戻すとよい。
 
 ---
 
 ## 2. YouTube側の素材（コピー）— そのまま貼れる雛形
 
-### チャンネル名（案）
-- 一息 — 坐雲堂 ｜ Issoku Zazen Hall
-- （ハンドル例）`@issoku`
+### チャンネル
+- 名前（案）: 一息 — 坐雲堂 ｜ Issoku / The Un-do
+- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用）
 
 ### チャンネル概要（About）
 > 一息（Issoku）— 24時間ひらく、世界の坐禅堂「坐雲堂（The Un-do）」。
