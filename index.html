@@ -381,11 +381,10 @@ function bell(delay=0, gain=0.82){
 /* 鐘三声：約4.6秒間隔、ゆったりと余韻を重ねる */
 function ring3(then){ bell(0); bell(4.6); bell(9.2); setTimeout(then, 13200); }
 
-/* ---------- smoke: delicate, evolving strands (余烟) ----------
-   煙は固定本数ではない。火種では一筋（層流）、上で乱れて 1〜数本に分かれたり、
-   また一本へ戻ったりする。各筋は太さも濃さも刻々と変わり、上ほど広がって淡く溶ける。
-   各筋を「中心線＋可変半幅のリボン（塗り）」として描き、強度ノイズで本数を揺らす。
-   筋0＝中心の主筋（ほぼ常在）、筋1・2＝時おり立つ副次。燃え下がると起点も下がる。 */
+/* ---------- smoke: one stalk that may split (余烟) ----------
+   火種からまず一本（層流）で立ちのぼり、「不定の高さ（破断高 hb）」で太さ・揺れが増し、
+   時おりそこから枝が分かれて二本になり、また一本へ戻る（最大2本）。上ほど淡く溶ける。
+   幹を1本、枝を最大1本（強度ノイズで出没）として中心線＋可変半幅のリボン（塗り）で描く。 */
 let smokeRAF, smokeOn=false;
 function startSmoke(){
   const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
@@ -396,20 +395,37 @@ function startSmoke(){
   /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
   const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
   const R=(a,b)=>a+Math.random()*(b-a);
-  /* 3筋ぶんの個体差（毎セッション乱択） */
-  const strands=[0,1,2].map(i=>({
-    p1:R(0,6.28), p2:R(0,6.28), p3:R(0,6.28),
-    f1:2.3+R(0,1.3), f2:4.8+R(0,2.0), v1:0.75+R(0,0.5), v2:1.25+R(0,0.7),
-    baseW:i===0?R(3.4,4.6):R(2.0,3.6),               // 太さの個体差
-    div:(i===0?R(1,3):R(7,15)), side:(i%2?1:-1)*R(0.7,1.2),
-    iA:R(0,6.28), iB:R(0,6.28), if1:0.07+R(0,0.06), if2:0.13+R(0,0.10),
-    floor:i===0?0.55:0.0,                            // 主筋は途切れにくい
-    wf:3.2+R(0,2.2), wph:R(0,6.28)
-  }));
-  const M=24;
-  function inten(s){
-    const v=0.5 + 0.5*Math.sin(t*s.if1*6.28 + s.iA) + 0.32*Math.sin(t*s.if2*6.28 + s.iB);
-    return Math.max(s.floor*0.8, Math.max(0,Math.min(1,(v-0.35)/0.7))); // しばしば0＝その筋は消える
+  /* 毎セッション乱択の個体差。TR＝幹、BR＝枝 */
+  const TR={ f1:1.9+R(0,0.9), f2:4.0+R(0,1.5), v1:0.65+R(0,0.4), v2:1.05+R(0,0.5),
+             p1:R(0,6.28), p2:R(0,6.28), baseW:R(3.0,4.2), wf:2.6+R(0,2.0), wph:R(0,6.28),
+             hbP:R(0,6.28), hbf:0.16+R(0,0.10) };               // 幹の破断高ドリフト
+  const BR={ side:(Math.random()<0.5?1:-1), spread:7+R(0,7), f1:2.6+R(0,1.8), v1:0.9+R(0,0.6),
+             p1:R(0,6.28), iA:R(0,6.28), iB:R(0,6.28), if1:0.05+R(0,0.05), if2:0.11+R(0,0.08),
+             hoff:0.06+R(0,0.12), hjit:R(0,6.28), wscale:0.55+R(0,0.2) };
+  const M=26, lerp=(a,b,u)=>a+(b-a)*u;
+  /* 中心線 pts と半幅 hws から、上へ淡く溶ける柔らかいリボンを塗る */
+  function ribbon(pts, hws, baseA, blur){
+    if(pts.length<3 || baseA<=0.002) return;
+    let yTop=pts[0][1], yBot=pts[0][1];
+    for(const p of pts){ if(p[1]<yTop)yTop=p[1]; if(p[1]>yBot)yBot=p[1]; }
+    const lastI=pts.length-1;
+    x.beginPath();
+    for(let i=0;i<=lastI;i++){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
+      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
+      if(i===0) x.moveTo(pts[i][0]+nx,pts[i][1]+ny); else x.lineTo(pts[i][0]+nx,pts[i][1]+ny); }
+    for(let i=lastI;i>=0;i--){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
+      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
+      x.lineTo(pts[i][0]-nx, pts[i][1]-ny); }
+    x.closePath();
+    const g=x.createLinearGradient(0,yBot,0,yTop);
+    g.addColorStop(0.00,'rgba('+RGB+','+(baseA*0.6).toFixed(3)+')');
+    g.addColorStop(0.18,'rgba('+RGB+','+baseA.toFixed(3)+')');
+    g.addColorStop(0.65,'rgba('+RGB+','+(baseA*0.5).toFixed(3)+')');
+    g.addColorStop(1.00,'rgba('+RGB+',0)');
+    x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(baseA*0.8).toFixed(3)+')'; x.shadowBlur=blur;
+    x.fill();
   }
   function loop(now){
     if(!smokeOn) return;
@@ -418,46 +434,39 @@ function startSmoke(){
     const baseX=W/2, y0=emberY(), rise=Math.min(300, y0-8);
     if(rise>24){
       x.lineJoin='round'; x.lineCap='round';
-      for(const s of strands){
-        const I=reduced?(0.4+s.floor*0.4):inten(s);
-        if(I<0.05) continue;
-        const cen=[], hw=[];
-        for(let i=0;i<=M;i++){
-          const h=i/M, y=y0 - h*rise;
-          const amp=0.8 + h*h*13;                                  // 下は直線的、上ほど大きくゆらぐ
-          const wander=Math.sin(h*s.f1 - t*s.v1 + s.p1)*amp + Math.sin(h*s.f2 - t*s.v2 + s.p2)*amp*0.32;
-          const diverge=s.side*s.div*Math.pow(h,1.3)*(1+0.25*Math.sin(t*0.3+s.p3)); // 上で扇状に分かれる
-          cen.push([baseX+wander+diverge, y]);
-          const env=Math.sin(Math.min(1,h*1.05)*Math.PI);          // 0両端・中ほどふくらむ
-          const undu=0.65+0.35*Math.sin(h*s.wf - t*0.9 + s.wph);   // 太さ・濃淡のゆらぎ
-          hw.push(Math.max(0.35, s.baseW*(0.16+0.95*env)*undu));
+      /* 幹の破断高（不定の高さ）。これより上で揺れ・太さが増す */
+      const hb0=Math.max(0.12,Math.min(0.62, 0.34+0.16*Math.sin(t*TR.hbf*6.28+TR.hbP)+0.06*Math.sin(t*0.5+TR.hbP)));
+      /* 幹（一本）：層流（下）→破断高で乱流（上）。途中から太さが変わる */
+      const cenT=[], hwT=[];
+      for(let i=0;i<=M;i++){
+        const h=i/M, y=y0-h*rise;
+        const lam=0.4+0.8*h;                                // 層流：細く、ほぼ真っ直ぐ
+        const turb=h>hb0?(2.5+9*(h-hb0)):0;                 // 破断高より上で乱れる
+        const amp=lam+turb;
+        const wander=Math.sin(h*TR.f1 - t*TR.v1 + TR.p1)*amp + Math.sin(h*TR.f2 - t*TR.v2 + TR.p2)*amp*0.3;
+        cenT.push([baseX+wander, y]);
+        const env=0.2+0.85*Math.sin(Math.min(1,h*1.05)*Math.PI);
+        const undu=0.7+0.3*Math.sin(h*TR.wf - t*0.9 + TR.wph); // 太さの変化
+        hwT.push(Math.max(0.35, TR.baseW*env*undu));
+      }
+      ribbon(cenT, hwT.map(w=>w*1.7), 0.055, 12);   // 幹のかさ（ハロー）
+      ribbon(cenT, hwT, 0.175, 5);                  // 幹の芯
+      /* 枝（最大1本）：強度ノイズで出没。出れば二本、消えれば一本へ */
+      const Ib = reduced?0.0 : Math.max(0,Math.min(1,(0.5+0.5*Math.sin(t*BR.if1*6.28+BR.iA)+0.32*Math.sin(t*BR.if2*6.28+BR.iB)-0.5)/0.55));
+      if(Ib>0.06){
+        const hb=Math.max(0.2,Math.min(0.82, hb0+BR.hoff+0.05*Math.sin(t*0.4+BR.hjit)));
+        const fi=hb*M, i0=Math.min(M-1,Math.floor(fi)), u0=fi-i0;
+        const xA=lerp(cenT[i0][0], cenT[i0+1][0], u0), wA=lerp(hwT[i0], hwT[i0+1], u0)*BR.wscale;
+        const pts=[], hws=[], ST=16;
+        for(let j=0;j<=ST;j++){
+          const u=j/ST, h=hb+(1-hb)*u, y=y0-h*rise;
+          const wander=Math.sin(u*BR.f1*3.0 - t*BR.v1 + BR.p1)*(2+8*u);
+          const diverge=BR.side*BR.spread*Math.pow(u,1.25);   // 分岐点から徐々に離れる
+          pts.push([xA+diverge+wander, y]);
+          hws.push(Math.max(0.3, wA*(0.18+0.95*(1-u))));      // 分岐点で太く、上ほど細く
         }
-        const ribbon=(scaleW,aMul,blur)=>{
-          x.beginPath();
-          for(let i=0;i<=M;i++){
-            const a=cen[Math.min(M,i+1)], b=cen[Math.max(0,i-1)];
-            const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
-            const nx=-(dy/L)*hw[i]*scaleW, ny=(dx/L)*hw[i]*scaleW;
-            if(i===0) x.moveTo(cen[i][0]+nx,cen[i][1]+ny); else x.lineTo(cen[i][0]+nx,cen[i][1]+ny);
-          }
-          for(let i=M;i>=0;i--){
-            const a=cen[Math.min(M,i+1)], b=cen[Math.max(0,i-1)];
-            const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
-            const nx=-(dy/L)*hw[i]*scaleW, ny=(dx/L)*hw[i]*scaleW;
-            x.lineTo(cen[i][0]-nx, cen[i][1]-ny);
-          }
-          x.closePath();
-          const base=0.17*I*aMul;
-          const g=x.createLinearGradient(0,y0,0,y0-rise);
-          g.addColorStop(0.00,'rgba('+RGB+','+(base*0.65).toFixed(3)+')');
-          g.addColorStop(0.16,'rgba('+RGB+','+base.toFixed(3)+')');
-          g.addColorStop(0.60,'rgba('+RGB+','+(base*0.55).toFixed(3)+')');
-          g.addColorStop(1.00,'rgba('+RGB+',0)');
-          x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(base*0.8).toFixed(3)+')'; x.shadowBlur=blur;
-          x.fill();
-        };
-        ribbon(1.8,0.55,11);   // 柔らかいかさ（ハロー）
-        ribbon(1.0,1.0,4);     // 芯
+        ribbon(pts, hws.map(w=>w*1.7), 0.05*Ib, 11);
+        ribbon(pts, hws, 0.16*Ib, 5);
       }
       x.shadowBlur=0;
     }
