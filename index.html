@@ -444,29 +444,31 @@ function startSmoke(){
   const BR={ side:(Math.random()<0.5?1:-1), spread:7+R(0,7), f1:2.6+R(0,1.8), v1:0.9+R(0,0.6),
              p1:R(0,6.28), iA:R(0,6.28), iB:R(0,6.28), if1:0.05+R(0,0.05), if2:0.11+R(0,0.08),
              hoff:0.06+R(0,0.12), hjit:R(0,6.28), wscale:0.55+R(0,0.2) };
-  const M=26, lerp=(a,b,u)=>a+(b-a)*u;
+  const M=40, lerp=(a,b,u)=>a+(b-a)*u, smooth=(e0,e1,v)=>{const u=Math.max(0,Math.min(1,(v-e0)/(e1-e0)));return u*u*(3-2*u);};
   /* 中心線 pts と半幅 hws から、上へ淡く溶ける柔らかいリボンを塗る */
   function ribbon(pts, hws, baseA, blur){
-    if(pts.length<3 || baseA<=0.002) return;
+    const n=pts.length; if(n<3 || baseA<=0.002) return;
+    const Le=[], Re=[];                          // 左右のふち（中心線±法線×半幅）
+    for(let i=0;i<n;i++){
+      const a=pts[Math.min(n-1,i+1)], b=pts[Math.max(0,i-1)];
+      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
+      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
+      Le.push([pts[i][0]+nx, pts[i][1]+ny]); Re.push([pts[i][0]-nx, pts[i][1]-ny]);
+    }
     let yTop=pts[0][1], yBot=pts[0][1];
     for(const p of pts){ if(p[1]<yTop)yTop=p[1]; if(p[1]>yBot)yBot=p[1]; }
-    const lastI=pts.length-1;
-    x.beginPath();
-    for(let i=0;i<=lastI;i++){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
-      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
-      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
-      if(i===0) x.moveTo(pts[i][0]+nx,pts[i][1]+ny); else x.lineTo(pts[i][0]+nx,pts[i][1]+ny); }
-    for(let i=lastI;i>=0;i--){ const a=pts[Math.min(lastI,i+1)], b=pts[Math.max(0,i-1)];
-      const dx=a[0]-b[0], dy=a[1]-b[1], L=Math.hypot(dx,dy)||1;
-      const nx=-(dy/L)*hws[i], ny=(dx/L)*hws[i];
-      x.lineTo(pts[i][0]-nx, pts[i][1]-ny); }
-    x.closePath();
+    /* ふちを二次曲線でなめらかに（直線セグメントのガクつきを解消） */
+    x.beginPath(); x.moveTo(Le[0][0],Le[0][1]);
+    for(let i=1;i<n-1;i++){ const mx=(Le[i][0]+Le[i+1][0])/2, my=(Le[i][1]+Le[i+1][1])/2; x.quadraticCurveTo(Le[i][0],Le[i][1],mx,my); }
+    x.lineTo(Le[n-1][0],Le[n-1][1]); x.lineTo(Re[n-1][0],Re[n-1][1]);
+    for(let i=n-2;i>=1;i--){ const mx=(Re[i][0]+Re[i-1][0])/2, my=(Re[i][1]+Re[i-1][1])/2; x.quadraticCurveTo(Re[i][0],Re[i][1],mx,my); }
+    x.lineTo(Re[0][0],Re[0][1]); x.closePath();
     const g=x.createLinearGradient(0,yBot,0,yTop);
-    g.addColorStop(0.00,'rgba('+RGB+','+(baseA*0.6).toFixed(3)+')');
-    g.addColorStop(0.18,'rgba('+RGB+','+baseA.toFixed(3)+')');
-    g.addColorStop(0.65,'rgba('+RGB+','+(baseA*0.5).toFixed(3)+')');
-    g.addColorStop(1.00,'rgba('+RGB+',0)');
-    x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(baseA*0.8).toFixed(3)+')'; x.shadowBlur=blur;
+    g.addColorStop(0.00,'rgba('+RGB+','+(baseA*0.5).toFixed(3)+')');
+    g.addColorStop(0.20,'rgba('+RGB+','+baseA.toFixed(3)+')');
+    g.addColorStop(0.62,'rgba('+RGB+','+(baseA*0.5).toFixed(3)+')');
+    g.addColorStop(1.00,'rgba('+RGB+',0)');                  // 上ほど薄く（拡散して消える）
+    x.fillStyle=g; x.shadowColor='rgba('+RGB+','+(baseA*0.7).toFixed(3)+')'; x.shadowBlur=blur;
     x.fill();
   }
   function loop(now){
@@ -477,19 +479,19 @@ function startSmoke(){
     if(rise>24){
       x.lineJoin='round'; x.lineCap='round';
       /* 幹の破断高（不定の高さ）。これより上で揺れ・太さが増す */
-      const hb0=Math.max(0.12,Math.min(0.62, 0.34+0.16*Math.sin(t*TR.hbf*6.28+TR.hbP)+0.06*Math.sin(t*0.5+TR.hbP)));
-      /* 幹（一本）：層流（下）→破断高で乱流（上）。途中から太さが変わる */
+      const hb0 = 0.34 + 0.13*Math.sin(t*0.45 + TR.hbP);    // 破断高はゆっくり上下（段差は作らない）
+      /* 幹（一本）：層流（下）→破断高で乱流（上）。上ほど少し太く・薄く拡散 */
       const cenT=[], hwT=[];
       for(let i=0;i<=M;i++){
         const h=i/M, y=y0-h*rise;
-        const lam=0.4+0.8*h;                                // 層流：細く、ほぼ真っ直ぐ
-        const turb=h>hb0?(2.5+9*(h-hb0)):0;                 // 破断高より上で乱れる
-        const amp=lam+turb;
+        const lam=0.5+0.7*h;                                  // 層流：細く、ほぼ真っ直ぐ
+        const gate=smooth(hb0-0.16, hb0+0.16, h);             // 破断高をなめらかに跨ぐ（段差なし）
+        const amp=lam + gate*(3.0+6.5*Math.max(0,h-hb0));     // 上ほど乱れが増す
         const wander=Math.sin(h*TR.f1 - t*TR.v1 + TR.p1)*amp + Math.sin(h*TR.f2 - t*TR.v2 + TR.p2)*amp*0.3;
         cenT.push([baseX+wander, y]);
-        const env=0.2+0.85*Math.sin(Math.min(1,h*1.05)*Math.PI);
-        const undu=0.7+0.3*Math.sin(h*TR.wf - t*0.9 + TR.wph); // 太さの変化
-        hwT.push(Math.max(0.35, TR.baseW*env*undu));
+        const env=0.32 + 0.52*Math.pow(h,0.85);               // 下細く→上ほど少し太く（拡散）
+        const undu=0.82+0.18*Math.sin(h*TR.wf - t*0.75 + TR.wph); // 太さの微ゆらぎ（控えめ）
+        hwT.push(Math.max(0.4, TR.baseW*env*undu));
       }
       ribbon(cenT, hwT.map(w=>w*1.7), 0.055, 12);   // 幹のかさ（ハロー）
       ribbon(cenT, hwT, 0.175, 5);                  // 幹の芯
@@ -499,13 +501,13 @@ function startSmoke(){
         const hb=Math.max(0.2,Math.min(0.82, hb0+BR.hoff+0.05*Math.sin(t*0.4+BR.hjit)));
         const fi=hb*M, i0=Math.min(M-1,Math.floor(fi)), u0=fi-i0;
         const xA=lerp(cenT[i0][0], cenT[i0+1][0], u0), wA=lerp(hwT[i0], hwT[i0+1], u0)*BR.wscale;
-        const pts=[], hws=[], ST=16;
+        const pts=[], hws=[], ST=22;
         for(let j=0;j<=ST;j++){
           const u=j/ST, h=hb+(1-hb)*u, y=y0-h*rise;
           const wander=Math.sin(u*BR.f1*3.0 - t*BR.v1 + BR.p1)*(2+8*u);
           const diverge=BR.side*BR.spread*Math.pow(u,1.25);   // 分岐点から徐々に離れる
           pts.push([xA+diverge+wander, y]);
-          hws.push(Math.max(0.3, wA*(0.18+0.95*(1-u))));      // 分岐点で太く、上ほど細く
+          hws.push(Math.max(0.35, wA*(0.55+0.7*u)));          // 分岐点は細め→上ほど少し太く
         }
         ribbon(pts, hws.map(w=>w*1.7), 0.05*Ib, 11);
         ribbon(pts, hws, 0.16*Ib, 5);
