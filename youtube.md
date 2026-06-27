@@ -30,7 +30,7 @@
   - ライブ直行: `…/channel/UCqzoMItMT74uC--y67S1-AQ/live`（`@The-un_do/live` でも可）
   - RSS: `https://www.youtube.com/feeds/videos.xml?channel_id=UCqzoMItMT74uC--y67S1-AQ`
   - ※アプリの導線（`YT_LIVE_URL`）は読みやすいハンドル `@The-un_do` のままでよい。IDは裏の永続キーとして記録。
-- **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（**本物の毛筆円相**（落款なし・淡色）＋朱印＋**本物の毛筆「一息」**・1600px四方）。一息は `issoku-source.jpg` 原本／`issoku-light.png` 淡色版
+- **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（**本物の毛筆円相**＋**篆刻（円相右上＝行雲流水／豪）**＋**本物の毛筆「一息」**・1600px四方）。素材：`enso-light.png`／`issoku-light.png`／`seal-koun.png`（行雲流水）／`seal-go.png`（豪）
 - **バナー（ヘッダー）**: `assets/youtube/banner.png`（毛筆円相＋**本物の毛筆「坐雲堂」**／THE UN-DO＋三日月・2560×1440・**全デバイス安全域1235×338に文字収め**）。坐雲堂は `seiundou-source.webp` 原本／`seiundou-light.png` 淡色版
 - **動画の透かし**: `assets/youtube/watermark.png`（円相のみ・背景透過＋淡い影・300px四方）
 - **リンク欄**: 「坐るアプリ → https://the-un-do.vercel.app/ 」

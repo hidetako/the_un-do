@@ -60,8 +60,10 @@
     filter:drop-shadow(0 14px 36px rgba(0,0,0,.45))}
   .plaque svg,.slot svg{width:100%;height:auto;display:block}
   /* 本物の毛筆 円相（スプラッシュの顔） */
-  .enso{width:min(50vw,190px); margin-bottom:22px}
-  .enso img{width:100%; height:auto; display:block}
+  .enso{position:relative; width:min(50vw,190px); margin-bottom:22px}
+  .enso .ring{width:100%; height:auto; display:block}
+  .enso .koun{position:absolute; right:-8%; top:-8%; width:38%; height:auto}
+  .enso .go{position:absolute; right:14%; bottom:-4%; width:28%; height:auto}
   /* 本物の毛筆「一息」 */
   .brandk{margin:0}
   .brandk img{display:block; margin:0 auto; width:clamp(152px,37vw,252px); height:auto}
@@ -99,6 +101,7 @@
   #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
   #setup .title{font-family:var(--brush); font-size:30px; color:var(--paper); margin:0 0 4px; letter-spacing:.08em}
   #setup .title small{display:block; font-family:var(--serif); font-size:11px; letter-spacing:.5em; color:var(--gold); margin-top:8px; padding-left:.5em}
+  #setup .title .titlebrush{display:block; margin:0 auto 2px; width:min(54vw,210px); height:auto}
   .group{width:min(92vw,540px); margin:26px 0 0}
   .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:14px; text-align:center; opacity:.9}
   .opts{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
@@ -232,7 +235,11 @@
 
   <!-- SPLASH -->
   <section class="screen on" id="splash">
-    <div class="enso breathe"><img src="assets/brush/enso.png" alt="円相" width="190" height="189"></div>
+    <div class="enso breathe">
+      <img class="ring" src="assets/brush/enso.png" alt="円相">
+      <img class="koun" src="assets/brush/koun.png" alt="行雲流水">
+      <img class="go" src="assets/brush/go.png" alt="豪">
+    </div>
     <h1 class="brandk"><img src="assets/brush/issoku.png" alt="一息"></h1>
     <div class="brandsub">ISSOKU</div>
     <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
@@ -243,7 +250,7 @@
 
   <!-- SETUP -->
   <section class="screen" id="setup">
-    <div class="title">坐雲堂<small>THE UN-DO</small></div>
+    <div class="title"><img class="titlebrush" src="assets/brush/seiundou.png" alt="坐雲堂"><small>THE UN-DO</small></div>
     <div class="lobby">
       <canvas id="globe" width="360" height="360" aria-hidden="true"></canvas>
       <div class="presence" id="presenceHall"><span class="pdot"></span><span class="ptext"></span></div>
