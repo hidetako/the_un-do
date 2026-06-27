@@ -24,7 +24,12 @@
 
 ### チャンネル
 - 名前（案）: 一息 — 坐雲堂 ｜ Issoku / The Un-do
-- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用）
+- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用。人が読む用・変更可）
+- **チャンネルID（恒久・一意）**: `UCqzoMItMT74uC--y67S1-AQ` → https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ
+  - ハンドルを変えても不変。RSS / API / 自動連携の鍵に使う。
+  - ライブ直行: `…/channel/UCqzoMItMT74uC--y67S1-AQ/live`（`@The-un_do/live` でも可）
+  - RSS: `https://www.youtube.com/feeds/videos.xml?channel_id=UCqzoMItMT74uC--y67S1-AQ`
+  - ※アプリの導線（`YT_LIVE_URL`）は読みやすいハンドル `@The-un_do` のままでよい。IDは裏の永続キーとして記録。
 - **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（一息の円相＋息＋朱印・1600px四方）
 - **バナー（ヘッダー）**: `assets/youtube/banner.png`（坐雲堂／THE UN-DO＋三日月・2560×1440・セーフエリア配慮）
 - **リンク欄**: 「坐るアプリ → https://the-un-do.vercel.app/ 」
