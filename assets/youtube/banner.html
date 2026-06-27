@@ -1,29 +1,32 @@
 <!doctype html><html><head><meta charset="utf-8"><style>
   html,body{margin:0;width:2560px;height:1440px;overflow:hidden}
-  .b{width:2560px;height:1440px;position:relative;display:flex;align-items:center;justify-content:center;
-     background:radial-gradient(115% 130% at 50% 26%, #2e2519 0%, #181410 54%, #0c0905 100%);
+  .b{width:2560px;height:1440px;position:relative;
+     background:radial-gradient(120% 135% at 50% 30%, #2e2519 0%, #181410 52%, #0c0905 100%);
      font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP',serif; overflow:hidden}
-  .moon{position:absolute; top:300px; left:1860px; width:290px; height:290px}
-  .moon svg{width:100%;height:100%;filter:drop-shadow(0 0 26px rgba(244,238,218,.4)) drop-shadow(0 0 60px rgba(244,238,218,.18))}
+  /* 月＝装飾。PC/TVの表示帯（中央±約210px）右側に置く（モバイル安全域の外） */
+  .moon{position:absolute; top:566px; left:2040px; width:214px; height:214px}
+  .moon svg{width:100%;height:100%;filter:drop-shadow(0 0 22px rgba(244,238,218,.4)) drop-shadow(0 0 52px rgba(244,238,218,.16))}
   .cloud{position:absolute; border-radius:50%; filter:blur(10px);
-    background:radial-gradient(ellipse at center, rgba(206,212,222,.22), rgba(206,212,222,.08) 55%, transparent 75%)}
-  .cl1{width:520px;height:120px;left:1740px;top:430px}
-  .row{display:flex;align-items:center;gap:110px;z-index:2}
-  .h{color:#efe9dc;font-size:170px;letter-spacing:.05em;line-height:1;font-weight:500}
-  .h .lat{display:block;color:#d8cdb6;font-size:66px;letter-spacing:.22em;margin-top:26px;padding-left:.22em}
-  .s{color:#c2a35e;font-size:44px;letter-spacing:.2em;margin-top:34px;padding-left:.2em}
-  .u{color:#e8c87a;font-size:46px;letter-spacing:.14em;margin-top:30px;padding-left:.14em}
+    background:radial-gradient(ellipse at center, rgba(206,212,222,.2), rgba(206,212,222,.07) 55%, transparent 75%)}
+  .cl1{width:420px;height:104px;left:1960px;top:690px}
+  /* 中央の安全エリア（1235×338）。主要素はこの中だけに置く */
+  .safe{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:1235px; height:338px; display:flex; align-items:center; justify-content:center; gap:62px}
+  .h{color:#efe9dc; font-size:116px; letter-spacing:.05em; line-height:1; font-weight:500}
+  .h .lat{display:block; color:#d8cdb6; font-size:42px; letter-spacing:.22em; margin-top:16px; padding-left:.22em}
+  .s{color:#c2a35e; font-size:28px; letter-spacing:.14em; margin-top:24px; padding-left:.14em}
+  .u{color:#e8c87a; font-size:30px; letter-spacing:.12em; margin-top:16px; padding-left:.12em}
 </style></head><body>
 <div class="b">
+  <div class="cloud cl1"></div>
   <div class="moon">
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs><mask id="cr"><rect width="100" height="100" fill="#000"/><circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="63" cy="45" r="30" fill="#000"/></mask></defs>
       <circle cx="50" cy="52" r="33" fill="#f4eeda" mask="url(#cr)"/>
     </svg>
   </div>
-  <div class="cloud cl1"></div>
-  <div class="row">
-    <svg width="330" height="330" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+  <div class="safe">
+    <svg width="232" height="232" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="smk" x1="0" y1="312" x2="0" y2="52" gradientUnits="userSpaceOnUse">
           <stop offset="0" stop-color="#efe9dc" stop-opacity="0.10"/>
