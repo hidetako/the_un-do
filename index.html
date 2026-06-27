@@ -34,9 +34,21 @@
     border:1px solid rgba(239,233,220,.3); border-radius:999px; padding:6px 14px;
     font-family:var(--serif); font-size:13px; letter-spacing:.12em; cursor:pointer; transition:opacity .4s}
   .bar button:hover{opacity:1}
-  .bar-left{display:flex; gap:10px}
+  .bar-left{display:flex; gap:10px; position:relative}
   .bar button.sound{font-size:15px; letter-spacing:0; padding:6px 13px}
   .bar button.sound.off{opacity:.3; text-decoration:line-through}
+  .bar button.lang{min-width:44px; text-align:center}
+  .langmenu{position:absolute; top:calc(100% + 8px); left:0; z-index:40;
+    background:rgba(20,18,14,.95); border:1px solid rgba(239,233,220,.22); border-radius:14px;
+    padding:6px; display:flex; flex-direction:column; gap:2px; min-width:150px;
+    box-shadow:0 12px 34px rgba(0,0,0,.5); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+  .langmenu[hidden]{display:none}
+  .bar .langmenu button{pointer-events:auto; display:block; width:100%; text-align:left;
+    border:0; border-radius:9px; background:transparent; color:var(--paper); opacity:.7;
+    font-family:var(--serif); font-size:14px; letter-spacing:.04em; padding:8px 12px; cursor:pointer;
+    transition:opacity .2s, background .2s}
+  .bar .langmenu button:hover{opacity:1; background:rgba(239,233,220,.08)}
+  .bar .langmenu button[aria-current="true"]{opacity:1; background:rgba(239,233,220,.13)}
   .exit{display:none}
 
   /* SPLASH */
@@ -199,8 +211,9 @@
 <body>
 <div class="bar">
   <div class="bar-left">
-    <button class="lang" id="langBtn">EN</button>
+    <button class="lang" id="langBtn" aria-haspopup="true" aria-label="language">EN</button>
     <button class="sound" id="soundBtn" aria-label="ambient sound">♪</button>
+    <div class="langmenu" id="langMenu" role="menu" hidden></div>
   </div>
   <button class="exit" id="exitBtn">✕</button>
 </div>
@@ -402,6 +415,10 @@ const T = {
     sitting:"ただ、座る", next:"次へ", ring:"鐘を鳴らす",
     endmsg:"からだを左右にやさしくゆらし、足をほぐして、合掌一礼。\nまた、いつでも。",
     again:"もう一度", out:"堂を出る",
+    p_open:"世界の坐雲堂は、いつでも開いています",
+    p_alone:"いま この堂にいるのは あなたひとり",
+    p_count:"いま {c} の地域から、{p}人がこの堂に",
+    confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
     scenes:{honden:"本堂",kare:"枯山水",umi:"海辺の岸壁",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
   en:{
@@ -414,7 +431,123 @@ const T = {
     sitting:"just sit", next:"Next", ring:"Ring the bell",
     endmsg:"Gently sway side to side, loosen your legs, and bow with palms together.\nReturn anytime.",
     again:"Once more", out:"Leave the Hall",
+    p_open:"The hall is open — anywhere, anytime",
+    p_alone:"You are the only one in the hall right now",
+    p_count:"{p} people from {c} regions are in the hall now",
+    confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Sea cliff",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
+  },
+  "zh-Hans":{
+    tagline:"全天候，从世界任何角落。<br>歇一口气。",
+    enter:"进入坐云堂", g_posture:"姿势", g_scene:"座处", g_time:"时长",
+    g_orient:"引导", g_sound:"环境音", snd_on:"开", snd_off:"关", begin:"开始",
+    yt_watch:"在 YouTube 上的坐云堂", credit:"Yorozu Solutions",
+    floor:"席地坐", floor_s:"结跏趺坐／半跏", chair:"坐椅子", chair_s:"椅子坐禅",
+    on:"播放", off:"跳过", min:"分",
+    sitting:"只管打坐", next:"下一步", ring:"鸣钟",
+    endmsg:"轻轻左右摇晃身体，舒展双腿，合掌一礼。\n随时再来。",
+    again:"再来一次", out:"走出堂外",
+    p_open:"世界各地的坐云堂，随时为你敞开",
+    p_alone:"此刻，堂中只有你一人",
+    p_count:"此刻，来自 {c} 个地区的 {p} 人正在堂中",
+    confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海边崖壁",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
+  },
+  "zh-Hant":{
+    tagline:"全天候，從世界任何角落。<br>歇一口氣。",
+    enter:"進入坐雲堂", g_posture:"姿勢", g_scene:"座處", g_time:"時長",
+    g_orient:"引導", g_sound:"環境音", snd_on:"開", snd_off:"關", begin:"開始",
+    yt_watch:"在 YouTube 上的坐雲堂", credit:"Yorozu Solutions",
+    floor:"席地坐", floor_s:"結跏趺坐／半跏", chair:"坐椅子", chair_s:"椅子坐禪",
+    on:"播放", off:"跳過", min:"分",
+    sitting:"只管打坐", next:"下一步", ring:"鳴鐘",
+    endmsg:"輕輕左右搖晃身體，舒展雙腿，合掌一禮。\n隨時再來。",
+    again:"再來一次", out:"走出堂外",
+    p_open:"世界各地的坐雲堂，隨時為你敞開",
+    p_alone:"此刻，堂中只有你一人",
+    p_count:"此刻，來自 {c} 個地區的 {p} 人正在堂中",
+    confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海邊崖壁",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
+  },
+  ko:{
+    tagline:"24시간, 세계 어디에서나.<br>한 호흡, 쉬어 가다.",
+    enter:"좌운당에 들다", g_posture:"자세", g_scene:"자리", g_time:"시간",
+    g_orient:"안내", g_sound:"환경음", snd_on:"켜기", snd_off:"끄기", begin:"시작하기",
+    yt_watch:"YouTube에서도, 좌운당", credit:"Yorozu Solutions",
+    floor:"바닥 좌선", floor_s:"결가부좌 / 반가부좌", chair:"의자 좌선", chair_s:"의자 좌선",
+    on:"재생", off:"건너뛰기", min:"분",
+    sitting:"그저, 앉다", next:"다음", ring:"종을 울리다",
+    endmsg:"몸을 좌우로 부드럽게 흔들고, 다리를 풀고, 합장하여 한 번 절합니다.\n언제든지, 또.",
+    again:"다시 한 번", out:"당을 나서다",
+    p_open:"세계의 좌운당은, 언제나 열려 있습니다",
+    p_alone:"지금 이 당에 있는 사람은 당신 혼자입니다",
+    p_count:"지금 {c}개 지역에서 {p}명이 이 당에 있습니다",
+    confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
+    scenes:{honden:"본당",kare:"고산수 정원",umi:"바닷가 절벽",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
+  },
+  es:{
+    tagline:"A toda hora, desde cualquier lugar.<br>Toma un respiro.",
+    enter:"Entrar en la sala", g_posture:"Postura", g_scene:"Lugar", g_time:"Duración",
+    g_orient:"Guía", g_sound:"Sonido ambiente", snd_on:"Activar", snd_off:"Silenciar", begin:"Comenzar",
+    yt_watch:"The Un-do en YouTube", credit:"Yorozu Solutions",
+    floor:"En el suelo", floor_s:"piernas cruzadas", chair:"En silla", chair_s:"zazen en silla",
+    on:"Reproducir", off:"Omitir", min:"min",
+    sitting:"solo sentarse", next:"Siguiente", ring:"Tocar la campana",
+    endmsg:"Mece el cuerpo suavemente de lado a lado, afloja las piernas y haz una reverencia con las palmas juntas.\nVuelve cuando quieras.",
+    again:"Una vez más", out:"Salir de la sala",
+    p_open:"La sala está abierta, en cualquier lugar y a cualquier hora",
+    p_alone:"Ahora mismo eres la única persona en la sala",
+    p_count:"Ahora hay {p} personas de {c} regiones en la sala",
+    confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
+    scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Acantilado junto al mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
+  },
+  fr:{
+    tagline:"À toute heure, où que vous soyez.<br>Le temps d’un souffle.",
+    enter:"Entrer dans la salle", g_posture:"Posture", g_scene:"Place", g_time:"Durée",
+    g_orient:"Guidage", g_sound:"Son d’ambiance", snd_on:"Activer", snd_off:"Couper", begin:"Commencer",
+    yt_watch:"The Un-do sur YouTube", credit:"Yorozu Solutions",
+    floor:"Au sol", floor_s:"jambes croisées", chair:"Sur une chaise", chair_s:"zazen sur chaise",
+    on:"Lire", off:"Passer", min:"min",
+    sitting:"juste s’asseoir", next:"Suivant", ring:"Sonner la cloche",
+    endmsg:"Balancez doucement le corps de gauche à droite, détendez vos jambes et inclinez-vous, paumes jointes.\nRevenez quand vous voulez.",
+    again:"Encore une fois", out:"Quitter la salle",
+    p_open:"La salle est ouverte, partout et à toute heure",
+    p_alone:"Vous êtes seul·e dans la salle en ce moment",
+    p_count:"{p} personnes de {c} régions sont dans la salle",
+    confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
+    scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Falaise au bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
+  },
+  de:{
+    tagline:"Jederzeit, von überall.<br>Einen Atemzug lang innehalten.",
+    enter:"Die Halle betreten", g_posture:"Haltung", g_scene:"Sitzplatz", g_time:"Dauer",
+    g_orient:"Anleitung", g_sound:"Naturklang", snd_on:"An", snd_off:"Aus", begin:"Beginnen",
+    yt_watch:"The Un-do auf YouTube", credit:"Yorozu Solutions",
+    floor:"Auf dem Boden", floor_s:"im Schneidersitz", chair:"Auf dem Stuhl", chair_s:"Stuhl-Zazen",
+    on:"Abspielen", off:"Überspringen", min:"Min.",
+    sitting:"einfach sitzen", next:"Weiter", ring:"Die Glocke läuten",
+    endmsg:"Wiege den Körper sanft hin und her, lockere die Beine und verneige dich mit zusammengelegten Händen.\nKomm jederzeit wieder.",
+    again:"Noch einmal", out:"Die Halle verlassen",
+    p_open:"Die Halle ist offen – überall und jederzeit",
+    p_alone:"Im Moment bist du allein in der Halle",
+    p_count:"{p} Menschen aus {c} Regionen sind jetzt in der Halle",
+    confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
+    scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Klippe am Meer",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
+  },
+  pt:{
+    tagline:"A qualquer hora, de qualquer lugar.<br>Respire fundo.",
+    enter:"Entrar no salão", g_posture:"Postura", g_scene:"Lugar", g_time:"Duração",
+    g_orient:"Orientação", g_sound:"Som ambiente", snd_on:"Ativar", snd_off:"Silenciar", begin:"Começar",
+    yt_watch:"The Un-do no YouTube", credit:"Yorozu Solutions",
+    floor:"No chão", floor_s:"pernas cruzadas", chair:"Na cadeira", chair_s:"zazen na cadeira",
+    on:"Reproduzir", off:"Pular", min:"min",
+    sitting:"apenas sentar", next:"Próximo", ring:"Tocar o sino",
+    endmsg:"Balance o corpo suavemente de um lado a outro, solte as pernas e faça uma reverência com as palmas juntas.\nVolte quando quiser.",
+    again:"Mais uma vez", out:"Sair do salão",
+    p_open:"O salão está aberto — em qualquer lugar, a qualquer hora",
+    p_alone:"Neste momento, você é a única pessoa no salão",
+    p_count:"Agora há {p} pessoas de {c} regiões no salão",
+    confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
+    scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Penhasco à beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
   }
 };
 const ORIENT = {
@@ -428,7 +561,42 @@ const ORIENT = {
         "Left leg over right — cross-legged. A chair is fine too.",
         "Lift the shoulders, drop them as you exhale.","Sway side to side; find the center.",
         "Eyes half-open.","— Now, regulate the breath. <b>Chosoku</b>.",
-        "In through the nose, out through the mouth. Slowly settle it.","Shoulders & ears, nose & navel — in one line."]
+        "In through the nose, out through the mouth. Slowly settle it.","Shoulders & ears, nose & navel — in one line."],
+    "zh-Hans":["在你喜欢的座处，取一个舒适的姿势。","整理好坐垫，转身两次，合掌一礼。",
+        "右腿上叠左腿，结跏趺坐。若有困难，坐椅子也可。",
+        "提起双肩，随呼气轻轻落下。","左右摇摆，寻找中心。",
+        "双眼半开。","——从这里开始，调整呼吸。<b>调息</b>。",
+        "用鼻吸气，用口呼气。慢慢地调匀。","肩与耳、鼻与丹田，连成一线。"],
+    "zh-Hant":["在你喜歡的座處，取一個舒適的姿勢。","整理好坐墊，轉身兩次，合掌一禮。",
+        "右腿上疊左腿，結跏趺坐。若有困難，坐椅子也可。",
+        "提起雙肩，隨吐氣輕輕落下。","左右搖擺，尋找中心。",
+        "雙眼半開。","——從這裡開始，調整呼吸。<b>調息</b>。",
+        "用鼻吸氣，用口吐氣。慢慢地調勻。","肩與耳、鼻與丹田，連成一線。"],
+    ko:["마음에 드는 자리에서, 편안한 자세로.","방석을 매만지고, 방향을 바꿔 두 번, 합장하여 절합니다.",
+        "오른 넓적다리에 왼 다리를 올려 결가부좌. 어렵다면 의자도 좋습니다.",
+        "두 어깨를 들어 올렸다가, 숨을 내쉬며 툭 떨어뜨립니다.","좌우로 흔들며, 중심을 찾습니다.",
+        "눈은 반쯤, 뜬 채로.","——여기서부터, 호흡을 고릅니다. <b>조식(調息)</b>.",
+        "코로 들이쉬고, 입으로 내쉽니다. 천천히, 골라 갑니다.","어깨와 귀, 코와 단전이 일직선으로."],
+    es:["Acomódate en tu sitio, sin tensión.","Ordena tu cojín; gírate dos veces e inclínate con las palmas juntas.",
+        "Pierna izquierda sobre la derecha, piernas cruzadas. Una silla también vale.",
+        "Levanta los hombros y déjalos caer al exhalar.","Mécete de lado a lado; encuentra el centro.",
+        "Los ojos entreabiertos.","— Desde aquí, regula la respiración. <b>Chōsoku</b>.",
+        "Inhala por la nariz, exhala por la boca. Despacio, ve asentándola.","Hombros y orejas, nariz y vientre: en una sola línea."],
+    fr:["Installez-vous à votre place, sans effort.","Ajustez votre coussin ; tournez-vous deux fois et inclinez-vous, paumes jointes.",
+        "Jambe gauche sur la droite, en tailleur. Une chaise convient aussi.",
+        "Soulevez les épaules, laissez-les retomber en expirant.","Balancez-vous de gauche à droite ; trouvez le centre.",
+        "Les yeux mi-clos.","— À partir d’ici, réglez le souffle. <b>Chōsoku</b>.",
+        "Inspirez par le nez, expirez par la bouche. Lentement, laissez-le s’apaiser.","Épaules et oreilles, nez et ventre : sur une même ligne."],
+    de:["Nimm bequem auf deinem Platz Platz, ganz gelöst.","Richte dein Kissen, wende dich zweimal und verneige dich mit zusammengelegten Händen.",
+        "Linkes Bein über das rechte – im Schneidersitz. Ein Stuhl ist auch in Ordnung.",
+        "Hebe die Schultern und lass sie beim Ausatmen fallen.","Wiege dich hin und her; finde die Mitte.",
+        "Die Augen halb geöffnet.","— Von hier an: reguliere den Atem. <b>Chōsoku</b>.",
+        "Durch die Nase ein, durch den Mund aus. Langsam, lass ihn sich setzen.","Schultern und Ohren, Nase und Bauch – in einer Linie."],
+    pt:["Acomode-se em seu lugar, à vontade.","Ajeite a almofada; vire-se duas vezes e faça uma reverência com as palmas juntas.",
+        "Perna esquerda sobre a direita, pernas cruzadas. Uma cadeira também serve.",
+        "Erga os ombros e deixe-os cair ao expirar.","Balance de um lado a outro; encontre o centro.",
+        "Os olhos entreabertos.","— A partir daqui, regule a respiração. <b>Chōsoku</b>.",
+        "Inspire pelo nariz, expire pela boca. Devagar, vá assentando.","Ombros e orelhas, nariz e ventre: numa só linha."]
   },
   chair:{
     ja:["椅子に浅く腰かけ、背もたれには寄りかからない。","両足は肩幅、足の裏を床にぴたり。",
@@ -440,7 +608,42 @@ const ORIENT = {
         "Rest on your sitting bones; pelvis upright.","Stack the spine; let the head settle on top.",
         "Hands in the cosmic mudra, or simply on your knees.","Sway side to side; find the center.",
         "Eyes half-open, gaze ~1.5m ahead.","— Now, regulate the breath. <b>Chosoku</b>.",
-        "Through the nose, naturally. Let it come and go, and settle."]
+        "Through the nose, naturally. Let it come and go, and settle."],
+    "zh-Hans":["浅坐椅上，不靠椅背。","两脚与肩同宽，脚掌平贴地面。",
+        "上身落于坐骨，骨盆端正竖立。","脊椎一节一节叠起，头轻轻安放其上。",
+        "双手结法界定印，或自然放在膝上。","左右摇摆，寻找中心。",
+        "双眼半开，落在前方约一点五米的地面。","——从这里开始，调整呼吸。<b>调息</b>。",
+        "用鼻，自然呼吸。任其出入，慢慢调匀。"],
+    "zh-Hant":["淺坐椅上，不靠椅背。","兩腳與肩同寬，腳掌平貼地面。",
+        "上身落於坐骨，骨盆端正豎立。","脊椎一節一節疊起，頭輕輕安放其上。",
+        "雙手結法界定印，或自然放在膝上。","左右搖擺，尋找中心。",
+        "雙眼半開，落在前方約一點五米的地面。","——從這裡開始，調整呼吸。<b>調息</b>。",
+        "用鼻，自然呼吸。任其出入，慢慢調勻。"],
+    ko:["의자에 얕게 걸터앉고, 등받이에 기대지 않습니다.","두 발은 어깨너비로, 발바닥을 바닥에 딱 붙입니다.",
+        "상체를 좌골 위에 얹고, 골반을 곧게 세웁니다.","척추를 하나씩 쌓아 올리고, 머리를 살며시 올려놓습니다.",
+        "손은 법계정인, 또는 그대로 무릎 위에.","좌우로 흔들며, 중심을 찾습니다.",
+        "눈은 반쯤, 1.5미터 앞 바닥에.","——여기서부터, 호흡을 고릅니다. <b>조식(調息)</b>.",
+        "코로, 자연스럽게. 드나듦에 맡긴 채, 골라 갑니다."],
+    es:["Siéntate hacia el borde de la silla; no te apoyes en el respaldo.","Pies a la anchura de los hombros, plantas firmes en el suelo.",
+        "Apóyate sobre los isquiones; la pelvis erguida.","Apila la columna; deja que la cabeza repose encima.",
+        "Manos en el mudra cósmico, o sencillamente sobre las rodillas.","Mécete de lado a lado; encuentra el centro.",
+        "Ojos entreabiertos, la mirada a un metro y medio.","— Desde aquí, regula la respiración. <b>Chōsoku</b>.",
+        "Por la nariz, con naturalidad. Deja que entre y salga, y se asiente."],
+    fr:["Asseyez-vous au bord de la chaise ; ne vous adossez pas.","Pieds écartés à la largeur des épaules, plantes bien à plat.",
+        "Reposez sur les ischions ; le bassin droit.","Empilez la colonne ; laissez la tête se poser au sommet.",
+        "Mains dans le mudra cosmique, ou simplement sur les genoux.","Balancez-vous de gauche à droite ; trouvez le centre.",
+        "Les yeux mi-clos, le regard à un mètre cinquante.","— À partir d’ici, réglez le souffle. <b>Chōsoku</b>.",
+        "Par le nez, naturellement. Laissez-le aller et venir, et s’apaiser."],
+    de:["Setz dich weit vorn auf den Stuhl; lehn dich nicht an.","Füße schulterbreit, die Sohlen flach auf dem Boden.",
+        "Ruhe auf den Sitzbeinen; das Becken aufrecht.","Staple die Wirbelsäule; lass den Kopf sanft obenauf ruhen.",
+        "Hände im kosmischen Mudra oder einfach auf den Knien.","Wiege dich hin und her; finde die Mitte.",
+        "Augen halb geöffnet, der Blick etwa 1,5 m voraus.","— Von hier an: reguliere den Atem. <b>Chōsoku</b>.",
+        "Durch die Nase, ganz natürlich. Lass ihn kommen und gehen und sich setzen."],
+    pt:["Sente-se na beira da cadeira; não se encoste.","Pés à largura dos ombros, plantas firmes no chão.",
+        "Apoie-se sobre os ísquios; a pélvis ereta.","Empilhe a coluna; deixe a cabeça repousar no topo.",
+        "Mãos no mudra cósmico, ou simplesmente sobre os joelhos.","Balance de um lado a outro; encontre o centro.",
+        "Olhos entreabertos, o olhar a um metro e meio.","— A partir daqui, regule a respiração. <b>Chōsoku</b>.",
+        "Pelo nariz, naturalmente. Deixe-a ir e vir, e assentar."]
   }
 };
 
@@ -449,7 +652,34 @@ const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
-let lang = store.get('issoku_lang') || 'ja';
+/* 対応言語（コード, 母語表記）。バーのボタンには短ラベルを表示。 */
+const LANGS = [
+  ['ja','日本語'], ['en','English'], ['zh-Hans','简体中文'], ['zh-Hant','繁體中文'],
+  ['ko','한국어'], ['es','Español'], ['fr','Français'], ['de','Deutsch'], ['pt','Português']
+];
+const LANG_SHORT = {ja:'あ', en:'EN', 'zh-Hans':'简', 'zh-Hant':'繁', ko:'한', es:'ES', fr:'FR', de:'DE', pt:'PT'};
+const NF_LOCALE = {ja:'ja-JP', en:'en-US', 'zh-Hans':'zh-CN', 'zh-Hant':'zh-TW', ko:'ko-KR', es:'es-ES', fr:'fr-FR', de:'de-DE', pt:'pt-BR'};
+/* 初回は閲覧者の言語を尊重。navigator.languages を優先順に見て、対応言語に対応づける。
+   中国語は繁体(hant/tw/hk/mo)を区別。未対応のみなら英語、判定不能なら日本語。手動切替は localStorage に記憶。 */
+function detectLang(){
+  try{
+    const ls = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language||''];
+    for(const raw of ls){
+      const l = (raw||'').toLowerCase();
+      if(/^ja\b/.test(l)) return 'ja';
+      if(/^zh/.test(l)) return /hant|tw|hk|mo/.test(l) ? 'zh-Hant' : 'zh-Hans';
+      if(/^ko\b/.test(l)) return 'ko';
+      if(/^es\b/.test(l)) return 'es';
+      if(/^fr\b/.test(l)) return 'fr';
+      if(/^de\b/.test(l)) return 'de';
+      if(/^pt\b/.test(l)) return 'pt';
+      if(/^en\b/.test(l)) return 'en';
+    }
+    return ls.some(Boolean) ? 'en' : 'ja';
+  }catch(e){ return 'ja'; }
+}
+let lang = store.get('issoku_lang') || detectLang();
+if(!T[lang]) lang = detectLang();   // 旧い保存値や未対応コードのフォールバック
 let soundOn = store.get('issoku_sound')!=='0';
 const sel = { posture:'floor', scene:'honden', time:5, orient:true };
 try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
@@ -467,7 +697,7 @@ function applyLang(){
   const t=T[lang];
   document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t');
     if(t[k]!==undefined){ if(k==='tagline') el.innerHTML=t[k]; else el.textContent=t[k]; } });
-  $('#langBtn').textContent = lang==='ja' ? 'EN' : 'あ';
+  $('#langBtn').textContent = LANG_SHORT[lang] || 'A';
   document.documentElement.lang = lang;
   buildOpts();
   updatePresence();
@@ -822,12 +1052,10 @@ const presence = (() => {
   return { connect, setSitting, leave, compute, startGlobe, stopGlobe, onChange:(f)=>{onChange=f;} };
 })();
 function presenceText(){
-  const p=presence.compute(), nf=new Intl.NumberFormat(lang==='ja'?'ja-JP':'en-US');
-  if(!p.live) return lang==='ja' ? '世界の坐雲堂は、いつでも開いています' : 'The hall is open — anywhere, anytime';
-  if(p.people<=1) return lang==='ja' ? 'いま この堂にいるのは あなたひとり' : 'You are the only one in the hall right now';
-  return lang==='ja'
-    ? `いま ${nf.format(p.countries)} の地域から、${nf.format(p.people)}人がこの堂に`
-    : `${nf.format(p.people)} people from ${nf.format(p.countries)} regions are in the hall now`;
+  const p=presence.compute(), t=T[lang], nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
+  if(!p.live) return t.p_open;
+  if(p.people<=1) return t.p_alone;
+  return t.p_count.replace('{p}', nf.format(p.people)).replace('{c}', nf.format(p.countries));
 }
 function updatePresence(){ const txt=presenceText();
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
@@ -875,7 +1103,19 @@ function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeou
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
 
 /* ---------- wire up ---------- */
-$('#langBtn').onclick=()=>{ lang= lang==='ja'?'en':'ja'; store.set('issoku_lang',lang); applyLang(); };
+/* 言語ピッカー（ポップオーバー）。バーのボタンで開閉、外側クリックで閉じる。 */
+function buildLangMenu(){
+  const m=$('#langMenu'); m.innerHTML='';
+  LANGS.forEach(([code,label])=>{
+    const b=document.createElement('button'); b.type='button'; b.textContent=label; b.lang=code;
+    if(code===lang) b.setAttribute('aria-current','true');
+    b.onclick=(e)=>{ e.stopPropagation(); lang=code; store.set('issoku_lang',lang); m.hidden=true; applyLang(); };
+    m.appendChild(b);
+  });
+}
+$('#langBtn').onclick=(e)=>{ e.stopPropagation(); const m=$('#langMenu');
+  if(m.hidden){ buildLangMenu(); m.hidden=false; } else { m.hidden=true; } };
+document.addEventListener('click',()=>{ const m=$('#langMenu'); if(m&&!m.hidden) m.hidden=true; });
 $('#enterBtn').onclick=()=>{ ensureCtx(); show('setup'); };
 function refreshSoundBtn(){ const b=$('#soundBtn'); b.classList.toggle('off',!soundOn);
   b.setAttribute('aria-label', soundOn?'ambient sound: on':'ambient sound: off'); b.title=b.getAttribute('aria-label'); }
@@ -891,10 +1131,10 @@ function showConfirm(){
   if(!$('#session').classList.contains('on')) return;
   if($('#orient').style.display==='flex') return;      // オリエン中は出さない
   if($('#confirm').classList.contains('show')) return;
-  const ja=lang==='ja';
-  $('#confirmMsg').textContent = ja?'坐を、つづけますか？':'Continue sitting?';
-  $('#contBtn').textContent = ja?'つづける':'Continue';
-  $('#stopBtn').textContent = ja?'やめる':'End';
+  const t=T[lang];
+  $('#confirmMsg').textContent = t.confirm_msg;
+  $('#contBtn').textContent = t.confirm_cont;
+  $('#stopBtn').textContent = t.confirm_stop;
   $('#confirm').classList.add('show');
 }
 $('#contBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); };

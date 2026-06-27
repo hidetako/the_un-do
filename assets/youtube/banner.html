@@ -1,0 +1,73 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  html,body{margin:0;width:2560px;height:1440px;overflow:hidden}
+  .b{width:2560px;height:1440px;position:relative;display:flex;align-items:center;justify-content:center;
+     background:radial-gradient(115% 130% at 50% 26%, #2e2519 0%, #181410 54%, #0c0905 100%);
+     font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP',serif; overflow:hidden}
+  .moon{position:absolute; top:300px; left:1860px; width:290px; height:290px}
+  .moon svg{width:100%;height:100%;filter:drop-shadow(0 0 26px rgba(244,238,218,.4)) drop-shadow(0 0 60px rgba(244,238,218,.18))}
+  .cloud{position:absolute; border-radius:50%; filter:blur(10px);
+    background:radial-gradient(ellipse at center, rgba(206,212,222,.22), rgba(206,212,222,.08) 55%, transparent 75%)}
+  .cl1{width:520px;height:120px;left:1740px;top:430px}
+  .row{display:flex;align-items:center;gap:110px;z-index:2}
+  .h{color:#efe9dc;font-size:170px;letter-spacing:.05em;line-height:1;font-weight:500}
+  .h .lat{display:block;color:#d8cdb6;font-size:66px;letter-spacing:.22em;margin-top:26px;padding-left:.22em}
+  .s{color:#c2a35e;font-size:44px;letter-spacing:.2em;margin-top:34px;padding-left:.2em}
+  .u{color:#e8c87a;font-size:46px;letter-spacing:.14em;margin-top:30px;padding-left:.14em}
+</style></head><body>
+<div class="b">
+  <div class="moon">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><mask id="cr"><rect width="100" height="100" fill="#000"/><circle cx="50" cy="52" r="33" fill="#fff"/><circle cx="63" cy="45" r="30" fill="#000"/></mask></defs>
+      <circle cx="50" cy="52" r="33" fill="#f4eeda" mask="url(#cr)"/>
+    </svg>
+  </div>
+  <div class="cloud cl1"></div>
+  <div class="row">
+    <svg width="330" height="330" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="smk" x1="0" y1="312" x2="0" y2="52" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#efe9dc" stop-opacity="0.10"/>
+          <stop offset="0.12" stop-color="#efe9dc" stop-opacity="0.26"/>
+          <stop offset="0.55" stop-color="#efe9dc" stop-opacity="0.13"/>
+          <stop offset="1" stop-color="#efe9dc" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="soft" x="-60%" y="-15%" width="220%" height="130%"><feGaussianBlur stdDeviation="5"/></filter>
+      </defs>
+      <path id="smokeHalo" fill="url(#smk)" filter="url(#soft)"/>
+      <path id="smokeCore" fill="url(#smk)"/>
+      <path id="enso" fill="#efe9dc"/>
+      <g transform="translate(256 250)"><rect width="44" height="44" rx="6" fill="#b04a39"/><circle cx="22" cy="22" r="12" fill="none" stroke="#efe9dc" stroke-width="3.4"/></g>
+    </svg>
+    <div class="txt">
+      <div class="h">坐雲堂<span class="lat">THE&nbsp;UN-DO</span></div>
+      <div class="s">一息 ISSOKU ｜ 24時間ひらく、世界の坐禅堂</div>
+      <div class="u">the-un-do.vercel.app</div>
+    </div>
+  </div>
+</div>
+<script>
+function ribbon(pts,hws){const n=pts.length,L=[],R=[];
+  for(let i=0;i<n;i++){const a=pts[Math.min(n-1,i+1)],b=pts[Math.max(0,i-1)];
+    const dx=a[0]-b[0],dy=a[1]-b[1],l=Math.hypot(dx,dy)||1,nx=-(dy/l),ny=(dx/l);
+    L.push([pts[i][0]+nx*hws[i],pts[i][1]+ny*hws[i]]);R.push([pts[i][0]-nx*hws[i],pts[i][1]-ny*hws[i]]);}
+  let d='M'+L[0][0].toFixed(2)+','+L[0][1].toFixed(2);
+  for(let i=1;i<n;i++)d+='L'+L[i][0].toFixed(2)+','+L[i][1].toFixed(2);
+  for(let i=n-1;i>=0;i--)d+='L'+R[i][0].toFixed(2)+','+R[i][1].toFixed(2);return d+'Z';}
+function enso(cx,cy,Rr,gapC,gapD,hwMax){const N=170,a0=gapC+gapD/2,a1=gapC+360-gapD/2,o=[],ip=[];
+  for(let i=0;i<=N;i++){const s=i/N,ang=(a0+(a1-a0)*s)*Math.PI/180;
+    const f=(0.22+0.78*Math.sin(Math.PI*Math.pow(s,0.72)))*(1-0.82*Math.pow(s,4));
+    const hw=Math.max(0.6,hwMax*f),ca=Math.cos(ang),sa=Math.sin(ang);
+    o.push([cx+(Rr+hw)*ca,cy+(Rr+hw)*sa]);ip.push([cx+(Rr-hw)*ca,cy+(Rr-hw)*sa]);}
+  let d='M'+o[0][0].toFixed(2)+','+o[0][1].toFixed(2);
+  for(let i=1;i<o.length;i++)d+='L'+o[i][0].toFixed(2)+','+o[i][1].toFixed(2);
+  for(let i=ip.length-1;i>=0;i--)d+='L'+ip[i][0].toFixed(2)+','+ip[i][1].toFixed(2);return d+'Z';}
+function smoke(cx,yBase,yTop,baseW,seed){const N=80,pts=[],hws=[],rise=yBase-yTop;
+  for(let i=0;i<=N;i++){const h=i/N,y=yBase-h*rise;const drift=Math.pow(h,1.7)*20;
+    const sway=Math.sin(h*3.0+seed)*(1+h*6)+Math.sin(h*6.4+seed*1.7)*(0.5+h*3);pts.push([cx+drift+sway,y]);
+    const env=0.13+0.60*Math.pow(h,0.9),grow=Math.min(1,h*6);hws.push(Math.max(0.5,baseW*env*grow));}
+  return ribbon(pts,hws);}
+document.getElementById('enso').setAttribute('d', enso(192,184,126,90,54,23));
+document.getElementById('smokeCore').setAttribute('d', smoke(192,312,70,6.5,1.7));
+document.getElementById('smokeHalo').setAttribute('d', smoke(192,312,70,12,1.7));
+</script>
+</body></html>
