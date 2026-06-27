@@ -3,23 +3,24 @@
   .a{width:800px;height:800px;display:flex;flex-direction:column;align-items:center;justify-content:center;
      background:radial-gradient(120% 95% at 50% 40%, #2c2319 0%, #181410 56%, #0e0b07 100%);
      font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP',serif}
-  .stage{position:relative;width:300px;height:300px}
+  .stage{position:relative;width:286px;height:286px}
   .stage>*{position:absolute}
   /* 本物の円相（淡色・落款なし） */
-  .stage img.enso{left:18px;top:16px;width:264px;height:263px}
+  .stage img.enso{left:17px;top:15px;width:252px;height:251px}
   /* 朱印 */
-  .seal{left:196px;top:198px}
-  .name{color:#efe9dc;font-size:104px;letter-spacing:.14em;margin-top:26px;font-weight:500;padding-left:.14em}
-  .sub{color:#c2a35e;font-size:25px;letter-spacing:.62em;margin-top:18px;padding-left:.62em}
+  .seal{left:188px;top:190px}
+  /* 本物の筆文字「一息」（淡色） */
+  img.issoku{width:392px;height:auto;margin-top:26px;display:block}
+  .sub{color:#c2a35e;font-size:25px;letter-spacing:.62em;margin-top:14px;padding-left:.62em}
 </style></head><body>
 <div class="a">
   <div class="stage">
     <img class="enso" src="./enso-light.png">
-    <svg class="seal" width="42" height="42" xmlns="http://www.w3.org/2000/svg">
-      <rect width="42" height="42" rx="6" fill="#b04a39"/><circle cx="21" cy="21" r="11.5" fill="none" stroke="#efe9dc" stroke-width="3.2"/>
+    <svg class="seal" width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="6" fill="#b04a39"/><circle cx="20" cy="20" r="11" fill="none" stroke="#efe9dc" stroke-width="3"/>
     </svg>
   </div>
-  <div class="name">一息</div>
+  <img class="issoku" src="./issoku-light.png">
   <div class="sub">ISSOKU</div>
 </div>
 </body></html>
