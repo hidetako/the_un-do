@@ -173,9 +173,6 @@
   .status.show{opacity:1}
   #session[data-scene="kare"] #status,#session[data-scene="cho"] #status,#session[data-scene="neko"] #status{color:rgba(40,32,22,.6)}
   #session[data-scene="neko"] #status{bottom:22%}   /* 眠る猫と文字が重ならないよう上へ逃がす */
-  /* 調息：写真の香炉の位置に線香を立てる（写真側に受け皿があるのでアプリの皿は隠す） */
-  #session[data-scene="cho"] .censer{ right:auto; left:48.6%; bottom:29.5%; transform:translateX(-50%) scale(.5); transform-origin:bottom center }
-  #session[data-scene="cho"] .bowl{ display:none }
 
   /* 坐禅中の中断/継続 確認 */
   #confirm{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
@@ -362,7 +359,7 @@ const T = {
     p_alone:"いま この堂にいるのは あなたひとり",
     p_count:"いま {c} の地域から、{p}人がこの堂に",
     confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
-    scenes:{honden:"本堂",kare:"枯山水",umi:"海辺の岸壁",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
+    scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
   en:{
     tagline:"Anytime, from anywhere.<br>Take one breath.",
@@ -378,7 +375,7 @@ const T = {
     p_alone:"You are the only one in the hall right now",
     p_count:"{p} people from {c} regions are in the hall now",
     confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
-    scenes:{honden:"Main hall",kare:"Dry garden",umi:"Sea cliff",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
+    scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
   },
   "zh-Hans":{
     tagline:"全天候，从世界任何角落。<br>歇一口气。",
@@ -394,7 +391,7 @@ const T = {
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，来自 {c} 个地区的 {p} 人正在堂中",
     confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
-    scenes:{honden:"正殿",kare:"枯山水",umi:"海边崖壁",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
   },
   "zh-Hant":{
     tagline:"全天候，從世界任何角落。<br>歇一口氣。",
@@ -410,7 +407,7 @@ const T = {
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，來自 {c} 個地區的 {p} 人正在堂中",
     confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
-    scenes:{honden:"正殿",kare:"枯山水",umi:"海邊崖壁",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
   },
   ko:{
     tagline:"24시간, 세계 어디에서나.<br>한 호흡, 쉬어 가다.",
@@ -426,7 +423,7 @@ const T = {
     p_alone:"지금 이 당에 있는 사람은 당신 혼자입니다",
     p_count:"지금 {c}개 지역에서 {p}명이 이 당에 있습니다",
     confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
-    scenes:{honden:"본당",kare:"고산수 정원",umi:"바닷가 절벽",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
+    scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
   },
   es:{
     tagline:"A toda hora, desde cualquier lugar.<br>Toma un respiro.",
@@ -442,7 +439,7 @@ const T = {
     p_alone:"Ahora mismo eres la única persona en la sala",
     p_count:"Ahora hay {p} personas de {c} regiones en la sala",
     confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
-    scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Acantilado junto al mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
+    scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
   },
   fr:{
     tagline:"À toute heure, où que vous soyez.<br>Le temps d’un souffle.",
@@ -458,7 +455,7 @@ const T = {
     p_alone:"Vous êtes seul·e dans la salle en ce moment",
     p_count:"{p} personnes de {c} régions sont dans la salle",
     confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
-    scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Falaise au bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
+    scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
   },
   de:{
     tagline:"Jederzeit, von überall.<br>Einen Atemzug lang innehalten.",
@@ -474,7 +471,7 @@ const T = {
     p_alone:"Im Moment bist du allein in der Halle",
     p_count:"{p} Menschen aus {c} Regionen sind jetzt in der Halle",
     confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
-    scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Klippe am Meer",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
+    scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
   },
   pt:{
     tagline:"A qualquer hora, de qualquer lugar.<br>Respire fundo.",
@@ -490,7 +487,7 @@ const T = {
     p_alone:"Neste momento, você é a única pessoa no salão",
     p_count:"Agora há {p} pessoas de {c} regiões no salão",
     confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
-    scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Penhasco à beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
+    scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
   }
 };
 const ORIENT = {
@@ -840,7 +837,7 @@ const ambient = (() => {
         later(knock,(15+Math.random()*9)*1000); };
       later(knock,(7+Math.random()*6)*1000);
     },
-    /* 海辺の岸壁：寄せて引く波。ゆっくり膨らみ、しずまる。 */
+    /* 海岸：寄せて引く波。ゆっくり膨らみ、しずまる。 */
     umi(){
       const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=0.4;
       const g=ac.createGain(); g.gain.value=0.13; mod(g.gain,0.13,0.09); mod(g.gain,0.04,0.137); mod(lp.frequency,260,0.09);
@@ -1050,7 +1047,7 @@ function startIncense(durMs){
 function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
 function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
-  $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('splash'); }
+  $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
 /* 言語ピッカー（ポップオーバー）。バーのボタンで開閉、外側クリックで閉じる。 */
@@ -1076,7 +1073,7 @@ $('#soundBtn').onclick=()=>{ soundOn=!soundOn; store.set('issoku_sound', soundOn
 refreshSoundBtn();
 $('#beginBtn').onclick=enterSession;
 $('#exitBtn').onclick=abort;
-/* 坐禅中に画面をクリック → 中断/継続の確認（やめる＝初期画面へ） */
+/* 坐禅中に画面をクリック → 中断/継続の確認（やめる＝坐雲堂の入口=setupへ） */
 function showConfirm(){
   if(!$('#session').classList.contains('on')) return;
   if($('#orient').style.display==='flex') return;      // オリエン中は出さない
