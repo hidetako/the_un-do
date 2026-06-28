@@ -148,7 +148,7 @@
   #scene::after{content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(130% 100% at 50% 45%, transparent 52%, rgba(0,0,0,.32) 100%)}
   .scene-honden{background:#0c0906 url(assets/brush/honden.jpg) center/cover no-repeat}
-  .scene-kare{background:linear-gradient(165deg,#e7e0cf 0%,#d3c9b2 60%,#c3b89f 100%)}
+  .scene-kare{background:#cdbfa0 url(assets/brush/kare.jpg) center/cover no-repeat}
   .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
   .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
   .scene-neko{background:linear-gradient(168deg,#e3d6b8 0%,#c9ad84 100%)}
@@ -165,10 +165,9 @@
   @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
   .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
   .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
-  /* 座処の作画（枯山水＝石組＋砂紋／猫＝丸まって眠る） */
-  .garden,.cat{position:absolute; inset:0; display:none; pointer-events:none}
-  .garden svg,.cat svg{width:100%; height:100%; display:block}
-  .scene-kare .garden{display:block}
+  /* 座処の作画（猫＝丸まって眠る／枯山水は実写写真 assets/brush/kare.jpg） */
+  .cat{position:absolute; inset:0; display:none; pointer-events:none}
+  .cat svg{width:100%; height:100%; display:block}
   .scene-neko .cat{display:block}
   .cat .catg{transform-box:fill-box; transform-origin:50% 92%; animation:catbreath 5.5s ease-in-out infinite}
   @keyframes catbreath{0%,100%{transform:scale(1)} 50%{transform:scale(1.018)}}
@@ -339,45 +338,6 @@
           <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
           <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
           <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
-        </svg>
-      </div>
-      <div class="garden">
-        <svg viewBox="0 0 412 880" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <linearGradient id="ksky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7c4dc"/><stop offset="1" stop-color="#d2e1e9"/></linearGradient>
-            <linearGradient id="kwall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dccfb4"/><stop offset="1" stop-color="#c1b292"/></linearGradient>
-            <linearGradient id="kstone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b7464"/><stop offset="1" stop-color="#423c2c"/></linearGradient>
-            <linearGradient id="kstone2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#857c69"/><stop offset="1" stop-color="#4a4331"/></linearGradient>
-          </defs>
-          <!-- 青空 -->
-          <rect x="0" y="0" width="412" height="318" fill="url(#ksky)"/>
-          <!-- 庭の奥の塀：土塀＋瓦屋根 -->
-          <rect x="0" y="316" width="412" height="48" fill="url(#kwall)"/>
-          <rect x="0" y="318" width="412" height="3" fill="#000" opacity="0.10"/>
-          <rect x="-6" y="302" width="424" height="16" fill="#6a6253"/>
-          <rect x="-6" y="302" width="424" height="3.5" fill="#7e7563"/>
-          <rect x="0" y="362" width="412" height="5" fill="#3f3a2c" opacity="0.16"/>
-          <!-- 砂紋（手前） -->
-          <g fill="none" stroke="#a99a78" stroke-opacity="0.42" stroke-width="1.3">
-            <ellipse cx="150" cy="728" rx="54" ry="20"/>
-            <ellipse cx="150" cy="728" rx="90" ry="33"/>
-            <ellipse cx="150" cy="728" rx="128" ry="47"/>
-            <ellipse cx="150" cy="728" rx="168" ry="62"/>
-            <ellipse cx="150" cy="728" rx="210" ry="78"/>
-            <ellipse cx="150" cy="728" rx="254" ry="94"/>
-            <ellipse cx="150" cy="728" rx="300" ry="111"/>
-            <ellipse cx="150" cy="728" rx="348" ry="129"/>
-            <ellipse cx="150" cy="728" rx="398" ry="147"/>
-          </g>
-          <!-- ごつごつした角張った石 -->
-          <ellipse cx="158" cy="726" rx="88" ry="12" fill="#352f22" opacity="0.18"/>
-          <path d="M102,718 L114,672 L128,652 L138,668 L150,640 L162,664 L175,650 L188,680 L192,706 L172,722 L138,724 L114,722 Z" fill="url(#kstone)"/>
-          <path d="M190,720 L200,686 L214,672 L226,688 L235,706 L228,722 L206,724 Z" fill="url(#kstone2)"/>
-          <g fill="none" stroke="#2c281e" stroke-opacity="0.22" stroke-width="1.2" stroke-linejoin="round">
-            <path d="M150,640 L146,694 L132,720"/>
-            <path d="M162,664 L160,700"/>
-            <path d="M214,672 L210,702 L220,722"/>
-          </g>
         </svg>
       </div>
       <div class="cat">
