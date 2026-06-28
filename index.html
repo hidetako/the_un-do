@@ -172,6 +172,12 @@
   .scene-neko .cat{display:block}
   .cat .catg{transform-box:fill-box; transform-origin:50% 92%; animation:catbreath 5.5s ease-in-out infinite}
   @keyframes catbreath{0%,100%{transform:scale(1)} 50%{transform:scale(1.018)}}
+  /* 本堂（honden）＝障子の採光＋奥の円相掛軸＋手前の坐蒲（空の席） */
+  .hall{position:absolute; inset:0; display:none; pointer-events:none}
+  .hall svg{width:100%; height:100%; display:block}
+  .scene-honden .hall{display:block}
+  .hall .shojiglow{animation:shoji 12s ease-in-out infinite}
+  @keyframes shoji{0%,100%{opacity:.9} 50%{opacity:1}}
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -317,6 +323,48 @@
   <!-- SESSION -->
   <section class="screen" id="session">
     <div id="scene">
+      <div class="hall">
+        <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <radialGradient id="hshoji" cx="50%" cy="44%" r="60%">
+              <stop offset="0" stop-color="#9a7a44" stop-opacity="0.55"/>
+              <stop offset="55%" stop-color="#6f5832" stop-opacity="0.32"/>
+              <stop offset="100%" stop-color="#4a3c26" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="hfloor" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3a2c1c"/><stop offset="1" stop-color="#191209"/>
+            </linearGradient>
+            <radialGradient id="hzafu" cx="50%" cy="30%" r="72%">
+              <stop offset="0" stop-color="#2f2316"/><stop offset="100%" stop-color="#120c07"/>
+            </radialGradient>
+          </defs>
+          <!-- 障子の採光（奥のやわらかな灯り） -->
+          <rect class="shojiglow" x="372" y="146" width="536" height="336" fill="url(#hshoji)"/>
+          <g stroke="#241a10" stroke-opacity="0.42" stroke-width="3" fill="none">
+            <rect x="372" y="146" width="536" height="336"/>
+            <line x1="506" y1="146" x2="506" y2="482"/><line x1="640" y1="146" x2="640" y2="482"/><line x1="774" y1="146" x2="774" y2="482"/>
+            <line x1="372" y1="258" x2="908" y2="258"/><line x1="372" y1="370" x2="908" y2="370"/>
+          </g>
+          <!-- 奥の円相（淡い掛軸） -->
+          <circle cx="640" cy="300" r="86" fill="none" stroke="#efe9dc" stroke-opacity="0.5" stroke-width="7"
+                  stroke-linecap="round" stroke-dasharray="486 56" transform="rotate(64 640 300)"/>
+          <!-- 床（板敷き） -->
+          <rect x="0" y="500" width="1280" height="220" fill="url(#hfloor)"/>
+          <rect x="0" y="500" width="1280" height="2" fill="#5a4730" opacity="0.5"/>
+          <g stroke="#0e0a06" stroke-opacity="0.32" stroke-width="2">
+            <line x1="250" y1="500" x2="172" y2="720"/><line x1="640" y1="500" x2="640" y2="720"/><line x1="1030" y1="500" x2="1108" y2="720"/>
+          </g>
+          <!-- 坐蒲（空の席） -->
+          <ellipse cx="600" cy="566" rx="132" ry="30" fill="#000" opacity="0.34"/>
+          <ellipse cx="600" cy="558" rx="116" ry="44" fill="url(#hzafu)"/>
+          <ellipse cx="600" cy="540" rx="100" ry="36" fill="#281d12"/>
+          <ellipse cx="600" cy="533" rx="92" ry="30" fill="#33271a"/>
+          <path d="M 512,533 A 92,30 0 0 1 688,533" fill="none" stroke="#7a5c34" stroke-opacity="0.5" stroke-width="3"/>
+          <g stroke="#15100a" stroke-opacity="0.38" stroke-width="2">
+            <line x1="560" y1="512" x2="555" y2="556"/><line x1="600" y1="507" x2="600" y2="560"/><line x1="640" y1="512" x2="645" y2="556"/>
+          </g>
+        </svg>
+      </div>
       <div class="moon">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
