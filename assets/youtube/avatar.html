@@ -3,67 +3,24 @@
   .a{width:800px;height:800px;display:flex;flex-direction:column;align-items:center;justify-content:center;
      background:radial-gradient(120% 95% at 50% 40%, #2c2319 0%, #181410 56%, #0e0b07 100%);
      font-family:'Hiragino Mincho ProN','Yu Mincho','Noto Serif CJK JP',serif}
-  .name{color:#efe9dc;font-size:104px;letter-spacing:.14em;margin-top:6px;font-weight:500;padding-left:.14em}
-  .sub{color:#c2a35e;font-size:25px;letter-spacing:.62em;margin-top:18px;padding-left:.62em}
+  .stage{position:relative;width:286px;height:286px}
+  .stage>*{position:absolute}
+  /* 本物の円相（淡色・落款なし） */
+  .stage img.enso{left:17px;top:15px;width:252px;height:251px}
+  /* 篆刻：行雲流水（円相の右上）・豪（朱印の位置） */
+  .stage img.seal-koun{left:244px; top:-20px; width:62px; height:auto}
+  .stage img.seal-go{left:-6px; top:218px; width:34px; height:auto}
+  /* 本物の筆文字「一息」（淡色） */
+  img.issoku{width:392px;height:auto;margin-top:26px;display:block}
+  .sub{color:#c2a35e;font-size:25px;letter-spacing:.62em;margin-top:14px;padding-left:.62em}
 </style></head><body>
 <div class="a">
-  <svg width="384" height="384" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="smk" x1="0" y1="312" x2="0" y2="52" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#efe9dc" stop-opacity="0.10"/>
-        <stop offset="0.12" stop-color="#efe9dc" stop-opacity="0.26"/>
-        <stop offset="0.55" stop-color="#efe9dc" stop-opacity="0.13"/>
-        <stop offset="1" stop-color="#efe9dc" stop-opacity="0"/>
-      </linearGradient>
-      <filter id="soft" x="-60%" y="-15%" width="220%" height="130%"><feGaussianBlur stdDeviation="5"/></filter>
-    </defs>
-    <!-- 息＝線香の煙（円相の下の切れ目から立ちのぼる）。enso の後ろに描く -->
-    <path id="smokeHalo" fill="url(#smk)" filter="url(#soft)"/>
-    <path id="smokeCore" fill="url(#smk)"/>
-    <!-- 円相（毛筆・下に切れ目） -->
-    <path id="enso" fill="#efe9dc"/>
-    <!-- 朱印 -->
-    <g transform="translate(256 250)"><rect width="44" height="44" rx="6" fill="#b04a39"/><circle cx="22" cy="22" r="12" fill="none" stroke="#efe9dc" stroke-width="3.4"/></g>
-  </svg>
-  <div class="name">一息</div>
+  <div class="stage">
+    <img class="enso" src="./enso-light.png">
+    <img class="seal-koun" src="./seal-koun.png" alt="行雲流水">
+    <img class="seal-go" src="./seal-go.png" alt="豪">
+  </div>
+  <img class="issoku" src="./issoku-light.png">
   <div class="sub">ISSOKU</div>
 </div>
-<script>
-function ribbon(pts,hws){
-  const n=pts.length,L=[],R=[];
-  for(let i=0;i<n;i++){const a=pts[Math.min(n-1,i+1)],b=pts[Math.max(0,i-1)];
-    const dx=a[0]-b[0],dy=a[1]-b[1],l=Math.hypot(dx,dy)||1,nx=-(dy/l),ny=(dx/l);
-    L.push([pts[i][0]+nx*hws[i],pts[i][1]+ny*hws[i]]);R.push([pts[i][0]-nx*hws[i],pts[i][1]-ny*hws[i]]);}
-  let d='M'+L[0][0].toFixed(2)+','+L[0][1].toFixed(2);
-  for(let i=1;i<n;i++)d+='L'+L[i][0].toFixed(2)+','+L[i][1].toFixed(2);
-  for(let i=n-1;i>=0;i--)d+='L'+R[i][0].toFixed(2)+','+R[i][1].toFixed(2);
-  return d+'Z';
-}
-/* 毛筆の円相：太さが変化する塗りのリボン。切れ目は下(90°)。 */
-function enso(cx,cy,Rr,gapC,gapD,hwMax){
-  const N=170,a0=gapC+gapD/2,a1=gapC+360-gapD/2,o=[],ip=[];
-  for(let i=0;i<=N;i++){const s=i/N,ang=(a0+(a1-a0)*s)*Math.PI/180;
-    const f=(0.22+0.78*Math.sin(Math.PI*Math.pow(s,0.72)))*(1-0.82*Math.pow(s,4));
-    const hw=Math.max(0.6,hwMax*f),ca=Math.cos(ang),sa=Math.sin(ang);
-    o.push([cx+(Rr+hw)*ca,cy+(Rr+hw)*sa]);ip.push([cx+(Rr-hw)*ca,cy+(Rr-hw)*sa]);}
-  let d='M'+o[0][0].toFixed(2)+','+o[0][1].toFixed(2);
-  for(let i=1;i<o.length;i++)d+='L'+o[i][0].toFixed(2)+','+o[i][1].toFixed(2);
-  for(let i=ip.length-1;i>=0;i--)d+='L'+ip[i][0].toFixed(2)+','+ip[i][1].toFixed(2);
-  return d+'Z';
-}
-/* 線香の煙：細く立ちのぼり、上ほど横へ流れて薄く拡散（fillは縦グラデ） */
-function smoke(cx,yBase,yTop,baseW,seed){
-  const N=80,pts=[],hws=[],rise=yBase-yTop;
-  for(let i=0;i<=N;i++){const h=i/N,y=yBase-h*rise;
-    const drift=Math.pow(h,1.7)*20;
-    const sway=Math.sin(h*3.0+seed)*(1+h*6)+Math.sin(h*6.4+seed*1.7)*(0.5+h*3);
-    pts.push([cx+drift+sway,y]);
-    const env=0.13+0.60*Math.pow(h,0.9), grow=Math.min(1,h*6);
-    hws.push(Math.max(0.5,baseW*env*grow));}
-  return ribbon(pts,hws);
-}
-document.getElementById('enso').setAttribute('d', enso(192,184,126,90,54,23));
-document.getElementById('smokeCore').setAttribute('d', smoke(192,312,70,6.5,1.7));
-document.getElementById('smokeHalo').setAttribute('d', smoke(192,312,70,12,1.7));
-</script>
 </body></html>

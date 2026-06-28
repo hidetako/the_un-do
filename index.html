@@ -59,8 +59,14 @@
   .plaque{width:min(64vw,300px); margin-bottom:30px;
     filter:drop-shadow(0 14px 36px rgba(0,0,0,.45))}
   .plaque svg,.slot svg{width:100%;height:auto;display:block}
-  .brandk{font-family:var(--brush); font-size:clamp(52px,11vw,92px); line-height:1;
-    margin:0; letter-spacing:.08em; color:var(--paper)}
+  /* 本物の毛筆 円相（スプラッシュの顔） */
+  .enso{position:relative; width:min(50vw,190px); margin-bottom:22px}
+  .enso .ring{width:100%; height:auto; display:block}
+  .enso .koun{position:absolute; right:-20%; top:-18%; width:33%; height:auto}
+  .enso .go{position:absolute; left:-14%; bottom:-12%; width:20%; height:auto}
+  /* 本物の毛筆「一息」 */
+  .brandk{margin:0}
+  .brandk img{display:block; margin:0 auto; width:clamp(152px,37vw,252px); height:auto}
   .brandsub{color:var(--gold); letter-spacing:.62em; font-size:12px; margin:14px 0 0; padding-left:.62em}
   .tagline{color:var(--soft); font-size:14.5px; line-height:1.9; opacity:.85; margin:26px 0 40px; max-width:300px; font-weight:400}
   .enter{font-family:var(--serif); font-size:16px; letter-spacing:.18em; color:var(--paper);
@@ -86,6 +92,7 @@
   /* よろづソリューションズ クレジット（控えめ） */
   .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
     letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
+  .credit img{width:min(42vw,168px); height:auto; display:block; margin:0 auto; opacity:.6}
   .lobby{width:min(86vw,360px); margin:24px auto 6px; display:flex; flex-direction:column; align-items:center; gap:14px}
   .lobby canvas{width:196px; height:196px; display:block}
   @media (max-width:520px){ .lobby canvas{width:166px; height:166px} }
@@ -94,6 +101,7 @@
   #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
   #setup .title{font-family:var(--brush); font-size:30px; color:var(--paper); margin:0 0 4px; letter-spacing:.08em}
   #setup .title small{display:block; font-family:var(--serif); font-size:11px; letter-spacing:.5em; color:var(--gold); margin-top:8px; padding-left:.5em}
+  #setup .title .titlebrush{display:block; margin:0 auto 2px; width:min(54vw,210px); height:auto}
   .group{width:min(92vw,540px); margin:26px 0 0}
   .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:14px; text-align:center; opacity:.9}
   .opts{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
@@ -107,8 +115,13 @@
 
   /* time slider */
   .timewrap{width:min(86vw,400px); margin:2px auto 0}
-  .timeval{font-family:var(--brush); font-size:52px; color:var(--paper); line-height:1; text-align:center; letter-spacing:.04em}
-  .timeunit{font-family:var(--serif); font-size:16px; color:var(--gold); margin-left:10px; letter-spacing:.1em}
+  /* 手書きの時間表示（数字は画像、単位は言語別に画像/文字） */
+  .timeval{display:flex; align-items:flex-end; justify-content:center; gap:2px; line-height:1; min-height:54px}
+  #timeNum{display:inline-flex; align-items:flex-end; gap:4px}
+  #timeNum img{height:50px; width:auto; display:block}
+  .timeunit{display:inline-flex; align-items:flex-end; margin-left:12px;
+    font-family:var(--serif); font-size:16px; color:var(--gold); letter-spacing:.1em}
+  .timeunit img{height:30px; width:auto; display:block; opacity:.95}
   input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin-top:22px;
     border-radius:2px; background:rgba(239,233,220,.2); outline:none; cursor:pointer}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; border-radius:50%;
@@ -222,26 +235,22 @@
 
   <!-- SPLASH -->
   <section class="screen on" id="splash">
-    <div class="plaque breathe">
-      <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
-        <rect x="24" y="12" width="632" height="392" rx="3" fill="#efe9dc" stroke="#d8cdb6" stroke-width="1"/>
-        <text x="208" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">調</text>
-        <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
-        <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
-        <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
-      </svg>
+    <div class="enso breathe">
+      <img class="ring" src="assets/brush/enso.png" alt="円相">
+      <img class="koun" src="assets/brush/koun.png" alt="行雲流水">
+      <img class="go" src="assets/brush/go.png" alt="豪">
     </div>
-    <h1 class="brandk">一息</h1>
+    <h1 class="brandk"><img src="assets/brush/issoku.png" alt="一息"></h1>
     <div class="brandsub">ISSOKU</div>
     <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
     <div class="presence presence-splash" id="presenceSplash"><span class="pdot"></span><span class="ptext"></span></div>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
-    <div class="credit" data-t="credit">よろづソリューションズ</div>
+    <div class="credit"><img src="assets/brush/yorozu.png" alt="よろづソリューションズ / Yorozu Solutions"></div>
   </section>
 
   <!-- SETUP -->
   <section class="screen" id="setup">
-    <div class="title">坐雲堂<small>THE UN-DO</small></div>
+    <div class="title"><img class="titlebrush" src="assets/brush/seiundou.png" alt="坐雲堂"><small>THE UN-DO</small></div>
     <div class="lobby">
       <canvas id="globe" width="360" height="360" aria-hidden="true"></canvas>
       <div class="presence" id="presenceHall"><span class="pdot"></span><span class="ptext"></span></div>
@@ -258,7 +267,7 @@
     <div class="group">
       <div class="glabel" data-t="g_time">時間</div>
       <div class="timewrap">
-        <div class="timeval"><span id="timeNum">5</span><span class="timeunit" data-t="min">分</span></div>
+        <div class="timeval"><span id="timeNum"></span><span class="timeunit" id="timeUnit"></span></div>
         <input type="range" id="timeRange" min="1" max="60" step="1" value="5" aria-label="時間（分）">
         <div class="timeticks"><span>1</span><span>15</span><span>30</span><span>45</span><span>60</span></div>
       </div>
@@ -701,6 +710,7 @@ function applyLang(){
   document.documentElement.lang = lang;
   buildOpts();
   updatePresence();
+  renderTimeUnit();
   document.querySelectorAll('.ytlink').forEach(a=>{ if(YT_LIVE_URL){ a.href=YT_LIVE_URL; a.hidden=false; } else { a.hidden=true; } });
 }
 
@@ -1148,8 +1158,18 @@ $('#outBtn').onclick=()=>{ $('#stick').style.height='280px'; show('splash'); };
 
 sel.time = Math.min(60, Math.max(1, parseInt(sel.time,10)||5));
 const timeRange=$('#timeRange'), timeNum=$('#timeNum');
-timeRange.value=sel.time; timeNum.textContent=sel.time;
-timeRange.oninput=()=>{ sel.time=+timeRange.value; timeNum.textContent=sel.time; save(); };
+/* 手書きの時間：数字0-9は全言語共通の画像、単位は言語別（分=日中／min=英ほか／韓は「분」テキスト） */
+const UNIT_IMG = {ja:'fun','zh-Hans':'fun','zh-Hant':'fun', en:'min', es:'min', fr:'min', de:'min', pt:'min'};
+function renderTimeNum(n){
+  timeNum.innerHTML = String(n).split('').map(function(d){ return '<img src="assets/brush/d'+d+'.png" alt="'+d+'">'; }).join('');
+}
+function renderTimeUnit(){
+  const u=UNIT_IMG[lang], el=$('#timeUnit'); if(!el) return;
+  if(u){ el.innerHTML='<img src="assets/brush/'+u+'.png" alt="'+(u==='fun'?'分':'min')+'">'; }
+  else { el.textContent=(T[lang]&&T[lang].min)||'min'; }
+}
+timeRange.value=sel.time; renderTimeNum(sel.time); renderTimeUnit();
+timeRange.oninput=()=>{ sel.time=+timeRange.value; renderTimeNum(sel.time); save(); };
 
 /* 在室の気配を実データで（入退室は通知せず、数だけ静かに反映） */
 presence.onChange(updatePresence);

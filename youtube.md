@@ -24,11 +24,17 @@
 
 ### チャンネル
 - 名前（案）: 一息 — 坐雲堂 ｜ Issoku / The Un-do
-- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用）
-- **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（一息の円相＋息＋朱印・1600px四方）
-- **バナー（ヘッダー）**: `assets/youtube/banner.png`（坐雲堂／THE UN-DO＋三日月・2560×1440・セーフエリア配慮）
+- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用。人が読む用・変更可）
+- **チャンネルID（恒久・一意）**: `UCqzoMItMT74uC--y67S1-AQ` → https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ
+  - ハンドルを変えても不変。RSS / API / 自動連携の鍵に使う。
+  - ライブ直行: `…/channel/UCqzoMItMT74uC--y67S1-AQ/live`（`@The-un_do/live` でも可）
+  - RSS: `https://www.youtube.com/feeds/videos.xml?channel_id=UCqzoMItMT74uC--y67S1-AQ`
+  - ※アプリの導線（`YT_LIVE_URL`）は読みやすいハンドル `@The-un_do` のままでよい。IDは裏の永続キーとして記録。
+- **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（**本物の毛筆円相**＋**篆刻（円相右上＝行雲流水／豪）**＋**本物の毛筆「一息」**・1600px四方）。素材：`enso-light.png`／`issoku-light.png`／`seal-koun.png`（行雲流水）／`seal-go.png`（豪）
+- **バナー（ヘッダー）**: `assets/youtube/banner.png`（毛筆円相＋**本物の毛筆「坐雲堂」**／THE UN-DO＋三日月・2560×1440・**全デバイス安全域1235×338に文字収め**）。坐雲堂は `seiundou-source.webp` 原本／`seiundou-light.png` 淡色版
+- **動画の透かし**: `assets/youtube/watermark.png`（円相のみ・背景透過＋淡い影・300px四方）
 - **リンク欄**: 「坐るアプリ → https://the-un-do.vercel.app/ 」
-- ※素材は円相ロゴ等のベクターで生成（HTML版 `assets/youtube/*.html` から再生成可）。筆文字は環境フォントの簡易表示なので、よりブラッシュ感を出すなら Canva 等で調整可。
+- ※円相は本物の毛筆作品（`assets/youtube/enso-source.png` 原本／`enso-light.png` 紙地を抜いた淡色版）。各素材は `assets/youtube/*.html` から再生成可（`enso-light.png` を参照）。
 
 ### チャンネル概要（About）
 > 一息（Issoku）— 24時間ひらく、世界の坐禅堂「坐雲堂（The Un-do）」。
