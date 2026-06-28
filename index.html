@@ -89,6 +89,14 @@
   .ytlink:hover{opacity:1}
   .ytlink[hidden]{display:none}
   .ytlink.end{margin-top:24px}
+  /* お布施（運営継続の窓口・控えめ） */
+  .support{ display:inline-flex; align-items:center; gap:7px; font-family:var(--serif); font-size:12.5px; letter-spacing:.1em;
+    color:var(--gold); opacity:.72; text-decoration:none; border-bottom:1px solid rgba(194,163,94,.28); padding-bottom:2px; transition:opacity .4s }
+  .support::before{ content:''; width:14px; height:14px; flex:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21c-4-2.6-7-5.6-7-9.2A3.8 3.8 0 0 1 12 9a3.8 3.8 0 0 1 7 2.8C19 15.4 16 18.4 12 21z' fill='none' stroke='%23c2a35e' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat center/contain }
+  .support:hover{ opacity:1 }
+  .support[hidden]{ display:none }
+  .support.end{ margin-top:14px }
   /* よろづソリューションズ クレジット（控えめ） */
   .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
     letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
@@ -233,6 +241,9 @@
   #liveCap{ position:fixed; left:0; right:0; bottom:26px; z-index:70; text-align:center; display:none;
     font-family:var(--serif); color:var(--paper); opacity:.5; font-size:15px; letter-spacing:.22em; padding-left:.22em }
   body.broadcast.playing #liveCap{ display:block }
+  #liveCount{ position:fixed; left:0; right:0; top:24px; z-index:70; text-align:center; display:none;
+    font-family:var(--serif); color:var(--paper); opacity:.62; font-size:15px; letter-spacing:.16em; padding:0 16px }
+  body.broadcast.playing #liveCount{ display:block }
   body.broadcast.playing{ cursor:none }
 </style>
 </head>
@@ -248,6 +259,7 @@
 
 <!-- 配信専用モードのオーバーレイ（?live のときだけ表示・全画面fixed） -->
 <div id="liveStart"><button id="liveStartBtn"></button></div>
+<div id="liveCount"></div>
 <div id="liveCap"></div>
 
 <div class="app">
@@ -426,6 +438,7 @@
       <button class="out" id="outBtn" data-t="out">堂を出る</button>
     </div>
     <a class="ytlink end" id="ytLinkEnd" data-t="yt_watch" target="_blank" rel="noopener noreferrer" hidden></a>
+    <a class="support end" id="supportLink" target="_blank" rel="noopener noreferrer" hidden></a>
   </section>
 
 </div>
@@ -721,6 +734,11 @@ function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.r
 /* YouTube表口（坐雲堂チャンネル）URL。設定すると入口に導線が出る。未設定なら非表示。
    ライブを常設したら文言を「いま一緒に坐る（ライブ）」へ戻すとよい。 */
 const YT_LIVE_URL = 'https://www.youtube.com/@The-un_do';
+/* お布施（運営継続資金）の受け入れ先。決済プロバイダのURL（Stripe Payment Link / Ko-fi 等）を入れると
+   終わりの画面に「お布施で支える」の静かな導線が出る。空なら非表示。外部リンクのみ＝CSP緩和不要。 */
+const SUPPORT_URL = '';
+const SUPPORT_T = { ja:'お布施で、堂を支える', en:'Support the hall', 'zh-Hans':'护持这座坐云堂', 'zh-Hant':'護持這座坐雲堂',
+  ko:'이 당을 후원하기', es:'Apoyar la sala', fr:'Soutenir la salle', de:'Die Halle unterstützen', pt:'Apoiar o salão' };
 function applyLang(){
   const t=T[lang];
   document.querySelectorAll('[data-t]').forEach(el=>{ const k=el.getAttribute('data-t');
@@ -731,6 +749,7 @@ function applyLang(){
   updatePresence();
   renderTimeUnit();
   document.querySelectorAll('.ytlink').forEach(a=>{ if(YT_LIVE_URL){ a.href=YT_LIVE_URL; a.hidden=false; } else { a.hidden=true; } });
+  const sup=$('#supportLink'); if(sup){ if(SUPPORT_URL){ sup.href=SUPPORT_URL; sup.textContent=SUPPORT_T[lang]||SUPPORT_T.en; sup.hidden=false; } else sup.hidden=true; }
 }
 
 const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
@@ -1023,7 +1042,7 @@ const presence = (() => {
     onChange();
   }
   function track(){ return channel && channel.track({ lat:me.lat, lng:me.lng, sitting }); }
-  async function connect(){
+  async function connect(observer){
     try{
       /* サプライチェーン対策（基準 G-2-1 / H-7）：浮動 @2 ではなく厳密バージョンへ固定。
          esm.sh の依存もすべて同オリジン配下に解決される。更新時はバージョンを明示的に上げる。 */
@@ -1032,7 +1051,7 @@ const presence = (() => {
       client=mod.createClient(SB_URL, SB_KEY, { realtime:{ params:{ eventsPerSecond:2 } } });
       channel=client.channel(SB_CHANNEL, { config:{ presence:{ key:myId } } });
       channel.on('presence', { event:'sync' }, sync);
-      channel.subscribe(async (st)=>{ if(st==='SUBSCRIBED'){ live=true; await track(); sync(); } });
+      channel.subscribe(async (st)=>{ if(st==='SUBSCRIBED'){ live=true; if(!observer) await track(); sync(); } });
     }catch(e){ live=false; onChange(); }
   }
   function setSitting(b){ sitting=b; if(live){ try{ track(); }catch(e){} } }
@@ -1216,7 +1235,15 @@ function startBcast(o){
   (function burn(){ const p=(Date.now()%o.periodMs)/o.periodMs;
     $('#stick').style.height=(280*(1-p)).toFixed(1)+'px'; bcastRAF=requestAnimationFrame(burn); })();
   document.body.classList.add('playing');
+  presence.onChange(updateLiveCount); presence.connect(true); updateLiveCount();   // 観測者として接続（自分は数えない）
   try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }catch(e){}
+}
+function updateLiveCount(){
+  if(!document.body.classList.contains('broadcast')) return;
+  const p=presence.compute(), n=p.sitting||0, nf=new Intl.NumberFormat('en-US');
+  $('#liveCount').textContent = n>0
+    ? ('いま世界で '+nf.format(n)+'人が坐っています ・ '+nf.format(n)+' sitting now')
+    : '世界の坐雲堂、ひらいています ・ the hall is open';
 }
 if(BCAST){
   document.body.classList.add('broadcast');
