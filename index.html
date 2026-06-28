@@ -150,20 +150,10 @@
   .scene-honden{background:#0c0906 url(assets/brush/honden.jpg) center/cover no-repeat}
   .scene-kare{background:#cdbfa0 url(assets/brush/kare.jpg) center/cover no-repeat}
   .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
-  .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
+  .scene-tsuki{background:#0a1022 url(assets/brush/tsuki.jpg) center/cover no-repeat}
   .scene-neko{background:#d8c8a6 url(assets/brush/neko.jpg) center/cover no-repeat}
   .scene-cho{background:#2a2118 url(assets/brush/cho.jpg) center/cover no-repeat}
-  .moon{position:absolute; top:12%; right:15%; width:96px; height:96px; display:none}
-  .scene-tsuki .moon{display:block}
-  .moon svg{width:100%; height:100%; overflow:visible; display:block;
-    filter:drop-shadow(0 0 9px rgba(244,238,218,.42)) drop-shadow(0 0 24px rgba(244,238,218,.20))}
-  .moon .cloud{position:absolute; pointer-events:none; border-radius:50%; filter:blur(4px);
-    background:radial-gradient(ellipse at center, rgba(206,212,222,.30), rgba(206,212,222,.12) 52%, transparent 74%)}
-  .moon .cloud1{width:128px; height:32px; left:-22px; top:40px; animation:cloud1 27s ease-in-out infinite}
-  .moon .cloud2{width:92px; height:22px; left:14px; top:20px; opacity:.7; animation:cloud2 35s ease-in-out infinite}
-  @keyframes cloud1{0%,100%{transform:translateX(-7px)} 50%{transform:translateX(11px)}}
-  @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
-  /* 本堂・枯山水・猫・調息は実写写真を全画面背景に（assets/brush/honden|kare|neko|cho.jpg） */
+  /* 本堂・枯山水・猫・調息・夜の月は実写写真を全画面背景に（assets/brush/honden|kare|neko|cho|tsuki.jpg） */
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -314,20 +304,6 @@
   <!-- SESSION -->
   <section class="screen" id="session">
     <div id="scene">
-      <div class="moon">
-        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <mask id="crescent">
-              <rect width="100" height="100" fill="#000"/>
-              <circle cx="50" cy="52" r="33" fill="#fff"/>
-              <circle cx="63" cy="45" r="30" fill="#000"/>
-            </mask>
-          </defs>
-          <circle cx="50" cy="52" r="33" fill="#f4eeda" mask="url(#crescent)"/>
-        </svg>
-        <div class="cloud cloud1"></div>
-        <div class="cloud cloud2"></div>
-      </div>
     </div>
     <div class="censer">
       <div class="incense-wrap">
