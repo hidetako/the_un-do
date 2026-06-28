@@ -151,7 +151,7 @@
   .scene-kare{background:#cdbfa0 url(assets/brush/kare.jpg) center/cover no-repeat}
   .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
   .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
-  .scene-neko{background:linear-gradient(168deg,#e3d6b8 0%,#c9ad84 100%)}
+  .scene-neko{background:#d8c8a6 url(assets/brush/neko.jpg) center/cover no-repeat}
   .scene-cho{background:linear-gradient(165deg,#efe7d6 0%,#dccfb6 100%)}
   .moon{position:absolute; top:12%; right:15%; width:96px; height:96px; display:none}
   .scene-tsuki .moon{display:block}
@@ -165,13 +165,7 @@
   @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
   .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
   .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
-  /* 座処の作画（猫＝丸まって眠る／枯山水は実写写真 assets/brush/kare.jpg） */
-  .cat{position:absolute; inset:0; display:none; pointer-events:none}
-  .cat svg{width:100%; height:100%; display:block}
-  .scene-neko .cat{display:block}
-  .cat .catg{transform-box:fill-box; transform-origin:50% 92%; animation:catbreath 5.5s ease-in-out infinite}
-  @keyframes catbreath{0%,100%{transform:scale(1)} 50%{transform:scale(1.018)}}
-  /* 本堂（honden）＝本物の本堂写真を全画面背景に（assets/brush/honden.jpg） */
+  /* 本堂・枯山水・猫は実写写真を全画面背景に（assets/brush/honden.jpg / kare.jpg / neko.jpg） */
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -239,10 +233,12 @@
     cursor:pointer; transition:all .5s ease }
   #liveStartBtn:hover{ background:var(--paper); color:var(--ink); letter-spacing:.24em }
   #liveCap{ position:fixed; left:0; right:0; bottom:26px; z-index:70; text-align:center; display:none;
-    font-family:var(--serif); color:var(--paper); opacity:.5; font-size:15px; letter-spacing:.22em; padding-left:.22em }
+    font-family:var(--serif); color:var(--paper); opacity:.62; font-size:15px; letter-spacing:.22em; padding-left:.22em;
+    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4) }
   body.broadcast.playing #liveCap{ display:block }
   #liveCount{ position:fixed; left:0; right:0; top:24px; z-index:70; text-align:center; display:none;
-    font-family:var(--serif); color:var(--paper); opacity:.62; font-size:15px; letter-spacing:.16em; padding:0 16px }
+    font-family:var(--serif); color:var(--paper); opacity:.72; font-size:15px; letter-spacing:.16em; padding:0 16px;
+    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4) }
   body.broadcast.playing #liveCount{ display:block }
   body.broadcast.playing{ cursor:none }
 </style>
@@ -338,29 +334,6 @@
           <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
           <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
           <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
-        </svg>
-      </div>
-      <div class="cat">
-        <svg viewBox="0 0 412 880" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <clipPath id="catbody"><path d="M38,824 C24,794 42,748 102,738 C140,732 178,734 210,744 C262,758 282,786 272,808 C262,822 226,828 184,829 C118,830 62,830 38,824 Z"/></clipPath>
-          </defs>
-          <ellipse cx="150" cy="828" rx="136" ry="16" fill="#48402a" opacity="0.16"/>
-          <g class="catg">
-            <!-- 背ごしに覗くふたつの耳（先を丸く）。片方は黒、片方は茶＝三毛 -->
-            <path d="M88,744 C90,730 95,720 100,718 C105,720 110,730 112,742 Z" fill="#3a2f26"/>
-            <path d="M116,742 C118,728 123,718 128,716 C133,718 137,729 138,742 Z" fill="#be7e3a"/>
-            <!-- 丸まった背中（白地・低め＝loaf） -->
-            <path d="M38,824 C24,794 42,748 102,738 C140,732 178,734 210,744 C262,758 282,786 272,808 C262,822 226,828 184,829 C118,830 62,830 38,824 Z" fill="#efe7d6" stroke="#b6a684" stroke-opacity="0.45" stroke-width="1.4"/>
-            <!-- 三毛の斑（胴にクリップ）：茶と黒 -->
-            <g clip-path="url(#catbody)">
-              <path d="M46,778 C66,762 102,764 116,786 C124,800 114,820 88,822 C64,824 40,812 40,792 C39,784 40,782 46,778 Z" fill="#3a2f26"/>
-              <path d="M156,752 C188,744 230,752 248,778 C256,796 242,818 212,820 C184,822 160,808 156,784 C154,770 148,758 156,752 Z" fill="#be7e3a"/>
-              <path d="M74,748 C94,742 116,748 120,762 C108,758 90,758 80,764 C70,756 68,752 74,748 Z" fill="#be7e3a"/>
-            </g>
-            <!-- 巻いた尾（茶） -->
-            <path d="M260,812 C292,806 300,778 276,770 C258,764 248,780 258,792 C265,800 262,806 260,812 Z" fill="#be7e3a"/>
-          </g>
         </svg>
       </div>
     </div>
