@@ -219,6 +219,21 @@
 
   @media (max-width:520px){ .censer{right:2vw; transform:scale(.66)} }
   @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+
+  /* ---------- 配信専用モード（?live）---------- */
+  body.broadcast .bar, body.broadcast #exitBtn{ display:none !important }
+  #liveStart{ position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center;
+    background:radial-gradient(120% 90% at 50% 40%, #1a1510 0%, #0c0907 100%) }
+  body.broadcast #liveStart{ display:flex }
+  body.broadcast.playing #liveStart{ display:none }
+  #liveStartBtn{ font-family:var(--serif); font-size:18px; letter-spacing:.18em; color:var(--paper);
+    background:transparent; border:1px solid rgba(239,233,220,.5); border-radius:999px; padding:16px 44px;
+    cursor:pointer; transition:all .5s ease }
+  #liveStartBtn:hover{ background:var(--paper); color:var(--ink); letter-spacing:.24em }
+  #liveCap{ position:fixed; left:0; right:0; bottom:26px; z-index:70; text-align:center; display:none;
+    font-family:var(--serif); color:var(--paper); opacity:.5; font-size:15px; letter-spacing:.22em; padding-left:.22em }
+  body.broadcast.playing #liveCap{ display:block }
+  body.broadcast.playing{ cursor:none }
 </style>
 </head>
 <body>
@@ -230,6 +245,10 @@
   </div>
   <button class="exit" id="exitBtn">✕</button>
 </div>
+
+<!-- 配信専用モードのオーバーレイ（?live のときだけ表示・全画面fixed） -->
+<div id="liveStart"><button id="liveStartBtn"></button></div>
+<div id="liveCap"></div>
 
 <div class="app">
 
@@ -1150,6 +1169,7 @@ function showConfirm(){
 $('#contBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); };
 $('#stopBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); abort(); };
 $('#session').addEventListener('click',(e)=>{
+  if(document.body.classList.contains('broadcast')) return;   // 配信専用モードでは中断確認を出さない
   if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')) return;
   showConfirm();
 });
@@ -1173,8 +1193,42 @@ timeRange.oninput=()=>{ sel.time=+timeRange.value; renderTimeNum(sel.time); save
 
 /* 在室の気配を実データで（入退室は通知せず、数だけ静かに反映） */
 presence.onChange(updatePresence);
-presence.connect();
-window.addEventListener('pagehide', ()=>presence.leave());
+
+/* ---------- 配信専用モード（?live）----------
+   UIを隠して「一場面＋環境音＋鐘」だけを全画面表示。OBS等でそのまま配信できる。
+   鐘と線香は“世界時計の区切り”（既定30分）に同期＝誰が見ても同じ瞬間に同じ鐘。
+   例: ?live=neko&bell=30&sound=1&caption=1  （live/stage の値が座処。bellは分。） */
+const BQ = new URLSearchParams(location.search);
+const BCAST = BQ.has('live') || BQ.has('stage');
+let bcastRAF = 0;
+function startBcast(o){
+  ensureCtx();
+  $('#scene').className=''; $('#scene').classList.add('scene-'+o.scene);
+  $('#session').setAttribute('data-scene', o.scene);
+  $('#status').textContent='';
+  show('session');
+  if(o.caption) $('#liveCap').textContent='坐雲堂 ｜ the-un-do.vercel.app';
+  if(o.sound) ambient.start(o.scene);
+  startSmoke();
+  if(o.sound) bell(0,0.9);
+  (function ring(){ const now=Date.now(), next=Math.ceil((now+1)/o.periodMs)*o.periodMs;
+    setTimeout(()=>{ if(o.sound) bell(0,0.9); ring(); }, next-now); })();
+  (function burn(){ const p=(Date.now()%o.periodMs)/o.periodMs;
+    $('#stick').style.height=(280*(1-p)).toFixed(1)+'px'; bcastRAF=requestAnimationFrame(burn); })();
+  document.body.classList.add('playing');
+  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }catch(e){}
+}
+if(BCAST){
+  document.body.classList.add('broadcast');
+  let s=(BQ.get('live')||BQ.get('stage')||'').trim(); if(!SCENES.includes(s)) s='honden';
+  const o={ scene:s, periodMs:Math.max(1,parseInt(BQ.get('bell'),10)||30)*60000,
+            sound:BQ.get('sound')!=='0', caption:BQ.get('caption')!=='0' };
+  $('#liveStartBtn').textContent='▶ 坐をはじめる';
+  $('#liveStartBtn').onclick=()=>startBcast(o);
+} else {
+  presence.connect();
+  window.addEventListener('pagehide', ()=>presence.leave());
+}
 
 applyLang();
 </script>
