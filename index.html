@@ -58,7 +58,7 @@
   @keyframes breathe{0%,100%{transform:scale(1);opacity:.96} 50%{transform:scale(1.025);opacity:1}}
   .plaque{width:min(64vw,300px); margin-bottom:30px;
     filter:drop-shadow(0 14px 36px rgba(0,0,0,.45))}
-  .plaque svg,.slot svg{width:100%;height:auto;display:block}
+  .plaque svg{width:100%;height:auto;display:block}
   /* 本物の毛筆 円相（スプラッシュの顔） */
   .enso{position:relative; width:min(50vw,190px); margin-bottom:22px}
   .enso .ring{width:100%; height:auto; display:block}
@@ -152,7 +152,7 @@
   .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
   .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
   .scene-neko{background:#d8c8a6 url(assets/brush/neko.jpg) center/cover no-repeat}
-  .scene-cho{background:linear-gradient(165deg,#efe7d6 0%,#dccfb6 100%)}
+  .scene-cho{background:#2a2118 url(assets/brush/cho.jpg) center/cover no-repeat}
   .moon{position:absolute; top:12%; right:15%; width:96px; height:96px; display:none}
   .scene-tsuki .moon{display:block}
   .moon svg{width:100%; height:100%; overflow:visible; display:block;
@@ -163,9 +163,7 @@
   .moon .cloud2{width:92px; height:22px; left:14px; top:20px; opacity:.7; animation:cloud2 35s ease-in-out infinite}
   @keyframes cloud1{0%,100%{transform:translateX(-7px)} 50%{transform:translateX(11px)}}
   @keyframes cloud2{0%,100%{transform:translateX(9px)} 50%{transform:translateX(-9px)}}
-  .slot{position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:none; width:min(56vw,260px); opacity:.96}
-  .scene-cho .slot{display:block; filter:drop-shadow(0 12px 30px rgba(0,0,0,.18))}
-  /* 本堂・枯山水・猫は実写写真を全画面背景に（assets/brush/honden.jpg / kare.jpg / neko.jpg） */
+  /* 本堂・枯山水・猫・調息は実写写真を全画面背景に（assets/brush/honden|kare|neko|cho.jpg） */
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -326,15 +324,6 @@
         </svg>
         <div class="cloud cloud1"></div>
         <div class="cloud cloud2"></div>
-      </div>
-      <div class="slot">
-        <svg viewBox="0 0 680 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="調息">
-          <rect x="24" y="12" width="632" height="392" rx="3" fill="#efe9dc" stroke="#d8cdb6" stroke-width="1"/>
-          <text x="208" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">調</text>
-          <text x="470" y="300" text-anchor="middle" font-family="'Yuji Boku','Shippori Mincho',serif" font-size="250" fill="#171310">息</text>
-          <rect x="600" y="346" width="32" height="32" rx="4" fill="#b04a39"/>
-          <circle cx="616" cy="362" r="9.5" fill="none" stroke="#efe9dc" stroke-width="2.4"/>
-        </svg>
       </div>
     </div>
     <div class="censer">
