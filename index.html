@@ -147,7 +147,7 @@
   #scene{position:absolute; inset:0; z-index:-1; transition:background 1.6s ease}
   #scene::after{content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(130% 100% at 50% 45%, transparent 52%, rgba(0,0,0,.32) 100%)}
-  .scene-honden{background:radial-gradient(110% 90% at 50% 40%, #4a3a28, #221913 70%, #14100b 100%)}
+  .scene-honden{background:#0c0906 url(assets/brush/honden.jpg) center/cover no-repeat}
   .scene-kare{background:linear-gradient(165deg,#e7e0cf 0%,#d3c9b2 60%,#c3b89f 100%)}
   .scene-umi{background:linear-gradient(180deg,#23415c 0%,#3c6076 52%,#7e9cad 53%,#a7bec9 100%)}
   .scene-tsuki{background:radial-gradient(circle at 72% 26%, #32436e 0%, #18233f 50%, #0a1022 100%)}
@@ -172,12 +172,7 @@
   .scene-neko .cat{display:block}
   .cat .catg{transform-box:fill-box; transform-origin:50% 92%; animation:catbreath 5.5s ease-in-out infinite}
   @keyframes catbreath{0%,100%{transform:scale(1)} 50%{transform:scale(1.018)}}
-  /* 本堂（honden）＝障子の採光＋奥の円相掛軸＋手前の坐蒲（空の席） */
-  .hall{position:absolute; inset:0; display:none; pointer-events:none}
-  .hall svg{width:100%; height:100%; display:block}
-  .scene-honden .hall{display:block}
-  .hall .shojiglow{animation:shoji 12s ease-in-out infinite}
-  @keyframes shoji{0%,100%{opacity:.9} 50%{opacity:1}}
+  /* 本堂（honden）＝本物の本堂写真を全画面背景に（assets/brush/honden.jpg） */
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
@@ -323,95 +318,6 @@
   <!-- SESSION -->
   <section class="screen" id="session">
     <div id="scene">
-      <div class="hall">
-        <svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <radialGradient id="hshoji" cx="50%" cy="44%" r="60%">
-              <stop offset="0" stop-color="#9a7a44" stop-opacity="0.55"/>
-              <stop offset="55%" stop-color="#6f5832" stop-opacity="0.32"/>
-              <stop offset="100%" stop-color="#4a3c26" stop-opacity="0"/>
-            </radialGradient>
-            <linearGradient id="hfloor" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#3a2c1c"/><stop offset="1" stop-color="#191209"/>
-            </linearGradient>
-            <radialGradient id="hzafu" cx="50%" cy="30%" r="72%">
-              <stop offset="0" stop-color="#2f2316"/><stop offset="100%" stop-color="#120c07"/>
-            </radialGradient>
-            <linearGradient id="hbuddha" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#e8cd82"/><stop offset="0.5" stop-color="#c8a653"/><stop offset="1" stop-color="#8c7031"/>
-            </linearGradient>
-            <radialGradient id="hhalo" cx="50%" cy="50%" r="50%">
-              <stop offset="0" stop-color="#f3e2a8" stop-opacity="0.5"/>
-              <stop offset="58%" stop-color="#d8b860" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#d8b860" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <!-- 障子の採光（奥のやわらかな灯り） -->
-          <rect class="shojiglow" x="372" y="146" width="536" height="336" fill="url(#hshoji)"/>
-          <g stroke="#241a10" stroke-opacity="0.42" stroke-width="3" fill="none">
-            <rect x="372" y="146" width="536" height="336"/>
-            <line x1="506" y1="146" x2="506" y2="482"/><line x1="640" y1="146" x2="640" y2="482"/><line x1="774" y1="146" x2="774" y2="482"/>
-            <line x1="372" y1="258" x2="908" y2="258"/><line x1="372" y1="370" x2="908" y2="370"/>
-          </g>
-          <!-- 本尊：阿弥陀如来（坐像・蓮華座・光背） -->
-          <g>
-            <!-- 光背（身光・頭光） -->
-            <ellipse cx="640" cy="318" rx="148" ry="172" fill="url(#hhalo)"/>
-            <circle cx="640" cy="252" r="78" fill="url(#hhalo)"/>
-            <circle cx="640" cy="252" r="75" fill="none" stroke="#e7cf8e" stroke-opacity="0.26" stroke-width="2.4"/>
-            <!-- 蓮華座 -->
-            <path d="M 522,470 Q 540,436 562,462 Q 578,438 598,462 Q 618,436 640,462 Q 662,436 682,462 Q 702,438 718,462 Q 740,436 758,470 Q 740,492 640,494 Q 540,492 522,470 Z"
-                  fill="url(#hbuddha)" stroke="#7a5f2a" stroke-opacity="0.35" stroke-width="1"/>
-            <!-- 結跏趺坐（脚） -->
-            <path d="M 546,440 Q 546,408 596,400 L 684,400 Q 734,408 734,440 Q 734,460 684,462 L 596,462 Q 546,460 546,440 Z" fill="url(#hbuddha)"/>
-            <!-- 胴（袈裟） -->
-            <path d="M 566,406 Q 558,350 588,320 Q 602,298 640,296 Q 678,298 692,320 Q 722,350 714,406 Z" fill="url(#hbuddha)"/>
-            <!-- 袈裟のひだ -->
-            <g stroke="#7a5f2a" stroke-opacity="0.42" stroke-width="1.6" fill="none">
-              <path d="M 600,338 Q 640,356 680,338"/><path d="M 594,370 Q 640,392 686,370"/>
-            </g>
-            <!-- 定印を結ぶ手（弥陀定印） -->
-            <ellipse cx="640" cy="414" rx="44" ry="15" fill="url(#hbuddha)"/>
-            <g fill="none" stroke="#7a5f2a" stroke-opacity="0.5" stroke-width="2">
-              <circle cx="627" cy="413" r="5"/><circle cx="653" cy="413" r="5"/>
-            </g>
-            <!-- 首 -->
-            <rect x="625" y="284" width="30" height="22" rx="9" fill="url(#hbuddha)"/>
-            <!-- 耳（垂れ耳） -->
-            <path d="M 609,256 Q 599,262 601,286 Q 603,292 610,290 Z" fill="url(#hbuddha)"/>
-            <path d="M 671,256 Q 681,262 679,286 Q 677,292 670,290 Z" fill="url(#hbuddha)"/>
-            <!-- 顔 -->
-            <ellipse cx="640" cy="262" rx="33" ry="39" fill="url(#hbuddha)"/>
-            <!-- 螺髪（生え際） -->
-            <path d="M 609,260 Q 605,222 640,217 Q 675,222 671,260 Q 666,251 658,257 Q 650,249 642,257 Q 640,251 638,257 Q 630,249 622,257 Q 614,251 609,260 Z" fill="#6e5526"/>
-            <!-- 肉髻＋宝珠 -->
-            <ellipse cx="640" cy="210" rx="15" ry="17" fill="#6e5526"/>
-            <circle cx="640" cy="197" r="4" fill="#e8cd82"/>
-            <!-- 白毫 -->
-            <circle cx="640" cy="258" r="3.2" fill="#f6ecca"/>
-            <!-- 伏し目・口（穏やかな相） -->
-            <g stroke="#5a4a24" stroke-opacity="0.6" stroke-width="1.7" fill="none" stroke-linecap="round">
-              <path d="M 624,266 Q 630,270 637,267"/><path d="M 643,267 Q 650,270 656,266"/>
-              <path d="M 632,282 Q 640,285 648,282"/>
-            </g>
-          </g>
-          <!-- 床（板敷き） -->
-          <rect x="0" y="500" width="1280" height="220" fill="url(#hfloor)"/>
-          <rect x="0" y="500" width="1280" height="2" fill="#5a4730" opacity="0.5"/>
-          <g stroke="#0e0a06" stroke-opacity="0.32" stroke-width="2">
-            <line x1="250" y1="500" x2="172" y2="720"/><line x1="640" y1="500" x2="640" y2="720"/><line x1="1030" y1="500" x2="1108" y2="720"/>
-          </g>
-          <!-- 坐蒲（空の席） -->
-          <ellipse cx="600" cy="566" rx="132" ry="30" fill="#000" opacity="0.34"/>
-          <ellipse cx="600" cy="558" rx="116" ry="44" fill="url(#hzafu)"/>
-          <ellipse cx="600" cy="540" rx="100" ry="36" fill="#281d12"/>
-          <ellipse cx="600" cy="533" rx="92" ry="30" fill="#33271a"/>
-          <path d="M 512,533 A 92,30 0 0 1 688,533" fill="none" stroke="#7a5c34" stroke-opacity="0.5" stroke-width="3"/>
-          <g stroke="#15100a" stroke-opacity="0.38" stroke-width="2">
-            <line x1="560" y1="512" x2="555" y2="556"/><line x1="600" y1="507" x2="600" y2="560"/><line x1="640" y1="512" x2="645" y2="556"/>
-          </g>
-        </svg>
-      </div>
       <div class="moon">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
