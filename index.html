@@ -255,6 +255,18 @@
     text-shadow:0 1px 3px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4) }
   body.broadcast.playing #liveCount{ display:block }
   body.broadcast.playing{ cursor:none }
+  /* 在席数 専用ページ（?count） */
+  #countpage{ display:none; position:fixed; inset:0; z-index:90; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(120% 92% at 50% 40%, #1b2647 0%, #111b37 52%, #080d1e 100%); text-align:center; padding:32px }
+  body.countmode .bar{ display:none }
+  body.countmode #countpage{ display:flex }
+  #countpage .countnum{ display:flex; align-items:flex-end; justify-content:center; gap:8px; min-height:96px;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,.5)) }
+  #countpage .countnum img{ height:clamp(84px,19vw,156px); width:auto; display:block }
+  #countpage .countlabel{ margin-top:26px; font-family:var(--serif); letter-spacing:.22em; padding-left:.22em;
+    color:var(--soft); font-size:clamp(14px,2.4vw,18px); opacity:.92; max-width:80vw; line-height:1.7 }
+  #countpage .countfoot{ position:fixed; bottom:26px; left:0; right:0; text-align:center; font-family:var(--serif);
+    color:var(--paper); opacity:.5; font-size:13px; letter-spacing:.22em; padding-left:.22em }
 </style>
 </head>
 <body>
@@ -271,6 +283,13 @@
 <div id="liveStart"><button id="liveStartBtn"></button></div>
 <div id="liveCount"></div>
 <div id="liveCap"></div>
+
+<!-- 在席数だけを大きく見せる専用ページ（?count） -->
+<div id="countpage" aria-hidden="true">
+  <div class="countnum" id="countNum"></div>
+  <div class="countlabel" id="countLabel"></div>
+  <div class="countfoot">坐雲堂 ｜ the-un-do.vercel.app</div>
+</div>
 
 <div class="app">
 
@@ -1211,7 +1230,25 @@ function updateLiveCount(){
     ? ('いま世界で '+nf.format(n)+'人が坐っています ・ '+nf.format(n)+' sitting now')
     : '世界の坐雲堂、ひらいています ・ the hall is open';
 }
-if(BCAST){
+/* ---------- 在席数 専用ページ（?count） ---------- */
+const COUNT = BQ.has('count');
+const COUNT_LABEL = { ja:'いま、坐雲堂にいます', en:'in the hall now',
+  'zh-Hans':'此刻在坐云堂', 'zh-Hant':'此刻在坐雲堂', ko:'지금 좌운당에 있습니다',
+  es:'ahora en la sala', fr:'à présent dans la salle', de:'gerade in der Halle', pt:'agora na sala' };
+function updateCount(){
+  if(!document.body.classList.contains('countmode')) return;
+  const p=presence.compute(), n=p.people||0;
+  const num=$('#countNum'), lab=$('#countLabel');
+  if(!p.live || n<1){ num.innerHTML=''; lab.textContent=(T[lang]&&T[lang].p_open)||'the hall is open'; return; }
+  num.innerHTML = String(n).split('').map(function(d){ return '<img src="assets/brush/d'+d+'.png" alt="'+d+'">'; }).join('');
+  lab.textContent = COUNT_LABEL[lang]||COUNT_LABEL.en;
+}
+if(COUNT){
+  document.body.classList.add('countmode');
+  presence.onChange(updateCount); presence.connect(true); updateCount();   // 観測者として接続（自分は数えない）
+  setInterval(updateCount, 5000);
+  window.addEventListener('pagehide', ()=>presence.leave());
+} else if(BCAST){
   document.body.classList.add('broadcast');
   let s=(BQ.get('live')||BQ.get('stage')||'').trim(); if(!SCENES.includes(s)) s='honden';
   const o={ scene:s, periodMs:Math.max(1,parseInt(BQ.get('bell'),10)||30)*60000,
