@@ -265,6 +265,8 @@
   #countpage .countnum img{ height:clamp(84px,19vw,156px); width:auto; display:block }
   #countpage .countlabel{ margin-top:26px; font-family:var(--serif); letter-spacing:.22em; padding-left:.22em;
     color:var(--soft); font-size:clamp(14px,2.4vw,18px); opacity:.92; max-width:80vw; line-height:1.7 }
+  #countpage .count24{ margin-top:30px; font-family:var(--serif); letter-spacing:.18em; padding-left:.18em;
+    color:var(--gold); opacity:.78; font-size:clamp(12.5px,2vw,15px); line-height:1.7; min-height:1.2em }
   #countpage .countfoot{ position:fixed; bottom:26px; left:0; right:0; text-align:center; font-family:var(--serif);
     color:var(--paper); opacity:.5; font-size:13px; letter-spacing:.22em; padding-left:.22em }
 </style>
@@ -288,6 +290,7 @@
 <div id="countpage" aria-hidden="true">
   <div class="countnum" id="countNum"></div>
   <div class="countlabel" id="countLabel"></div>
+  <div class="count24" id="count24"></div>
   <div class="countfoot">坐雲堂 ｜ the-un-do.vercel.app</div>
 </div>
 
@@ -1044,7 +1047,10 @@ const presence = (() => {
       x.arc(q.sx,q.sy,m.sitting?2.4:1.6,0,6.2832); x.fill(); }
     x.shadowBlur=0;
   }
-  return { connect, setSitting, leave, compute, startGlobe, stopGlobe, onChange:(f)=>{onChange=f;} };
+  /* 集計のみ（個人情報なし）：座った延べ回数を +1／過去24時間の合計を取得 */
+  async function bumpSit(){ try{ if(client) await client.rpc('zaundo_bump_sit'); }catch(e){} }
+  async function sits24h(){ try{ if(client){ const r=await client.rpc('zaundo_sits_24h'); if(!r.error) return Number(r.data)||0; } }catch(e){} return null; }
+  return { connect, setSitting, leave, compute, startGlobe, stopGlobe, bumpSit, sits24h, onChange:(f)=>{onChange=f;} };
 })();
 function presenceText(){
   const p=presence.compute(), t=T[lang], nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
@@ -1063,6 +1069,7 @@ function enterSession(){
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
   presence.setSitting(true);
+  presence.bumpSit();   // 「過去24時間に座った延べ回数」を集計（個人情報なし）
   if(soundOn) ambient.start(sel.scene);
   if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
 }
@@ -1243,10 +1250,22 @@ function updateCount(){
   num.innerHTML = String(n).split('').map(function(d){ return '<img src="assets/brush/d'+d+'.png" alt="'+d+'">'; }).join('');
   lab.textContent = COUNT_LABEL[lang]||COUNT_LABEL.en;
 }
+const COUNT24_TPL = { ja:'過去24時間に {n} 人が坐りました', en:'{n} sat in the last 24h',
+  'zh-Hans':'过去24小时 {n} 人坐过', 'zh-Hant':'過去24小時 {n} 人坐過', ko:'지난 24시간 {n}명이 앉았습니다',
+  es:'{n} se sentaron en 24 h', fr:'{n} se sont assis en 24 h', de:'{n} saßen in 24 Std.', pt:'{n} sentaram-se em 24 h' };
+async function update24h(){
+  if(!document.body.classList.contains('countmode')) return;
+  const el=$('#count24'); if(!el) return;
+  const n=await presence.sits24h();
+  if(n==null){ el.textContent=''; return; }
+  const nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
+  el.textContent=(COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}', nf.format(n));
+}
 if(COUNT){
   document.body.classList.add('countmode');
   presence.onChange(updateCount); presence.connect(true); updateCount();   // 観測者として接続（自分は数えない）
   setInterval(updateCount, 5000);
+  setTimeout(update24h, 2500); setInterval(update24h, 60000);   // 過去24時間の延べ人数
   window.addEventListener('pagehide', ()=>presence.leave());
 } else if(BCAST){
   document.body.classList.add('broadcast');
