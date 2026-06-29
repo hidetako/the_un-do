@@ -707,8 +707,9 @@ function startSmoke(){
   const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
   const W=c.width, H=c.height; let last=performance.now(), t=0;
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-  /* 背景の明暗で煙色を変える：暗い座処＝淡い白煙／明るい座処＝淡いねずみ色（同化を防ぐ） */
-  const RGB = (sel.scene==='honden' || sel.scene==='tsuki') ? '221,215,203' : '78,66,54';
+  /* 背景の明暗で煙色を変える：暗い座処＝白煙／明るい座処＝ねずみ色（同化を防ぐ） */
+  const dark = (sel.scene==='honden' || sel.scene==='tsuki' || sel.scene==='cho');
+  const RGB = dark ? '226,221,210' : '66,55,45';
   /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
   const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
   const R=(a,b)=>a+Math.random()*(b-a);
@@ -768,8 +769,8 @@ function startSmoke(){
         const undu=0.82+0.18*Math.sin(h*TR.wf - t*0.75 + TR.wph); // 太さの微ゆらぎ（控えめ）
         hwT.push(Math.max(0.4, TR.baseW*env*undu));
       }
-      ribbon(cenT, hwT.map(w=>w*1.7), 0.055, 12);   // 幹のかさ（ハロー）
-      ribbon(cenT, hwT, 0.175, 5);                  // 幹の芯
+      ribbon(cenT, hwT.map(w=>w*1.7), 0.085, 12);   // 幹のかさ（ハロー）
+      ribbon(cenT, hwT, 0.28, 5);                   // 幹の芯（実写背景でも見えるよう濃く）
       /* 枝（最大1本）：強度ノイズで出没。出れば二本、消えれば一本へ */
       const Ib = reduced?0.0 : Math.max(0,Math.min(1,(0.5+0.5*Math.sin(t*BR.if1*6.28+BR.iA)+0.32*Math.sin(t*BR.if2*6.28+BR.iB)-0.5)/0.55));
       if(Ib>0.06){
@@ -784,8 +785,8 @@ function startSmoke(){
           pts.push([xA+diverge+wander, y]);
           hws.push(Math.max(0.35, wA*(0.55+0.7*u)));          // 分岐点は細め→上ほど少し太く
         }
-        ribbon(pts, hws.map(w=>w*1.7), 0.05*Ib, 11);
-        ribbon(pts, hws, 0.16*Ib, 5);
+        ribbon(pts, hws.map(w=>w*1.7), 0.08*Ib, 11);
+        ribbon(pts, hws, 0.26*Ib, 5);
       }
       x.shadowBlur=0;
     }
@@ -1121,6 +1122,7 @@ const BCAST = BQ.has('live') || BQ.has('stage');
 let bcastRAF = 0;
 function startBcast(o){
   ensureCtx();
+  sel.scene = o.scene;   // 配信モードでも煙の色・環境音が実際の座処に追従するように
   $('#scene').className=''; $('#scene').classList.add('scene-'+o.scene);
   $('#session').setAttribute('data-scene', o.scene);
   $('#status').textContent='';
