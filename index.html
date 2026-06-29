@@ -62,7 +62,12 @@
   #splash .credit{ position:absolute; left:0; right:0; bottom:42px; z-index:1 }
   #splash .credit img{ width:min(38vw,150px) }
   .breathe{animation:breathe 9s ease-in-out infinite}
-  @keyframes breathe{0%,100%{transform:scale(1);opacity:.96} 50%{transform:scale(1.025);opacity:1}}
+  @keyframes breathe{0%,100%{transform:translateY(7px) scale(.995);opacity:.95} 50%{transform:translateY(-7px) scale(1.03);opacity:1}}
+  /* 背景をゆっくり流れる淡い光 */
+  .splashglow{position:absolute; width:72vmax; height:72vmax; left:50%; top:40%; z-index:0; pointer-events:none;
+    background:radial-gradient(circle, rgba(126,150,224,.12), rgba(126,150,224,0) 60%);
+    animation:drift 20s ease-in-out infinite}
+  @keyframes drift{0%,100%{transform:translate(-60%,-56%) scale(1)} 50%{transform:translate(-40%,-44%) scale(1.14)}}
   /* スプラッシュを活かす：灯りの微粒子＋円相の光輪＋入場の立ち上がり */
   #splashFx{position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
   #splash .enso,#splash .brandk,#splash .brandsub,#splash .tagline,
@@ -79,7 +84,7 @@
   #splash.on .enter{animation:risein 1.1s ease .75s both}
   @media (prefers-reduced-motion: reduce){
     #splashFx{display:none}
-    .breathe,.enso::before,#splash.on .brandk,#splash.on .brandsub,#splash.on .tagline,
+    .breathe,.enso::before,.splashglow,#splash.on .brandk,#splash.on .brandsub,#splash.on .tagline,
     #splash.on .presence-splash,#splash.on .enter{animation:none}
   }
   .plaque{width:min(64vw,300px); margin-bottom:30px;
@@ -277,6 +282,7 @@
   <!-- SPLASH -->
   <section class="screen on" id="splash">
     <canvas id="splashFx" aria-hidden="true"></canvas>
+    <div class="splashglow" aria-hidden="true"></div>
     <div class="enso breathe">
       <img class="ring" src="assets/brush/enso.png" alt="円相">
       <img class="koun" src="assets/brush/koun.png" alt="行雲流水">
@@ -1103,10 +1109,10 @@ $('#enterBtn').onclick=()=>{ ensureCtx(); if(window.__splashFx) window.__splashF
   function size(){ c.width=Math.round(cw()*dpr); c.height=Math.round(ch()*dpr); x.setTransform(dpr,0,0,dpr,0,0); }
   function mk(fromBottom){ return { x:Math.random()*cw(),
       y: fromBottom? ch()+8+Math.random()*40 : Math.random()*ch(),
-      r:0.6+Math.random()*1.8, vy:4+Math.random()*9, amp:6+Math.random()*16,
-      f:0.18+Math.random()*0.5, ph:Math.random()*6.28, a:0.05+Math.random()*0.15,
+      r:0.6+Math.random()*2.0, vy:6+Math.random()*15, amp:9+Math.random()*22,
+      f:0.2+Math.random()*0.55, ph:Math.random()*6.28, a:0.07+Math.random()*0.17,
       tw:0.4+Math.random()*0.8, ivory:Math.random()<0.4 }; }
-  function init(){ const n=Math.max(14, Math.min(40, Math.round(cw()*ch()/26000))); parts=[]; for(let i=0;i<n;i++) parts.push(mk(false)); }
+  function init(){ const n=Math.max(22, Math.min(60, Math.round(cw()*ch()/17000))); parts=[]; for(let i=0;i<n;i++) parts.push(mk(false)); }
   function loop(now){ const dt=Math.min(50, now-last)/1000; last=now;
     x.clearRect(0,0,cw(),ch());
     for(const p of parts){ p.y-=p.vy*dt; p.ph+=dt*p.f;
