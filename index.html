@@ -757,9 +757,11 @@ function startSmoke(){
   const c=$('#smoke'), stick=$('#stick'); const x=c.getContext('2d'); smokeOn=true;
   const W=c.width, H=c.height; let last=performance.now(), t=0;
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
-  /* 背景の明暗で煙色を変える：暗い座処＝白煙／明るい座処＝ねずみ色（同化を防ぐ） */
-  const dark = (sel.scene==='honden' || sel.scene==='tsuki' || sel.scene==='cho');
-  const RGB = dark ? '226,221,210' : '66,55,45';
+  /* 背景の明暗で煙色を変える：暗い座処＝白煙／明るい座処＝ねずみ色（同化を防ぐ）。
+     ローテーション配信で座処が変わっても追従するよう、毎フレーム再計算する。 */
+  let RGB='226,221,210';
+  const calcRGB = () => { const dark=(sel.scene==='honden'||sel.scene==='tsuki'||sel.scene==='cho'); RGB = dark?'226,221,210':'66,55,45'; };
+  calcRGB();
   /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
   const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
   const R=(a,b)=>a+Math.random()*(b-a);
@@ -800,6 +802,7 @@ function startSmoke(){
   function loop(now){
     if(!smokeOn) return;
     const dt=Math.min(50, now-last); last=now; if(!reduced) t += dt*0.001;
+    calcRGB();
     x.clearRect(0,0,W,H);
     const baseX=W/2, y0=emberY(), rise=Math.min(450, y0-8);  // 煙の全体長（旧300→1.5倍）
     if(rise>24){
@@ -1213,13 +1216,28 @@ const BCAST = BQ.has('live') || BQ.has('stage');
 let bcastRAF = 0;
 function startBcast(o){
   ensureCtx();
-  sel.scene = o.scene;   // 配信モードでも煙の色・環境音が実際の座処に追従するように
-  $('#scene').className=''; $('#scene').classList.add('scene-'+o.scene);
-  $('#session').setAttribute('data-scene', o.scene);
+  /* 座処を適用（煙の色・環境音も追従）。背景は #scene の1.6sクロスフェードで滑らかに変わる。 */
+  function applyScene(s){
+    if(s===sel.scene) return;
+    sel.scene = s;
+    $('#scene').className=''; $('#scene').classList.add('scene-'+s);
+    $('#session').setAttribute('data-scene', s);
+    if(o.sound) ambient.start(s);
+  }
+  /* ローテーション配信：座処を一定時間ごとに巡回。世界時計に同期＝誰が見ても同じ座処。 */
+  const sceneAt = (ms)=> SCENES[Math.floor(Date.now()/ms)%SCENES.length];
+  sel.scene = o.rotateMs ? sceneAt(o.rotateMs) : o.scene;
+  $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
+  $('#session').setAttribute('data-scene', sel.scene);
   $('#status').textContent='';
   show('session');
   if(o.caption) $('#liveCap').textContent='坐雲堂 ｜ the-un-do.vercel.app';
-  if(o.sound) ambient.start(o.scene);
+  if(o.sound) ambient.start(sel.scene);
+  if(o.rotateMs){
+    (function rot(){ applyScene(sceneAt(o.rotateMs));
+      const next=Math.ceil((Date.now()+1)/o.rotateMs)*o.rotateMs;
+      setTimeout(rot, Math.max(250, next-Date.now())); })();
+  }
   startSmoke();
   if(o.sound) bell(0,0.9);
   (function ring(){ const now=Date.now(), next=Math.ceil((now+1)/o.periodMs)*o.periodMs;
@@ -1269,8 +1287,13 @@ if(COUNT){
   window.addEventListener('pagehide', ()=>presence.leave());
 } else if(BCAST){
   document.body.classList.add('broadcast');
-  let s=(BQ.get('live')||BQ.get('stage')||'').trim(); if(!SCENES.includes(s)) s='honden';
-  const o={ scene:s, periodMs:Math.max(1,parseInt(BQ.get('bell'),10)||30)*60000,
+  let s=(BQ.get('live')||BQ.get('stage')||'').trim();
+  /* ?live=all / ?live=rotate / ?rotate=<分> で座処を巡回（既定10分／座処）。世界時計同期。 */
+  const rotateOn = s==='all' || s==='rotate' || BQ.has('rotate');
+  const rotMin = Math.max(1, parseInt(BQ.get('rotate'),10) || 10);
+  if(!SCENES.includes(s)) s='honden';
+  const o={ scene:s, rotateMs: rotateOn ? rotMin*60000 : 0,
+            periodMs:Math.max(1,parseInt(BQ.get('bell'),10)||30)*60000,
             sound:BQ.get('sound')!=='0', caption:BQ.get('caption')!=='0' };
   $('#liveStartBtn').textContent='▶ 坐をはじめる';
   $('#liveStartBtn').onclick=()=>startBcast(o);
