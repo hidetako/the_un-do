@@ -17,7 +17,8 @@
 - 外部リンクのみのため **CSPの緩和は不要**（動画を埋め込まない＝広告もアプリ内に出ない）。
 
 **現状（2026-07-02 ライブ開始済み）**: `YT_LIVE_URL = 'https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ/live'`（**恒久ID版**・常に現行ライブへ飛ぶ）＋文言は9言語で「**いま一緒に坐る（ライブ）**/Sit together now — live」系に切替済み。初回配信URL: https://youtube.com/live/wOBMywDsKG8
-> ⚠️ **ハンドル注意（2026-07-02判明）**: `@The-un_do` は現在**未有効**（チャンネルページごと404）。実際のハンドルは **`@adminYorozuya`**。`@The-un_do` を使いたい場合は YouTube Studio →「カスタマイズ」→ ハンドルで取得し直すこと。アプリの導線はID版なのでハンドル変更の影響を受けない。
+> ✅ **ハンドル確定（2026-07-02）**: **`@Issoku_The_un_do`** を取得（https://www.youtube.com/@Issoku_The_un_do ・`/live`とも到達確認済み）。旧記録の `@The-un_do` は未取得のまま終了、初期ハンドルは `@adminYorozuya` だった。アプリの導線は恒久ID版（`/channel/UCqzoMItMT74uC--y67S1-AQ/live`）なのでハンドル変更の影響を受けない。
+> ⚠️ **残ブランディング**: チャンネル名が「admin Yorozuya」・アイコンが個人写真のまま。Studio「カスタマイズ」で名前を「一息 — 坐雲堂 ｜ Issoku / The Un-do」に、アイコン/バナー/透かしを `assets/youtube/` の素材に差し替えること。
 
 ---
 
@@ -25,12 +26,12 @@
 
 ### チャンネル
 - 名前（案）: 一息 — 坐雲堂 ｜ Issoku / The Un-do
-- **ハンドル**: `@The-un_do` → https://www.youtube.com/@The-un_do （`@issoku` は取得済みのため、寺名 The Un-do を採用。人が読む用・変更可）
+- **ハンドル（確定）**: `@Issoku_The_un_do` → https://www.youtube.com/@Issoku_The_un_do （2026-07-02取得。屋号＋寺名。人が読む用・変更可）
 - **チャンネルID（恒久・一意）**: `UCqzoMItMT74uC--y67S1-AQ` → https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ
   - ハンドルを変えても不変。RSS / API / 自動連携の鍵に使う。
-  - ライブ直行: `…/channel/UCqzoMItMT74uC--y67S1-AQ/live`（`@The-un_do/live` でも可）
+  - ライブ直行: `…/channel/UCqzoMItMT74uC--y67S1-AQ/live`（`@Issoku_The_un_do/live` でも可）
   - RSS: `https://www.youtube.com/feeds/videos.xml?channel_id=UCqzoMItMT74uC--y67S1-AQ`
-  - ※アプリの導線（`YT_LIVE_URL`）は読みやすいハンドル `@The-un_do` のままでよい。IDは裏の永続キーとして記録。
+  - ※アプリの導線（`YT_LIVE_URL`）は**恒久ID版を使用中**（ハンドル変更で切れた事故を受けて）。ハンドルは人が読む用。
 - **アイコン（プロフィール画像）**: `assets/youtube/avatar.png`（**本物の毛筆円相**＋**篆刻（円相右上＝行雲流水／豪）**＋**本物の毛筆「一息」**・1600px四方）。素材：`enso-light.png`／`issoku-light.png`／`seal-koun.png`（行雲流水）／`seal-go.png`（豪）
 - **バナー（ヘッダー）**: `assets/youtube/banner.png`（毛筆円相＋**本物の毛筆「坐雲堂」**／THE UN-DO＋三日月・2560×1440・**全デバイス安全域1235×338に文字収め**）。坐雲堂は `seiundou-source.webp` 原本／`seiundou-light.png` 淡色版
 - **動画の透かし**: `assets/youtube/watermark.png`（円相のみ・背景透過＋淡い影・300px四方）
