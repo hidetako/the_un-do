@@ -1242,8 +1242,10 @@ function startBcast(o){
     $('#liveCap').innerHTML='<img src="assets/brush/seiundou.png" alt="坐雲堂"><span>the-un-do.vercel.app</span>';
     /* 下帯のささやきローテーション：URL／これは何か／どう参加するか を静かに巡回 */
     const msgs=[ 'the-un-do.vercel.app',
-      '24時間ひらく、世界の坐禅堂 ・ a zen hall, open 24/7',
-      '概要欄のリンクから、一緒に坐れます ・ join from the link in the description' ];
+      '24時間ひらく、世界の坐禅堂',
+      'A zen hall of the world — open 24/7',
+      '概要欄のリンクから、一緒に坐れます',
+      'Sit with us anytime — link in the description' ];
     let mi=0; const sp=$('#liveCap').querySelector('span');
     setInterval(()=>{ sp.style.opacity=0;
       setTimeout(()=>{ mi=(mi+1)%msgs.length; sp.textContent=msgs[mi]; sp.style.opacity=''; }, 950);
