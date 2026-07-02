@@ -16,7 +16,8 @@
 - ライブ/チャンネルのURLを入れると、入口に「**▶ いま、世界の堂を眺める（YouTubeライブ）**／▶ Watch the hall live on YouTube」が表示され、**別タブで開く**（`rel="noopener"`）。
 - 外部リンクのみのため **CSPの緩和は不要**（動画を埋め込まない＝広告もアプリ内に出ない）。
 
-**現状（2026-07-02 ライブ開始済み）**: `YT_LIVE_URL = 'https://www.youtube.com/@The-un_do/live'`（常に現行ライブへ飛ぶ固定URL）＋文言は9言語で「**いま一緒に坐る（ライブ）**/Sit together now — live」系に切替済み。初回配信URL: https://youtube.com/live/wOBMywDsKG8
+**現状（2026-07-02 ライブ開始済み）**: `YT_LIVE_URL = 'https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ/live'`（**恒久ID版**・常に現行ライブへ飛ぶ）＋文言は9言語で「**いま一緒に坐る（ライブ）**/Sit together now — live」系に切替済み。初回配信URL: https://youtube.com/live/wOBMywDsKG8
+> ⚠️ **ハンドル注意（2026-07-02判明）**: `@The-un_do` は現在**未有効**（チャンネルページごと404）。実際のハンドルは **`@adminYorozuya`**。`@The-un_do` を使いたい場合は YouTube Studio →「カスタマイズ」→ ハンドルで取得し直すこと。アプリの導線はID版なのでハンドル変更の影響を受けない。
 
 ---
 

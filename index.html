@@ -689,7 +689,7 @@ function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.r
 
 /* YouTube表口（坐雲堂チャンネル）URL。設定すると入口に導線が出る。未設定なら非表示。
    ライブを常設したら文言を「いま一緒に坐る（ライブ）」へ戻すとよい。 */
-const YT_LIVE_URL = 'https://www.youtube.com/@The-un_do/live';
+const YT_LIVE_URL = 'https://www.youtube.com/channel/UCqzoMItMT74uC--y67S1-AQ/live';   /* ハンドルではなく恒久ID（@The-un_doは未有効・実ハンドルは@adminYorozuya） */
 /* お布施（運営継続資金）の受け入れ先。決済プロバイダのURL（Stripe Payment Link / Ko-fi 等）を入れると
    終わりの画面に「お布施で支える」の静かな導線が出る。空なら非表示。外部リンクのみ＝CSP緩和不要。 */
 const SUPPORT_URL = 'https://buy.stripe.com/fZu7sL7fB2nRa2A7GE6J200';
@@ -1270,20 +1270,26 @@ function startBcast(o){
 function updateLiveCount(){
   if(!document.body.classList.contains('broadcast')) return;
   const p=presence.compute(), n=p.sitting||0, nf=new Intl.NumberFormat('en-US');
-  $('#liveCount').textContent = n>0
+  $('#liveCount').textContent = n>1
     ? ('いま世界で '+nf.format(n)+'人が坐っています ・ '+nf.format(n)+' sitting now')
-    : '世界の坐雲堂、ひらいています ・ the hall is open';
+    : n===1
+      ? 'いま、ひとりが坐っています ・ someone is sitting now'   /* 1人は数字にせず気配として */
+      : '世界の坐雲堂、ひらいています ・ the hall is open';
 }
 /* ---------- 在席数 専用ページ（?count） ---------- */
 const COUNT = BQ.has('count');
 const COUNT_LABEL = { ja:'いま、坐雲堂にいます', en:'in the hall now',
   'zh-Hans':'此刻在坐云堂', 'zh-Hant':'此刻在坐雲堂', ko:'지금 좌운당에 있습니다',
   es:'ahora en la sala', fr:'à présent dans la salle', de:'gerade in der Halle', pt:'agora na sala' };
+const COUNT_ONE = { ja:'いま、ひとりが坐雲堂にいます', en:'someone is in the hall now',
+  'zh-Hans':'此刻有一人在坐云堂', 'zh-Hant':'此刻有一人在坐雲堂', ko:'지금 한 사람이 좌운당에 있습니다',
+  es:'alguien está en la sala ahora', fr:'quelqu’un est dans la salle', de:'jemand ist gerade in der Halle', pt:'alguém está na sala agora' };
 function updateCount(){
   if(!document.body.classList.contains('countmode')) return;
   const p=presence.compute(), n=p.people||0;
   const num=$('#countNum'), lab=$('#countLabel');
   if(!p.live || n<1){ num.innerHTML=''; lab.textContent=(T[lang]&&T[lang].p_open)||'the hall is open'; return; }
+  if(n===1){ num.innerHTML=''; lab.textContent=COUNT_ONE[lang]||COUNT_ONE.en; return; }   /* 1人は数字にせず気配として */
   num.innerHTML = String(n).split('').map(function(d){ return '<img src="assets/brush/d'+d+'.png" alt="'+d+'">'; }).join('');
   lab.textContent = COUNT_LABEL[lang]||COUNT_LABEL.en;
 }
@@ -1294,7 +1300,7 @@ async function update24h(){
   if(!document.body.classList.contains('countmode')) return;
   const el=$('#count24'); if(!el) return;
   const n=await presence.sits24h();
-  if(n==null){ el.textContent=''; return; }
+  if(n==null || n<1){ el.textContent=''; return; }   /* 0のうちは掲げない（開堂したての静けさ） */
   const nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
   el.textContent=(COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}', nf.format(n));
 }
