@@ -38,14 +38,13 @@
 - **配信専用モード**: `?live=<座処>` ＋ **`?live=rotate`（=all）で6座処を巡回**（`?rotate=分`・既定10分・クロスフェード・世界時計同期・環境音/煙追従）。`?bell=分`/`?sound=0`/`?caption=0`。**配信画面は洗練済み**：下帯=毛筆「坐雲堂」落款＋URL、上帯=ささやきの在席行、全座処にシネマティックグレード（上下の締め＋data:SVGグレイン）。
 - **`?count` 専用ページ**：在席数を手書き数字で全画面表示＋「過去24時間に N人が坐りました」（多言語・60秒更新）。観測者接続で自分は数えない。アプリUIからはリンクしない（配信オーバーレイ／単体リンク用）。
 - **お布施**: 終わりの画面の `#supportLink`＝**有効化済みStripe** Payment Link（`https://buy.stripe.com/fZu7sL7fB2nRa2A7GE6J200`）。Stripeアカウント（個人事業主・よろづソリューションズ）の本人確認・セキュリティ自己申告書の入力サポート済み。
-- YouTubeチャンネル **@The-un_do**（ID `UCqzoMItMT74uC--y67S1-AQ`）。アイコン設定済み。**サムネ用GPTプロンプト／YouTube設定チェックリストは会話で渡し済み**（要点: 電話確認・子ども向けでない・収益化オフ・遅延=通常＋DVR・24hなら自動終了オフ・固定ストリームキー）。
+- **YouTubeライブ配信 開始済み（2026-07-02）**。チャンネルID `UCqzoMItMT74uC--y67S1-AQ`／ハンドル **`@Issoku_The_un_do`**（@The-un_doは未取得のまま終了・ハンドル404事故を受けアプリ導線は**恒久ID版** `/channel/<ID>/live`）。配信はユーザーPCのOBS（ブラウザソース `?live=rotate&bell=30`・音声はOBS制御）。**アプリ更新を配信に反映するにはOBSのブラウザソース再読み込み＋▶再クリックが必要**。初回配信 https://youtube.com/live/wOBMywDsKG8
 
-## 次にやること（pending）
-1. **YouTubeライブ配信の有効化**（電話認証・最大24h待ち）— ユーザー手作業・最優先。
-2. **サムネ＝完成・採用済み**（`assets/youtube/thumbnail.jpg`＝実写本堂＋毛筆坐雲堂＋LIVEバッジ・1280×720）。残りは**YouTube Studioへのアップロード**（ユーザー手作業）。
-3. YouTube Studio で **バナー `assets/youtube/banner.png`・透かし `watermark.png`** 差し替え（ユーザー手作業）。
-4. **OBSで配信開始**：映像 `?live=rotate&bell=30`（or 固定座処）、任意で `?count` をブラウザソースで重ねる。デスクトップ音声オン・マイクミュート・収益化オフ。
-5. **配信URLが決まったら**：アプリ入口の `YT_LIVE_URL` を `…/live` に繋ぎ替え＋文言を「いま一緒に坐る（ライブ）」へ（`youtube.md` L19 想定）。
+## 次にやること（pending）— 配信は開始済み。残りはチャンネルの化粧（すべてユーザー手作業）
+1. **チャンネル名とアイコン差し替え**：現状は名前「admin Yorozuya」＋個人写真のまま。Studio「カスタマイズ」→ 名前を「一息 — 坐雲堂 ｜ Issoku / The Un-do」、アイコン `assets/youtube/avatar.png`・バナー `banner.png`・透かし `watermark.png` へ。
+2. **サムネのアップロード確認**（`assets/youtube/thumbnail.jpg`＝採用済み・1280×720）。
+3. **外部リンクのクリック可能化**：説明欄URLをリンクにするには1回限りのチャンネル確認（Studioの青い「確認」リンク）。
+4. **公開範囲の確認**：限定公開のままなら「公開」へ（Studio「コンテンツ」→ライブ配信タブ）。
 
 ## 主要ファイル
 - `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール（`bumpSit`/`sits24h` 含む）、`startBcast`（rotate対応）/`updateLiveCount`/`updateCount`/`update24h`、`T`/`ORIENT` 辞書、`applyLang`、`#splashFx`。
