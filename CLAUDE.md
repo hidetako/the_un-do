@@ -42,7 +42,7 @@
 
 ## 次にやること（pending）
 1. **YouTubeライブ配信の有効化**（電話認証・最大24h待ち）— ユーザー手作業・最優先。
-2. **サムネ**：ユーザーがGPTで生成→貼ってもらったら円相重ね・題字・JPEG軽量化をこちらで仕上げ。
+2. **サムネ＝完成・採用済み**（`assets/youtube/thumbnail.jpg`＝実写本堂＋毛筆坐雲堂＋LIVEバッジ・1280×720）。残りは**YouTube Studioへのアップロード**（ユーザー手作業）。
 3. YouTube Studio で **バナー `assets/youtube/banner.png`・透かし `watermark.png`** 差し替え（ユーザー手作業）。
 4. **OBSで配信開始**：映像 `?live=rotate&bell=30`（or 固定座処）、任意で `?count` をブラウザソースで重ねる。デスクトップ音声オン・マイクミュート・収益化オフ。
 5. **配信URLが決まったら**：アプリ入口の `YT_LIVE_URL` を `…/live` に繋ぎ替え＋文言を「いま一緒に坐る（ライブ）」へ（`youtube.md` L19 想定）。
