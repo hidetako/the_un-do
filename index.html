@@ -246,15 +246,22 @@
     background:transparent; border:1px solid rgba(239,233,220,.5); border-radius:999px; padding:16px 44px;
     cursor:pointer; transition:all .5s ease }
   #liveStartBtn:hover{ background:var(--paper); color:var(--ink); letter-spacing:.24em }
-  #liveCap{ position:fixed; left:0; right:0; bottom:26px; z-index:70; text-align:center; display:none;
-    font-family:var(--serif); color:var(--paper); opacity:.62; font-size:15px; letter-spacing:.22em; padding-left:.22em;
-    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4) }
-  body.broadcast.playing #liveCap{ display:block }
-  #liveCount{ position:fixed; left:0; right:0; top:24px; z-index:70; text-align:center; display:none;
-    font-family:var(--serif); color:var(--paper); opacity:.72; font-size:15px; letter-spacing:.16em; padding:0 16px;
-    text-shadow:0 1px 3px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4) }
+  /* 下帯＝本物の毛筆「坐雲堂」＋URLの落款風（typed文字をやめて上質に） */
+  #liveCap{ position:fixed; left:0; right:0; bottom:24px; z-index:70; display:none; text-align:center }
+  body.broadcast.playing #liveCap{ display:flex; flex-direction:column; align-items:center; gap:9px }
+  #liveCap img{ width:108px; height:auto; opacity:.92; filter:drop-shadow(0 2px 8px rgba(0,0,0,.55)) }
+  #liveCap span{ font-family:var(--serif); font-size:10.5px; letter-spacing:.34em; padding-left:.34em;
+    color:var(--paper); opacity:.5; text-shadow:0 1px 3px rgba(0,0,0,.65) }
+  #liveCount{ position:fixed; left:0; right:0; top:26px; z-index:70; text-align:center; display:none;
+    font-family:var(--serif); color:var(--paper); opacity:.6; font-size:12.5px; letter-spacing:.3em; padding:0 16px .0 calc(16px + .3em);
+    text-shadow:0 1px 3px rgba(0,0,0,.65), 0 0 12px rgba(0,0,0,.45) }
   body.broadcast.playing #liveCount{ display:block }
   body.broadcast.playing{ cursor:none }
+  /* シネマティックグレード：上下の締め＋微細グレイン（写真を“一本の映像”に見せる） */
+  body.broadcast.playing::before{ content:''; position:fixed; inset:0; z-index:55; pointer-events:none;
+    background:linear-gradient(180deg, rgba(8,8,10,.38), transparent 17%, transparent 82%, rgba(8,8,10,.38)) }
+  body.broadcast.playing::after{ content:''; position:fixed; inset:0; z-index:56; pointer-events:none; opacity:.045;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E") }
   /* 在席数 専用ページ（?count） */
   #countpage{ display:none; position:fixed; inset:0; z-index:90; flex-direction:column; align-items:center; justify-content:center;
     background:radial-gradient(120% 92% at 50% 40%, #1b2647 0%, #111b37 52%, #080d1e 100%); text-align:center; padding:32px }
@@ -1231,7 +1238,7 @@ function startBcast(o){
   $('#session').setAttribute('data-scene', sel.scene);
   $('#status').textContent='';
   show('session');
-  if(o.caption) $('#liveCap').textContent='坐雲堂 ｜ the-un-do.vercel.app';
+  if(o.caption) $('#liveCap').innerHTML='<img src="assets/brush/seiundou.png" alt="坐雲堂"><span>the-un-do.vercel.app</span>';
   if(o.sound) ambient.start(sel.scene);
   if(o.rotateMs){
     (function rot(){ applyScene(sceneAt(o.rotateMs));
