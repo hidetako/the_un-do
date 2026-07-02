@@ -16,7 +16,7 @@
 - ライブ/チャンネルのURLを入れると、入口に「**▶ いま、世界の堂を眺める（YouTubeライブ）**／▶ Watch the hall live on YouTube」が表示され、**別タブで開く**（`rel="noopener"`）。
 - 外部リンクのみのため **CSPの緩和は不要**（動画を埋め込まない＝広告もアプリ内に出ない）。
 
-**現状**: `YT_LIVE_URL = 'https://www.youtube.com/@The-un_do'` を設定済み＝入口に導線「▶ YouTubeでも、坐雲堂」が表示される。ライブを常設したら飛び先を `…/live` に、文言を「いま一緒に坐る（ライブ）」へ戻すとよい。
+**現状（2026-07-02 ライブ開始済み）**: `YT_LIVE_URL = 'https://www.youtube.com/@The-un_do/live'`（常に現行ライブへ飛ぶ固定URL）＋文言は9言語で「**いま一緒に坐る（ライブ）**/Sit together now — live」系に切替済み。初回配信URL: https://youtube.com/live/wOBMywDsKG8
 
 ---
 
