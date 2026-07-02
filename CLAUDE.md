@@ -10,35 +10,43 @@
 
 ## 構成・デプロイ
 - **単一ファイル app: `index.html`**（全機能がここ）。
-- 画像: `assets/brush/`（配信対象）／YouTube素材: `assets/youtube/`（`.vercelignore`で**非配信**＝記録のみ）。
+- 画像: `assets/brush/`（配信対象。毛筆素材＋**6座処の実写JPEG**）／YouTube素材: `assets/youtube/`（`.vercelignore`で**非配信**＝記録のみ）。
 - 本番: **Vercel git連携で `main` → https://the-un-do.vercel.app/**
-- **開発ブランチ: `claude/wizardly-ramanujan-qf4j4b`**（ここに積み上げてきた。新規でも基本これに継ぐか、main から切る）。
-- 在室感: **Supabase Realtime Presence**（匿名・DB書き込みなし）。`@supabase/supabase-js@2.108.2` を esm.sh から固定読み込み。yorozuya-ghq プロジェクトを**間借り**（分離せず据え置き＝受容済みリスク。`SECURITY.md`）。
+- **開発ブランチ: `claude/claude-md-continuation-ofxh6x`**（PR #11〜#18 をここから出した。基本これに継ぐか main から切る）。
+- 在室感: **Supabase Realtime Presence**（匿名・揮発）。`@supabase/supabase-js@2.108.2` を esm.sh から固定読み込み。yorozuya-ghq プロジェクト（`dcxoouslwkfohdbacipa`）を**間借り**（分離せず据え置き＝受容済みリスク。`SECURITY.md`）。
+- **唯一のDB書き込み＝24h集計**：`zaundo_sit_hourly`（hour+cntのみ・PIIゼロ・RLS有効でanon直接不可）。関数 `zaundo_bump_sit()`（座り始めに+1）／`zaundo_sits_24h()`（過去24hの延べ回数）。適用済み・`SECURITY.md` 追記済み。
 
 ## 進め方（重要・過去ここで混乱した）
-- コミット → ブランチに push → **ドラフトPR**作成。ユーザーが「**マージして**」と言ったら ready 化→`main`へマージ→本番反映を確認。
-- **リポジトリは `hidetako/the_un-do`。push が実際に届いたか必ずPR一覧で確認**（別セッションの push が実リポジトリに届かず、存在しないPRを「作った」と誤認した事故あり）。**複数セッションを並行させない**こと。
+- コミット → ブランチに push → **ドラフトPR**作成。ユーザーが「**マージして**」と言ったら ready 化→`main`へマージ（squash）→本番反映を curl で確認。
+- **squashマージ後はブランチが main と履歴分岐する**。次の作業前に必ず `git fetch origin main && git reset --soft origin/main` でブランチを main 直上に作り直してから積む（force-push）。これを怠ると次のマージで衝突し、`-X ours` マージは**削除済みコードを復活させる**事故を起こす（実際に起きた）。
+- **リポジトリは `hidetako/the_un-do`。push が実際に届いたか必ずPR一覧で確認**。**複数セッションを並行させない**こと。
 - 画像で見せる時は**軽いJPEG（数百px）**。大きい画像を貼ると "リクエストが大きすぎます(32MB)" エラー。
-- ローカル検証: `python3 -m http.server` ＋ Playwright（`/opt/node22/.../playwright`, Chromium `/opt/pw-browsers/...`）。esm.sh/Google Fonts はオフラインで失敗するが CJK フォールバックで描画確認は可。スクショ確認後にコミット。
+- ユーザーが貼った画像はディスクに無い。**会話ログ jsonl**（`/root/.claude/projects/.../<session>.jsonl`）から base64 を抽出して保存する（既存の抽出スクリプトのパターン参照）。
+- ローカル検証: `python3 -m http.server` ＋ Playwright（`/opt/node22/lib/node_modules/playwright`＝CommonJS なので `import pkg from ...; const {chromium}=pkg`、Chromium は `/opt/pw-browsers/chromium-*/chrome-linux/chrome`）。esm.sh/Google Fonts はオフラインで失敗するが CJK フォールバックで描画確認は可。スクショ確認後にコミット。
 
 ## セキュリティ（ヨロヅヤ診断基準 v2.2 準拠・`SECURITY.md`）
 - CSP / HSTS / X-Frame-Options:DENY / Referrer-Policy / Permissions-Policy / COOP（`index.html` の meta ＋ `vercel.json` ＋ `_headers`）。
 - **CSPは緩めない。** 外部連携はすべて「**別タブで開くリンク**」のみ（埋め込み無し）。`img-src 'self' data:` は許可済み。
+- ghq に新規テーブルを足す時は RLS 必須＋公開キーの露出範囲を再確認（`SECURITY.md` の方針）。
 
 ## 現在の状態（done）
-- **ブランド全面手書き**：本物の毛筆 円相＋篆刻〔右上=**行雲流水**（左上セルだけ生成り、他は朱の線のみ）／左下=**豪**（朱の線のみ・縮小）〕＋筆「**一息**」「**坐雲堂**」＋「**よろづソリューションズ**」筆ロゴ。素材は `assets/brush/`（enso/issoku/yorozu/seiundou/koun/go/d0–9/fun/min）と `assets/youtube/`（原本含む）。
-- **多言語9言語**（ja/en/zh-Hans/zh-Hant/ko/es/fr/de/pt）。初回はブラウザ言語自動＋右上ピッカー。`T`/`ORIENT` 辞書、`SUPPORT_T`/`UNIT_IMG`/`SUPPORT_T` 等のマップ。
-- スプラッシュ＝円相+篆刻+一息、設定タイトル=筆の坐雲堂、**時間表示=手書き数字+分/min**。
-- **配信専用モード**: `?live=<座処>`（honden/kare/umi/tsuki/neko/cho）でUI非表示の全画面（一場面+環境音+鐘）。`?bell=分`/`?sound=0`/`?caption=0`。鐘と線香は**世界時計に同期**。画面上部に**世界の在席数**（`presence.connect(true)`＝観測者接続で自分は数えない）。`startBcast`/`updateLiveCount`。
-- **お布施**: 終わりの画面の `#supportLink`。定数 **`SUPPORT_URL`**（Stripe Payment Link を設定）。9言語（`SUPPORT_T`）。外部リンクのみ。
-- YouTubeチャンネル **@The-un_do**（ID `UCqzoMItMT74uC--y67S1-AQ`）。アイコン設定済み。
+- **ブランド全面手書き**：毛筆 円相＋篆刻（行雲流水／豪）＋筆「一息」「坐雲堂」＋よろづ筆ロゴ。素材 `assets/brush/`（enso/issoku/yorozu/seiundou/koun/go/d0–9/fun/min）。
+- **6座処すべて実写写真**（ユーザー生成をJPEG化して `assets/brush/` に）：honden=金の阿弥陀如来の本堂／kare=枯山水（灰色塀の採用版）／umi=海岸／tsuki=月夜／neko=三毛猫の和室／cho=調息の額。SVG作画は撤去済み。
+- **スプラッシュ刷新**：濃紺の地＋灯りの微粒子（`#splashFx`）＋流れる光（`.splashglow`）＋円相の光輪・浮遊＋入場の立ち上がり。市松は一度入れて**撤去済み**。全て `prefers-reduced-motion` で無効化。
+- **多言語9言語**（ja/en/zh-Hans/zh-Hant/ko/es/fr/de/pt）。umi の表示名は「**海岸**/Seashore」系（岸壁から変更済み）。
+- **挙動**：坐禅の中断（やめる）→**入口(setup)に戻る**（splashではない）。線香は全座処**右下固定**（choの香炉配置は撤回済み＝cover背景に固定座標は破綻する）。煙は濃いめ（幹芯0.28）＋**色は sel.scene の明暗に毎フレーム追従**（暗=honden/tsuki/cho→白煙、明→ねずみ色）。
+- **配信専用モード**: `?live=<座処>` ＋ **`?live=rotate`（=all）で6座処を巡回**（`?rotate=分`・既定10分・クロスフェード・世界時計同期・環境音/煙追従）。`?bell=分`/`?sound=0`/`?caption=0`。**配信画面は洗練済み**：下帯=毛筆「坐雲堂」落款＋URL、上帯=ささやきの在席行、全座処にシネマティックグレード（上下の締め＋data:SVGグレイン）。
+- **`?count` 専用ページ**：在席数を手書き数字で全画面表示＋「過去24時間に N人が坐りました」（多言語・60秒更新）。観測者接続で自分は数えない。アプリUIからはリンクしない（配信オーバーレイ／単体リンク用）。
+- **お布施**: 終わりの画面の `#supportLink`＝**有効化済みStripe** Payment Link（`https://buy.stripe.com/fZu7sL7fB2nRa2A7GE6J200`）。Stripeアカウント（個人事業主・よろづソリューションズ）の本人確認・セキュリティ自己申告書の入力サポート済み。
+- YouTubeチャンネル **@The-un_do**（ID `UCqzoMItMT74uC--y67S1-AQ`）。アイコン設定済み。**サムネ用GPTプロンプト／YouTube設定チェックリストは会話で渡し済み**（要点: 電話確認・子ども向けでない・収益化オフ・遅延=通常＋DVR・24hなら自動終了オフ・固定ストリームキー）。
 
 ## 次にやること（pending）
-1. （未マージなら）**お布施リンク有効化のPRをマージ→本番確認**（終わりの画面にリンク点灯）。
-2. YouTube Studio で **バナー `assets/youtube/banner.png`・透かし `watermark.png`** を差し替え（ユーザーの手作業）。
-3. **ライブ配信テスト**：OBSで `?live` のURLを全画面キャプチャ＋デスクトップ音声、**収益化オフ**。配信有効化は電話認証・最大24h。
-4. （任意）お布施導線を入口やlive概要欄にも。Stripe決済ページの金額は「**顧客が指定**」推奨。
+1. **YouTubeライブ配信の有効化**（電話認証・最大24h待ち）— ユーザー手作業・最優先。
+2. **サムネ＝完成・採用済み**（`assets/youtube/thumbnail.jpg`＝実写本堂＋毛筆坐雲堂＋LIVEバッジ・1280×720）。残りは**YouTube Studioへのアップロード**（ユーザー手作業）。
+3. YouTube Studio で **バナー `assets/youtube/banner.png`・透かし `watermark.png`** 差し替え（ユーザー手作業）。
+4. **OBSで配信開始**：映像 `?live=rotate&bell=30`（or 固定座処）、任意で `?count` をブラウザソースで重ねる。デスクトップ音声オン・マイクミュート・収益化オフ。
+5. **配信URLが決まったら**：アプリ入口の `YT_LIVE_URL` を `…/live` に繋ぎ替え＋文言を「いま一緒に坐る（ライブ）」へ（`youtube.md` L19 想定）。
 
 ## 主要ファイル
-- `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール、`startBcast`/`updateLiveCount`、`T`/`ORIENT` 辞書、`applyLang`。
-- `youtube.md`（YouTube連携・コピー・チャンネルID）、`SECURITY.md`、`企画書.md`、`vercel.json`、`_headers`、`.vercelignore`。
+- `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール（`bumpSit`/`sits24h` 含む）、`startBcast`（rotate対応）/`updateLiveCount`/`updateCount`/`update24h`、`T`/`ORIENT` 辞書、`applyLang`、`#splashFx`。
+- `youtube.md`（YouTube連携・コピー・チャンネルID・**配信URLの選択肢**）、`SECURITY.md`（24h集計の追記あり）、`企画書.md`、`vercel.json`、`_headers`、`.vercelignore`。
