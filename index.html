@@ -250,8 +250,8 @@
   #liveCap{ position:fixed; left:0; right:0; bottom:24px; z-index:70; display:none; text-align:center }
   body.broadcast.playing #liveCap{ display:flex; flex-direction:column; align-items:center; gap:9px }
   #liveCap img{ width:108px; height:auto; opacity:.92; filter:drop-shadow(0 2px 8px rgba(0,0,0,.55)) }
-  #liveCap span{ font-family:var(--serif); font-size:10.5px; letter-spacing:.34em; padding-left:.34em;
-    color:var(--paper); opacity:.5; text-shadow:0 1px 3px rgba(0,0,0,.65) }
+  #liveCap span{ font-family:var(--serif); font-size:12px; letter-spacing:.26em; padding-left:.26em;
+    color:var(--paper); opacity:.6; text-shadow:0 1px 3px rgba(0,0,0,.65); transition:opacity .9s ease; min-height:1.3em }
   #liveCount{ position:fixed; left:0; right:0; top:26px; z-index:70; text-align:center; display:none;
     font-family:var(--serif); color:var(--paper); opacity:.6; font-size:12.5px; letter-spacing:.3em; padding:0 16px .0 calc(16px + .3em);
     text-shadow:0 1px 3px rgba(0,0,0,.65), 0 0 12px rgba(0,0,0,.45) }
@@ -1238,7 +1238,17 @@ function startBcast(o){
   $('#session').setAttribute('data-scene', sel.scene);
   $('#status').textContent='';
   show('session');
-  if(o.caption) $('#liveCap').innerHTML='<img src="assets/brush/seiundou.png" alt="坐雲堂"><span>the-un-do.vercel.app</span>';
+  if(o.caption){
+    $('#liveCap').innerHTML='<img src="assets/brush/seiundou.png" alt="坐雲堂"><span>the-un-do.vercel.app</span>';
+    /* 下帯のささやきローテーション：URL／これは何か／どう参加するか を静かに巡回 */
+    const msgs=[ 'the-un-do.vercel.app',
+      '24時間ひらく、世界の坐禅堂 ・ a zen hall, open 24/7',
+      '概要欄のリンクから、一緒に坐れます ・ join from the link in the description' ];
+    let mi=0; const sp=$('#liveCap').querySelector('span');
+    setInterval(()=>{ sp.style.opacity=0;
+      setTimeout(()=>{ mi=(mi+1)%msgs.length; sp.textContent=msgs[mi]; sp.style.opacity=''; }, 950);
+    }, 14000);
+  }
   if(o.sound) ambient.start(sel.scene);
   if(o.rotateMs){
     (function rot(){ applyScene(sceneAt(o.rotateMs));
