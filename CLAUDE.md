@@ -35,8 +35,10 @@
 - **スプラッシュ刷新**：濃紺の地＋灯りの微粒子（`#splashFx`）＋流れる光（`.splashglow`）＋円相の光輪・浮遊＋入場の立ち上がり。市松は一度入れて**撤去済み**。全て `prefers-reduced-motion` で無効化。
 - **多言語9言語**（ja/en/zh-Hans/zh-Hant/ko/es/fr/de/pt）。umi の表示名は「**海岸**/Seashore」系（岸壁から変更済み）。
 - **挙動**：坐禅の中断（やめる）→**入口(setup)に戻る**（splashではない）。線香は全座処**右下固定**（choの香炉配置は撤回済み＝cover背景に固定座標は破綻する）。煙は濃いめ（幹芯0.28）＋**色は sel.scene の明暗に毎フレーム追従**（暗=honden/tsuki/cho→白煙、明→ねずみ色）。
-- **配信専用モード**: `?live=<座処>` ＋ **`?live=rotate`（=all）で6座処を巡回**（`?rotate=分`・既定10分・クロスフェード・世界時計同期・環境音/煙追従）。`?bell=分`/`?sound=0`/`?caption=0`。**配信画面は洗練済み**：下帯=毛筆「坐雲堂」落款＋URL、上帯=ささやきの在席行、全座処にシネマティックグレード（上下の締め＋data:SVGグレイン）。
-- **`?count` 専用ページ**：在席数を手書き数字で全画面表示＋「過去24時間に N人が坐りました」（多言語・60秒更新）。観測者接続で自分は数えない。アプリUIからはリンクしない（配信オーバーレイ／単体リンク用）。
+- **配信専用モード**: `?live=<座処>` ＋ **`?live=rotate`（=all）で6座処を巡回**（`?rotate=分`・既定10分・クロスフェード・世界時計同期・環境音/煙追従）。`?bell=分`/`?sound=0`/`?caption=0`。**配信画面は洗練済み**：全座処にシネマティックグレード（上下の締め＋data:SVGグレイン）。
+  - **下帯**=毛筆「坐雲堂」落款＋その下に**日英ローテーション**（14秒毎フェード：URL→「24時間ひらく、世界の坐禅堂」→A zen hall of the world — open 24/7→「概要欄のリンクから、一緒に坐れます」→Sit with us anytime — link in the description）。
+  - **上帯**=在席行（`#liveCount`）。アプリ誘導も担うため**大きめ**に（clamp(17-25px)・opacity.92）。**少人数の見せ方**：0人=「開堂しています」、1人=数字にせず「いま、ひとりが坐っています／someone is sitting now」、2人以上=数字。
+- **`?count` 専用ページ**：在席数を手書き数字で全画面表示＋「過去24時間に N人が坐りました」（多言語・60秒更新）。**1人は数字にせず「いま、ひとりが坐雲堂にいます」（9言語 COUNT_ONE）／24h=0は行ごと非表示**。観測者接続で自分は数えない。アプリUIからはリンクしない（配信オーバーレイ／単体リンク用）。
 - **お布施**: 終わりの画面の `#supportLink`＝**有効化済みStripe** Payment Link（`https://buy.stripe.com/fZu7sL7fB2nRa2A7GE6J200`）。Stripeアカウント（個人事業主・よろづソリューションズ）の本人確認・セキュリティ自己申告書の入力サポート済み。
 - **YouTubeライブ配信 開始済み（2026-07-02）**。チャンネルID `UCqzoMItMT74uC--y67S1-AQ`／ハンドル **`@Issoku_The_un_do`**（@The-un_doは未取得のまま終了・ハンドル404事故を受けアプリ導線は**恒久ID版** `/channel/<ID>/live`）。配信はユーザーPCのOBS（ブラウザソース `?live=rotate&bell=30`・音声はOBS制御）。**アプリ更新を配信に反映するにはOBSのブラウザソース再読み込み＋▶再クリックが必要**。初回配信 https://youtube.com/live/wOBMywDsKG8
 
@@ -48,4 +50,4 @@
 
 ## 主要ファイル
 - `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール（`bumpSit`/`sits24h` 含む）、`startBcast`（rotate対応）/`updateLiveCount`/`updateCount`/`update24h`、`T`/`ORIENT` 辞書、`applyLang`、`#splashFx`。
-- `youtube.md`（YouTube連携・コピー・チャンネルID・**配信URLの選択肢**）、`SECURITY.md`（24h集計の追記あり）、`企画書.md`、`vercel.json`、`_headers`、`.vercelignore`。
+- `youtube.md`（YouTube連携・コピー・チャンネルID・**配信URLの選択肢**）、`配信手順.md`（**別PCでの配信立ち上げ手順書**・つまずき早見表つき・`.vercelignore`で非配信）、`SECURITY.md`（24h集計の追記あり）、`企画書.md`、`vercel.json`、`_headers`、`.vercelignore`。
