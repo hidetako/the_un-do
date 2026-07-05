@@ -1087,7 +1087,7 @@ function updatePresence(){ const txt=presenceText();
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
 
 /* ---------- session flow ---------- */
-let timerRAF, timerActive=false, ringTimer=null;
+let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#session').setAttribute('data-scene', sel.scene);   // 背景は付けず、文字位置/色の出し分け用
@@ -1116,17 +1116,21 @@ function beginSitting(){
 }
 function startIncense(durMs){
   const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
+  /* 終了の鐘は実時間（setTimeout）で鳴らす。requestAnimationFrame は裏タブ／画面ロックで
+     停止・スロットルされるため、それに依存すると数分後の終了鐘が鳴らない。rAFは線香の描画のみ。 */
+  clearTimeout(endTimer);
+  endTimer=setTimeout(()=>{ if(!timerActive) return; timerActive=false; cancelAnimationFrame(timerRAF); endSession(); }, durMs);
   function loop(now){ if(!timerActive) return;
     let p=(now-start)/durMs; if(p>1)p=1;
     stick.style.height=(full*(1-p))+'px';
-    if(p>=1){ timerActive=false; endSession(); return; }
+    if(p>=1) return;               // 終了判定はendTimerに任せる（描画だけ止める）
     timerRAF=requestAnimationFrame(loop);
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
