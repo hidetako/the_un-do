@@ -880,62 +880,76 @@ const ambient = (() => {
   function later(fn, ms){ timers.push(setTimeout(()=>{ if(alive) fn(); }, ms)); }
 
   const builders = {
-    /* 本堂：深く暗い堂内のうなり。低く包み込む。 */
+    /* 本堂：深く暗い堂内のうなり。定常の低い胴鳴りで包む（波のように寄せ引きさせない）。 */
     honden(){
-      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=140; lp.Q.value=0.6;
-      const g=ac.createGain(); g.gain.value=0.20; mod(g.gain,0.06,0.05);
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=120; lp.Q.value=0.5;
+      const g=ac.createGain(); g.gain.value=0.16;                 // 定常。うねらせない
       s.connect(lp); lp.connect(g); g.connect(master); s.start();
+      const drone=ac.createOscillator(); drone.type='sine'; drone.frequency.value=57;  // 堂内の胴鳴り
+      const dg=ac.createGain(); dg.gain.value=0.05; mod(dg.gain,0.006,0.06);            // ごくわずかな揺らぎだけ
+      drone.connect(dg); dg.connect(master); drone.start(); started.push(drone);
     },
-    /* 枯山水：かすかな風＋折々の鹿威し（ししおどし）の「コーン」。 */
+    /* 枯山水：高めで乾いた「さやさや」（速く小さく＝風。波のうねりにしない）＋折々の鹿威しの「コーン」。 */
     kare(){
-      const s=noise(), bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=0.7;
-      const g=ac.createGain(); g.gain.value=0.06; mod(g.gain,0.045,0.08); mod(bp.frequency,180,0.05);
+      const s=noise(), bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1400; bp.Q.value=0.5;
+      const g=ac.createGain(); g.gain.value=0.05; mod(g.gain,0.014,0.6); mod(bp.frequency,300,0.5);
       s.connect(bp); bp.connect(g); g.connect(master); s.start();
+      /* 鹿威しは「まれに・不規則に」。短周期で繰り返すと拍になって坐の集中を遮るため間隔を長く取る。 */
       const knock=()=>{ const t=ac.currentTime, o=ac.createOscillator(), e=ac.createGain();
         o.type='sine'; o.frequency.setValueAtTime(230,t); o.frequency.exponentialRampToValueAtTime(96,t+0.13);
-        e.gain.setValueAtTime(0.0001,t); e.gain.exponentialRampToValueAtTime(0.22,t+0.006);
-        e.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
-        o.connect(e); e.connect(master); o.start(t); o.stop(t+0.5);
-        later(knock,(15+Math.random()*9)*1000); };
-      later(knock,(7+Math.random()*6)*1000);
+        e.gain.setValueAtTime(0.0001,t); e.gain.exponentialRampToValueAtTime(0.2,t+0.01);
+        e.gain.exponentialRampToValueAtTime(0.0001,t+0.5);
+        o.connect(e); e.connect(master); o.start(t); o.stop(t+0.55);
+        later(knock,(32+Math.random()*40)*1000); };   // 約32〜72秒・不規則
+      later(knock,(24+Math.random()*24)*1000);
     },
-    /* 海岸：寄せて引く波。ゆっくり膨らみ、しずまる。 */
+    /* 海岸：寄せて引く波。ゆっくり膨らみ、しずまる（「波」はここだけ）。 */
     umi(){
       const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=0.4;
       const g=ac.createGain(); g.gain.value=0.13; mod(g.gain,0.13,0.09); mod(g.gain,0.04,0.137); mod(lp.frequency,260,0.09);
       s.connect(lp); lp.connect(g); g.connect(master); s.start();
     },
-    /* 夜の月：しずかな夜気＋まばらな虫の音（鈴虫）。 */
+    /* 夜の月：ほぼ無音の夜気（定常）＋まばらな鈴虫。虫の音を主役に。 */
     tsuki(){
-      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=200;
-      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.05);
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=170;
+      const g=ac.createGain(); g.gain.value=0.02;                 // 定常のごく薄い夜気（うねらせない）
       s.connect(lp); lp.connect(g); g.connect(master); s.start();
-      const cricket=()=>{ const t=ac.currentTime, dur=0.5+Math.random()*0.5;
+      /* 鈴虫は「まばらに・不規則に」。短周期の連続音は拍になって集中を遮るため、遠くの気配程度に間引く。 */
+      const cricket=()=>{ const t=ac.currentTime, dur=0.6+Math.random()*0.6;
         const o=ac.createOscillator(); o.type='sine'; o.frequency.value=4300+Math.random()*1000;
         const tr=ac.createOscillator(); tr.type='square'; tr.frequency.value=26+Math.random()*10;
         const trg=ac.createGain(); trg.gain.value=0.011;
         const env=ac.createGain();
-        env.gain.setValueAtTime(0.0001,t); env.gain.linearRampToValueAtTime(0.011,t+0.05);
-        env.gain.setValueAtTime(0.011,t+dur-0.08); env.gain.linearRampToValueAtTime(0.0001,t+dur);
+        env.gain.setValueAtTime(0.0001,t); env.gain.linearRampToValueAtTime(0.011,t+0.12);
+        env.gain.setValueAtTime(0.011,t+dur-0.18); env.gain.linearRampToValueAtTime(0.0001,t+dur);
         tr.connect(trg); trg.connect(env.gain); o.connect(env); env.connect(master);
         o.start(t); tr.start(t); o.stop(t+dur); tr.stop(t+dur);
-        later(cricket,(2.2+Math.random()*3.6)*1000); };
-      later(cricket,(1.5+Math.random()*3)*1000);
+        later(cricket,(8+Math.random()*13)*1000); };   // 約8〜21秒・不規則
+      later(cricket,(4+Math.random()*8)*1000);
     },
-    /* 寝ている猫の横：ゆっくりした寝息（＝自然な調息のお手本）＋かすかな喉鳴り。 */
+    /* 寝ている猫の横：4秒周期の寝息（吸って、吐く＝調息のお手本）＋かすかな喉鳴り。波の寄せ引きではなく「息」。 */
     neko(){
-      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=360;
-      const g=ac.createGain(); g.gain.value=0.05; mod(g.gain,0.045,0.2);
-      s.connect(lp); lp.connect(g); g.connect(master); s.start();
-      const p=ac.createOscillator(); p.type='sawtooth'; p.frequency.value=52;
+      const s=noise(), bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=0.6;
+      const g=ac.createGain(); g.gain.value=0.0001;
+      s.connect(bp); bp.connect(g); g.connect(master); s.start();
+      /* ゆっくり静かな呼吸（吸気≈2.6s→呼気≈4s・約7.4s周期）。鋭い立ち上がりや無音の切れ目を避け、
+         なめらかに連続させて「拍」に感じさせない＝坐の集中を遮らない。 */
+      const breath=()=>{ const t=ac.currentTime;
+        bp.frequency.setValueAtTime(680,t);
+        g.gain.setValueAtTime(0.0006,t); g.gain.linearRampToValueAtTime(0.035,t+2.6);   // 吸気
+        bp.frequency.setValueAtTime(520,t+3.0);
+        g.gain.linearRampToValueAtTime(0.0006,t+7.0);                                    // 呼気（長く沈める）
+        later(breath,7400); };
+      breath();
+      const p=ac.createOscillator(); p.type='sawtooth'; p.frequency.value=52;   // 喉のごろごろ
       const plp=ac.createBiquadFilter(); plp.type='lowpass'; plp.frequency.value=170;
-      const pg=ac.createGain(); pg.gain.value=0.012; mod(pg.gain,0.012,22);
+      const pg=ac.createGain(); pg.gain.value=0.014; mod(pg.gain,0.013,24);
       p.connect(plp); plp.connect(pg); pg.connect(master); p.start(); started.push(p);
     },
-    /* 調息の額：ほぼ無音。簡素な床の間のかすかな空気。 */
+    /* 調息の額：ほぼ無音。床の間のかすかな空気（定常・うねらせない）。 */
     cho(){
       const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=220;
-      const g=ac.createGain(); g.gain.value=0.035; mod(g.gain,0.012,0.04);
+      const g=ac.createGain(); g.gain.value=0.03;                 // 定常。ゆらさない
       s.connect(lp); lp.connect(g); g.connect(master); s.start();
     }
   };
@@ -1073,7 +1087,7 @@ function updatePresence(){ const txt=presenceText();
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
 
 /* ---------- session flow ---------- */
-let timerRAF, timerActive=false, ringTimer=null;
+let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#session').setAttribute('data-scene', sel.scene);   // 背景は付けず、文字位置/色の出し分け用
@@ -1102,17 +1116,21 @@ function beginSitting(){
 }
 function startIncense(durMs){
   const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
+  /* 終了の鐘は実時間（setTimeout）で鳴らす。requestAnimationFrame は裏タブ／画面ロックで
+     停止・スロットルされるため、それに依存すると数分後の終了鐘が鳴らない。rAFは線香の描画のみ。 */
+  clearTimeout(endTimer);
+  endTimer=setTimeout(()=>{ if(!timerActive) return; timerActive=false; cancelAnimationFrame(timerRAF); endSession(); }, durMs);
   function loop(now){ if(!timerActive) return;
     let p=(now-start)/durMs; if(p>1)p=1;
     stick.style.height=(full*(1-p))+'px';
-    if(p>=1){ timerActive=false; endSession(); return; }
+    if(p>=1) return;               // 終了判定はendTimerに任せる（描画だけ止める）
     timerRAF=requestAnimationFrame(loop);
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
