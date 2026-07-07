@@ -1,0 +1,15 @@
+{
+  "name": "一息 — 坐雲堂 | Issoku · The Un-do",
+  "short_name": "坐雲堂",
+  "description": "24時間ひらく、世界の坐禅堂。A zen hall of the world — open 24/7.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#171310",
+  "theme_color": "#171310",
+  "lang": "ja",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
