@@ -1084,14 +1084,15 @@ const presence = (() => {
   async function sits24h(){ try{ if(client){ const r=await client.rpc('zaundo_sits_24h'); if(!r.error) return Number(r.data)||0; } }catch(e){} return null; }
   return { connect, setSitting, leave, compute, startGlobe, stopGlobe, bumpSit, sits24h, onChange:(f)=>{onChange=f;} };
 })();
-function presenceText(){
-  const p=presence.compute(), t=T[lang], nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
-  if(!p.live) return t.p_open;
-  if(p.people<=1) return t.p_alone;
-  return t.p_count.replace('{p}', nf.format(p.people)).replace('{c}', nf.format(p.countries));
+/* アプリ入口の在室表示も、配信・?count と集計方法を統一：「過去24時間の延べ着席数」。
+   瞬間の在室数は0〜1になりがちで淋しいため一日の積み上げを示す。生きた気配は地球儀の灯りが担う。
+   取得前・オフライン・0のときは「いつでも開いています」に静かに退く。 */
+async function updatePresence(){
+  const t=T[lang], nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
+  const n=await presence.sits24h();
+  const txt=(n && n>0) ? (COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}', nf.format(n)) : t.p_open;
+  document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt);
 }
-function updatePresence(){ const txt=presenceText();
-  document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt); }
 
 /* ---------- session flow ---------- */
 let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
