@@ -1001,6 +1001,17 @@ const presence = (() => {
   ];
   const land=[];
   REGIONS.forEach(r=>{ for(let i=0;i<r[4];i++) land.push({ lat:rand(r[0],r[1]), lng:rand(r[2],r[3]) }); });
+  /* 地球儀の灯り＝「過去24時間の延べ着席数」に合わせて点す。数は本物・位置はおおまか（気配）。
+     個人情報は持たないので、地域におおまかに散らす。人が増えたぶんだけ灯りを足す（既存は動かさない）。 */
+  const LIGHT_CAP=48, REGW=REGIONS.reduce((s,r)=>s+r[4],0);
+  let sat24=0; const sitLights=[];
+  function randRegionPoint(){ let k=rand(0,REGW), r=REGIONS[0];
+    for(const rg of REGIONS){ k-=rg[4]; if(k<=0){ r=rg; break; } }
+    return { lat:rand(r[0],r[1]), lng:rand(r[2],r[3]) }; }
+  function setSat(n){ n=Math.max(0, Math.min(n|0, LIGHT_CAP));
+    while(sitLights.length<n) sitLights.push(randRegionPoint());
+    if(sitLights.length>n) sitLights.length=n; sat24=n; }
+  async function refreshSat(){ const n=await sits24h(); if(n!=null) setSat(n); }
   const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* 匿名・おおまかな現在地（タイムゾーンから推定。位置情報APIは使わない＝企画書「位置はおおまかに」） */
@@ -1046,16 +1057,17 @@ const presence = (() => {
   }
 
   /* ---- globe ---- */
-  let raf=null, cv=null, x=null, rot=0, last=0;
+  let raf=null, cv=null, x=null, rot=0, last=0, satTimer=null;
   function startGlobe(canvas){
     cv=canvas; x=canvas.getContext('2d'); cancelAnimationFrame(raf); last=performance.now();
     if(!me) me=myPos();       // 観る人の位置を用意（接続前でも自分の灯りを点せるように）
     rot=-me.lng*D2R;          // 自分の経度を正面へ＝入室してまず自分の灯りが見える
+    refreshSat(); if(satTimer) clearInterval(satTimer); satTimer=setInterval(refreshSat, 60000);  // 24h集計に灯りを追従
     const loop=(t)=>{ const dt=Math.min(60,t-last); last=t; if(!reduced) rot+=dt*0.00007; draw(t);
       raf=requestAnimationFrame(loop); };
     raf=requestAnimationFrame(loop);
   }
-  function stopGlobe(){ cancelAnimationFrame(raf); raf=null; }
+  function stopGlobe(){ cancelAnimationFrame(raf); raf=null; if(satTimer){ clearInterval(satTimer); satTimer=null; } }
   function project(lat,lng,cx,cy,R){
     const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
     return { sx:cx+R*cl*Math.sin(lo), sy:cy-R*Math.sin(la), z };
@@ -1064,21 +1076,21 @@ const presence = (() => {
     const W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.42;
     x.clearRect(0,0,W,H);
     const g=x.createRadialGradient(cx-R*0.32,cy-R*0.32,R*0.15,cx,cy,R);
-    g.addColorStop(0,'rgba(64,84,100,0.34)'); g.addColorStop(0.7,'rgba(28,40,54,0.30)'); g.addColorStop(1,'rgba(12,18,26,0.04)');
+    g.addColorStop(0,'rgba(52,86,124,0.36)'); g.addColorStop(0.7,'rgba(22,44,78,0.32)'); g.addColorStop(1,'rgba(8,18,40,0.05)');
     x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.fillStyle=g; x.fill();
-    x.lineWidth=1; x.strokeStyle='rgba(180,200,210,0.10)'; x.stroke();
+    x.lineWidth=1; x.strokeStyle='rgba(160,190,225,0.12)'; x.stroke();
     /* 地球の地（淡い背景点・人ではない） */
     x.shadowBlur=0;
     for(const p of land){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
       const depth=0.45+0.55*q.z;
-      x.beginPath(); x.fillStyle='rgba(150,170,180,'+(0.05+0.10*depth).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
-    /* いまこの堂にいる人（実データ・金の灯り。坐っている人はより明るく） */
-    for(const m of members){ const q=project(m.lat,m.lng,cx,cy,R); if(q.z<=0) continue;
-      const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0024+(m.lng+m.lat)));
-      const a=Math.min(1,(m.sitting?0.95:0.62)*tw*depth);
+      x.beginPath(); x.fillStyle='rgba(148,176,210,'+(0.05+0.10*depth).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
+    /* 過去24時間に坐った人の灯り（数は本物・位置はおおまかな気配。人が増えたぶんだけ灯りが増える） */
+    for(const p of sitLights){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
+      const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0022+(p.lng+p.lat)));
+      const a=Math.min(1,0.6*tw*depth);
       x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
-      x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=m.sitting?10:5;
-      x.arc(q.sx,q.sy,m.sitting?2.4:1.6,0,6.2832); x.fill(); }
+      x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=5;
+      x.arc(q.sx,q.sy,1.6,0,6.2832); x.fill(); }
     /* 観る人自身の灯り：Realtimeの反映や自転を待たず、堂にいる実感として必ず点す。 */
     if(me){ const q=project(me.lat,me.lng,cx,cy,R);
       if(q.z>0){ const depth=0.45+0.55*q.z, tw=reduced?1:(0.80+0.20*Math.sin(t*0.0022));
