@@ -238,8 +238,9 @@
 
   /* ---------- 配信専用モード（?live）---------- */
   body.broadcast .bar, body.broadcast #exitBtn{ display:none !important }
+  /* ▶待機中も座処が透けて見えるよう半透明スクリムに（不透明だと▶未クリックのまま真っ黒が配信に乗る） */
   #liveStart{ position:fixed; inset:0; z-index:80; display:none; align-items:center; justify-content:center;
-    background:radial-gradient(120% 90% at 50% 40%, #1a1510 0%, #0c0907 100%) }
+    background:rgba(10,9,7,.38) }
   body.broadcast #liveStart{ display:flex }
   body.broadcast.playing #liveStart{ display:none }
   #liveStartBtn{ font-family:var(--serif); font-size:18px; letter-spacing:.18em; color:var(--paper);
@@ -1339,6 +1340,14 @@ if(COUNT){
   const o={ scene:s, rotateMs: rotateOn ? rotMin*60000 : 0,
             periodMs:Math.max(1,parseInt(BQ.get('bell'),10)||30)*60000,
             sound:BQ.get('sound')!=='0', caption:BQ.get('caption')!=='0' };
+  /* ▶を押す前でも黒画面を配信に乗せない：座処の背景だけ先に映しておく。
+     （OBSのブラウザソースで「対話」→▶を忘れると真っ黒が流れ続ける事故の恒久対策。
+       音・煙・鐘・ローテーションは従来どおり▶で解錠＝autoplay制約にも安全） */
+  const s0 = o.rotateMs ? SCENES[Math.floor(Date.now()/o.rotateMs)%SCENES.length] : o.scene;
+  $('#scene').className=''; $('#scene').classList.add('scene-'+s0);
+  $('#session').setAttribute('data-scene', s0);
+  $('#status').textContent='';
+  show('session');
   $('#liveStartBtn').textContent='▶ 坐をはじめる';
   $('#liveStartBtn').onclick=()=>startBcast(o);
 } else {
