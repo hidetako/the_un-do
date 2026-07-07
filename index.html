@@ -1049,6 +1049,8 @@ const presence = (() => {
   let raf=null, cv=null, x=null, rot=0, last=0;
   function startGlobe(canvas){
     cv=canvas; x=canvas.getContext('2d'); cancelAnimationFrame(raf); last=performance.now();
+    if(!me) me=myPos();       // 観る人の位置を用意（接続前でも自分の灯りを点せるように）
+    rot=-me.lng*D2R;          // 自分の経度を正面へ＝入室してまず自分の灯りが見える
     const loop=(t)=>{ const dt=Math.min(60,t-last); last=t; if(!reduced) rot+=dt*0.00007; draw(t);
       raf=requestAnimationFrame(loop); };
     raf=requestAnimationFrame(loop);
@@ -1077,6 +1079,13 @@ const presence = (() => {
       x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
       x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=m.sitting?10:5;
       x.arc(q.sx,q.sy,m.sitting?2.4:1.6,0,6.2832); x.fill(); }
+    /* 観る人自身の灯り：Realtimeの反映や自転を待たず、堂にいる実感として必ず点す。 */
+    if(me){ const q=project(me.lat,me.lng,cx,cy,R);
+      if(q.z>0){ const depth=0.45+0.55*q.z, tw=reduced?1:(0.80+0.20*Math.sin(t*0.0022));
+        const a=Math.min(1,0.9*tw*depth);
+        x.beginPath(); x.fillStyle='rgba(232,200,122,'+a.toFixed(3)+')';
+        x.shadowColor='rgba(232,200,122,'+a.toFixed(3)+')'; x.shadowBlur=9;
+        x.arc(q.sx,q.sy,2.3,0,6.2832); x.fill(); } }
     x.shadowBlur=0;
   }
   /* 集計のみ（個人情報なし）：座った延べ回数を +1／過去24時間の合計を取得 */
