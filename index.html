@@ -145,6 +145,9 @@
   .group{width:min(92vw,540px); margin:12px 0 0}
   .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:7px; text-align:center; opacity:.9}
   .opts{display:flex; flex-wrap:wrap; gap:9px; justify-content:center}
+  /* 座処は全言語で「上3・下3」に固定（折返し任せだと4+2などに崩れる） */
+  #sceneOpts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:min(92vw,520px); margin:0 auto}
+  #sceneOpts .opt{min-width:0; padding-left:6px; padding-right:6px}
   .opt{flex:0 1 auto; min-width:94px; background:rgba(239,233,220,.04); color:var(--paper);
     border:1px solid rgba(239,233,220,.16); border-radius:14px; padding:10px 15px; cursor:pointer;
     font-family:var(--serif); font-size:14.5px; letter-spacing:.04em; transition:all .35s ease}
