@@ -712,6 +712,8 @@ function applyLang(){
     if(t[k]!==undefined){ if(k==='tagline') el.innerHTML=t[k]; else el.textContent=t[k]; } });
   $('#langBtn').textContent = LANG_SHORT[lang] || 'A';
   document.documentElement.lang = lang;
+  /* 坐禅中の「ただ、座る」はJSで直接入れているため、data-t置換では更新されない。ここで追従させる。 */
+  const st=$('#status'); if(st && st.textContent && $('#session').classList.contains('on')) st.textContent=t.sitting;
   buildOpts();
   updatePresence();
   renderTimeUnit();
