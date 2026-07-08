@@ -133,22 +133,22 @@
   .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
     letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
   .credit img{width:min(42vw,168px); height:auto; display:block; margin:0 auto; opacity:.6}
-  .lobby{width:min(86vw,360px); margin:24px auto 6px; display:flex; flex-direction:column; align-items:center; gap:14px}
-  .lobby canvas{width:196px; height:196px; display:block}
-  @media (max-width:520px){ .lobby canvas{width:166px; height:166px} }
+  .lobby{width:min(86vw,360px); margin:8px auto 2px; display:flex; flex-direction:column; align-items:center; gap:8px}
+  .lobby canvas{width:104px; height:104px; display:block}
+  @media (max-width:520px){ .lobby canvas{width:96px; height:96px} }
 
   /* SETUP */
-  #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:80px 24px 60px}
+  #setup{background:linear-gradient(170deg,#1a1610,#100d0a); overflow-y:auto; justify-content:flex-start; padding:26px 24px 22px}
   #setup .title{font-family:var(--brush); font-size:30px; color:var(--paper); margin:0 0 4px; letter-spacing:.08em}
-  #setup .title small{display:block; font-family:var(--serif); font-size:11px; letter-spacing:.5em; color:var(--gold); margin-top:8px; padding-left:.5em}
-  #setup .title .titlebrush{display:block; margin:0 auto 2px; width:min(54vw,210px); height:auto}
-  .group{width:min(92vw,540px); margin:26px 0 0}
-  .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:14px; text-align:center; opacity:.9}
-  .opts{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
-  .opt{flex:0 1 auto; min-width:104px; background:rgba(239,233,220,.04); color:var(--paper);
-    border:1px solid rgba(239,233,220,.16); border-radius:14px; padding:14px 16px; cursor:pointer;
-    font-family:var(--serif); font-size:15px; letter-spacing:.04em; transition:all .35s ease}
-  .opt small{display:block; opacity:.5; font-size:11.5px; margin-top:4px; letter-spacing:.06em}
+  #setup .title small{display:block; font-family:var(--serif); font-size:11px; letter-spacing:.5em; color:var(--gold); margin-top:5px; padding-left:.5em}
+  #setup .title .titlebrush{display:block; margin:0 auto 2px; width:min(44vw,166px); height:auto}
+  .group{width:min(92vw,540px); margin:12px 0 0}
+  .glabel{font-size:11px; color:var(--gold); letter-spacing:.34em; margin-bottom:7px; text-align:center; opacity:.9}
+  .opts{display:flex; flex-wrap:wrap; gap:9px; justify-content:center}
+  .opt{flex:0 1 auto; min-width:94px; background:rgba(239,233,220,.04); color:var(--paper);
+    border:1px solid rgba(239,233,220,.16); border-radius:14px; padding:10px 15px; cursor:pointer;
+    font-family:var(--serif); font-size:14.5px; letter-spacing:.04em; transition:all .35s ease}
+  .opt small{display:block; opacity:.5; font-size:11.5px; margin-top:3px; letter-spacing:.06em}
   .opt:hover{border-color:rgba(239,233,220,.42); background:rgba(239,233,220,.07)}
   .opt.sel{background:var(--paper); color:var(--ink); border-color:var(--paper)}
   .opt.sel small{opacity:.55}
@@ -156,21 +156,21 @@
   /* time slider */
   .timewrap{width:min(86vw,400px); margin:2px auto 0}
   /* 手書きの時間表示（数字は画像、単位は言語別に画像/文字） */
-  .timeval{display:flex; align-items:flex-end; justify-content:center; gap:2px; line-height:1; min-height:54px}
+  .timeval{display:flex; align-items:flex-end; justify-content:center; gap:2px; line-height:1; min-height:44px}
   #timeNum{display:inline-flex; align-items:flex-end; gap:4px}
-  #timeNum img{height:50px; width:auto; display:block}
+  #timeNum img{height:42px; width:auto; display:block}
   .timeunit{display:inline-flex; align-items:flex-end; margin-left:12px;
     font-family:var(--serif); font-size:16px; color:var(--gold); letter-spacing:.1em}
   .timeunit img{height:30px; width:auto; display:block; opacity:.95}
-  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin-top:22px;
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:3px; margin-top:15px;
     border-radius:2px; background:rgba(239,233,220,.2); outline:none; cursor:pointer}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; border-radius:50%;
     background:var(--gold); border:4px solid #1a1610; cursor:pointer; box-shadow:0 0 0 1px rgba(194,163,94,.4)}
   input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:50%;
     background:var(--gold); border:4px solid #1a1610; cursor:pointer}
-  .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:10px; letter-spacing:.05em}
+  .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:7px; letter-spacing:.05em}
 
-  .begin{margin:40px 0 20px; font-family:var(--serif); font-size:16px; letter-spacing:.2em; color:var(--ink);
+  .begin{margin:14px 0 6px; font-family:var(--serif); font-size:16px; letter-spacing:.2em; color:var(--ink);
     background:var(--gold); border:none; border-radius:999px; padding:15px 48px; cursor:pointer; transition:all .4s}
   .begin:hover{background:#d2b572; letter-spacing:.26em}
 
@@ -322,7 +322,7 @@
     </div>
     <h1 class="brandk"><img src="assets/brush/issoku.png" alt="一息"></h1>
     <div class="brandsub">ISSOKU</div>
-    <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>ひと息、入れる。</p>
+    <p class="tagline" data-t="tagline">24時間、世界のどこからでも。<br>坐って、ひといき、つきましょう。</p>
     <div class="presence presence-splash" id="presenceSplash"><span class="pdot"></span><span class="ptext"></span></div>
     <button class="enter" id="enterBtn" data-t="enter">坐雲堂に入る</button>
     <div class="credit"><img src="assets/brush/yorozu.png" alt="よろづソリューションズ / Yorozu Solutions"></div>
@@ -411,7 +411,7 @@
 /* ---------- i18n ---------- */
 const T = {
   ja:{
-    tagline:"24時間、世界のどこからでも。<br>ひと息、入れる。",
+    tagline:"24時間、世界のどこからでも。<br>坐って、ひといき、つきましょう。",
     enter:"坐雲堂に入る", g_posture:"姿勢", g_scene:"座処", g_time:"時間",
     g_orient:"オリエンテーション", g_sound:"環境音", snd_on:"流す", snd_off:"消す", begin:"はじめる",
     yt_watch:"いま一緒に坐る（ライブ）", credit:"よろづソリューションズ",
@@ -427,7 +427,7 @@ const T = {
     scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
   en:{
-    tagline:"Anytime, from anywhere.<br>Take one breath.",
+    tagline:"Anytime, from anywhere.<br>Sit, and take a breath.",
     enter:"Enter the Hall", g_posture:"Posture", g_scene:"Seat", g_time:"Duration",
     g_orient:"Orientation", g_sound:"Nature sound", snd_on:"On", snd_off:"Off", begin:"Begin",
     yt_watch:"Sit together now — live", credit:"Yorozu Solutions",
@@ -443,7 +443,7 @@ const T = {
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
   },
   "zh-Hans":{
-    tagline:"全天候，从世界任何角落。<br>歇一口气。",
+    tagline:"全天候，从世界任何角落。<br>坐下来，歇口气吧。",
     enter:"进入坐云堂", g_posture:"姿势", g_scene:"座处", g_time:"时长",
     g_orient:"引导", g_sound:"环境音", snd_on:"开", snd_off:"关", begin:"开始",
     yt_watch:"现在一起打坐（直播）", credit:"Yorozu Solutions",
@@ -459,7 +459,7 @@ const T = {
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
   },
   "zh-Hant":{
-    tagline:"全天候，從世界任何角落。<br>歇一口氣。",
+    tagline:"全天候，從世界任何角落。<br>坐下來，歇口氣吧。",
     enter:"進入坐雲堂", g_posture:"姿勢", g_scene:"座處", g_time:"時長",
     g_orient:"引導", g_sound:"環境音", snd_on:"開", snd_off:"關", begin:"開始",
     yt_watch:"現在一起打坐（直播）", credit:"Yorozu Solutions",
@@ -475,7 +475,7 @@ const T = {
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
   },
   ko:{
-    tagline:"24시간, 세계 어디에서나.<br>한 호흡, 쉬어 가다.",
+    tagline:"24시간, 세계 어디에서나.<br>앉아서, 한 호흡 쉬어 가요.",
     enter:"좌운당에 들다", g_posture:"자세", g_scene:"자리", g_time:"시간",
     g_orient:"안내", g_sound:"환경음", snd_on:"켜기", snd_off:"끄기", begin:"시작하기",
     yt_watch:"지금 함께 앉기（라이브）", credit:"Yorozu Solutions",
@@ -491,7 +491,7 @@ const T = {
     scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
   },
   es:{
-    tagline:"A toda hora, desde cualquier lugar.<br>Toma un respiro.",
+    tagline:"A toda hora, desde cualquier lugar.<br>Siéntate y toma un respiro.",
     enter:"Entrar en la sala", g_posture:"Postura", g_scene:"Lugar", g_time:"Duración",
     g_orient:"Guía", g_sound:"Sonido ambiente", snd_on:"Activar", snd_off:"Silenciar", begin:"Comenzar",
     yt_watch:"Sentarse juntos ahora — en vivo", credit:"Yorozu Solutions",
@@ -507,7 +507,7 @@ const T = {
     scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
   },
   fr:{
-    tagline:"À toute heure, où que vous soyez.<br>Le temps d’un souffle.",
+    tagline:"À toute heure, où que vous soyez.<br>Asseyez-vous et respirez un instant.",
     enter:"Entrer dans la salle", g_posture:"Posture", g_scene:"Place", g_time:"Durée",
     g_orient:"Guidage", g_sound:"Son d’ambiance", snd_on:"Activer", snd_off:"Couper", begin:"Commencer",
     yt_watch:"S’asseoir ensemble — en direct", credit:"Yorozu Solutions",
@@ -523,7 +523,7 @@ const T = {
     scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
   },
   de:{
-    tagline:"Jederzeit, von überall.<br>Einen Atemzug lang innehalten.",
+    tagline:"Jederzeit, von überall.<br>Setz dich und atme einmal durch.",
     enter:"Die Halle betreten", g_posture:"Haltung", g_scene:"Sitzplatz", g_time:"Dauer",
     g_orient:"Anleitung", g_sound:"Naturklang", snd_on:"An", snd_off:"Aus", begin:"Beginnen",
     yt_watch:"Jetzt gemeinsam sitzen — live", credit:"Yorozu Solutions",
@@ -539,7 +539,7 @@ const T = {
     scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
   },
   pt:{
-    tagline:"A qualquer hora, de qualquer lugar.<br>Respire fundo.",
+    tagline:"A qualquer hora, de qualquer lugar.<br>Sente-se e respire fundo.",
     enter:"Entrar no salão", g_posture:"Postura", g_scene:"Lugar", g_time:"Duração",
     g_orient:"Orientação", g_sound:"Som ambiente", snd_on:"Ativar", snd_off:"Silenciar", begin:"Começar",
     yt_watch:"Sentar juntos agora — ao vivo", credit:"Yorozu Solutions",
