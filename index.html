@@ -1116,8 +1116,8 @@ const presence = (() => {
     raf=requestAnimationFrame(loop);
   }
   function stopGlobe(){ cancelAnimationFrame(raf); raf=null; if(satTimer){ clearInterval(satTimer); satTimer=null; } }
-  /* 地軸の傾き23.4°。北極を画面右上に傾け、傾いた軸のまわりを自転する（地球らしさ） */
-  const TILT=23.4*D2R, CT=Math.cos(TILT), ST=Math.sin(TILT);
+  /* 地軸の傾き-23.4°。北極を画面左上に傾け、傾いた軸のまわりを自転する（地球らしさ） */
+  const TILT=-23.4*D2R, CT=Math.cos(TILT), ST=Math.sin(TILT);
   function project(lat,lng,cx,cy,R){
     const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la);
     const x3=cl*Math.sin(lo), y3=Math.sin(la), z=cl*Math.cos(lo);
