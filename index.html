@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>一息 — Issoku｜オンライン座禅寺・坐雲堂</title>
 <!-- セキュリティ: よろづやwebアプリ診断基準書 Part H / A-5 / A-9 準拠（静的ホスト非依存のCSPフォールバック）。
      frame-ancestors / HSTS / X-Frame-Options 等のヘッダ専用項目は vercel.json・_headers 側で付与する。 -->
@@ -35,7 +35,9 @@
 
   /* top bar */
   .bar{position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between;
-    align-items:center; padding:16px 20px; z-index:30; pointer-events:none}
+    align-items:center; z-index:30; pointer-events:none;
+    /* iOSノッチ・ホームバーを避ける（PWA全画面時に効く） */
+    padding:calc(16px + env(safe-area-inset-top,0px)) calc(20px + env(safe-area-inset-right,0px)) 16px calc(20px + env(safe-area-inset-left,0px))}
   .bar button{pointer-events:auto; background:rgba(10,12,20,.34); color:var(--paper); opacity:.62;
     border:1px solid rgba(239,233,220,.3); border-radius:999px; padding:6px 14px; backdrop-filter:blur(2px);
     text-shadow:0 1px 2px rgba(0,0,0,.55);
@@ -110,7 +112,12 @@
   .presence{font-size:12px; letter-spacing:.12em; line-height:1.7; color:var(--soft); opacity:.82;
     display:flex; align-items:center; justify-content:center; gap:9px; margin:0; max-width:330px}
   .presence .ptext{transition:opacity .26s ease}
-  .lobby canvas{cursor:pointer}
+  .presence .pnum{display:inline-flex; align-items:flex-end; gap:1px; margin:0 3px; vertical-align:-4px}
+  .presence .pnum img{height:17px; width:auto; opacity:.95}
+  .lobby canvas{cursor:pointer; border-radius:50%}
+  .lobby canvas.hint{animation:globehint 3.2s ease 1}
+  @keyframes globehint{0%,100%{box-shadow:none} 30%,60%{box-shadow:0 0 26px rgba(194,163,94,.34)}}
+  @media (prefers-reduced-motion: reduce){ .lobby canvas.hint{animation:none} }
   .presence .pdot{flex:none; width:6px; height:6px; border-radius:50%; background:var(--gold);
     box-shadow:0 0 9px 2px rgba(194,163,94,.55); animation:pdotpulse 3.4s ease-in-out infinite}
   @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
@@ -132,7 +139,7 @@
   .support[hidden]{ display:none }
   .support.end{ margin-top:14px }
   /* よろづソリューションズ クレジット（控えめ） */
-  .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
+  .credit{position:absolute; bottom:calc(16px + env(safe-area-inset-bottom,0px)); left:0; right:0; text-align:center; font-size:10.5px;
     letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em;
     pointer-events:none}   /* 装飾のみ＝重なっても下のボタンのタップを奪わない */
   /* 低い画面（iPhone横向き・小型機）ではクレジットを通常フローに落とし、ボタンとの重なり自体を無くす */
@@ -179,6 +186,13 @@
   input[type=range]::-moz-range-thumb{width:22px; height:22px; border-radius:50%;
     background:var(--gold); border:4px solid #1a1610; cursor:pointer}
   .timeticks{display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:7px; letter-spacing:.05em}
+  /* 時間のプリセット（1タップ）。スライダーは微調整用に残す */
+  .tpresets{display:flex; justify-content:center; gap:8px; margin-top:10px}
+  .tpresets button{font-family:var(--serif); font-size:13px; letter-spacing:.06em; color:var(--paper);
+    background:rgba(239,233,220,.04); border:1px solid rgba(239,233,220,.16); border-radius:999px;
+    padding:6px 15px; cursor:pointer; transition:all .3s ease}
+  .tpresets button:hover{border-color:rgba(239,233,220,.42)}
+  .tpresets button.sel{background:var(--paper); color:var(--ink); border-color:var(--paper)}
 
   .begin{margin:14px 0 6px; font-family:var(--serif); font-size:16px; letter-spacing:.2em; color:var(--ink);
     background:var(--gold); border:none; border-radius:999px; padding:15px 48px; cursor:pointer; transition:all .4s}
@@ -242,7 +256,11 @@
   #end{background:radial-gradient(120% 90% at 50% 42%, #241c14, #120e0a 100%)}
   #end .ek{font-family:var(--brush); font-size:46px; color:var(--paper); margin-bottom:18px; letter-spacing:.1em}
   #end p{color:var(--soft); font-size:15.5px; line-height:2.2; max-width:380px; white-space:pre-line}
-  .endbtns{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap; justify-content:center}
+  /* 今日の禅語（日替わり）。将来 .zk を毛筆画像 <img> に差し替える前提の器 */
+  #zengo{margin-top:26px; text-align:center}
+  #zengo .zk{font-family:var(--brush); font-size:32px; color:var(--paper); letter-spacing:.14em; opacity:.95}
+  #zengo .zt{font-size:12.5px; color:var(--soft); margin-top:9px; letter-spacing:.08em; line-height:1.8; opacity:.85}
+  .endbtns{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center}
   .endbtns button{font-family:var(--serif); font-size:15px; letter-spacing:.16em; border-radius:999px;
     padding:13px 32px; cursor:pointer; transition:all .4s}
   .again{background:var(--paper); color:var(--ink); border:1px solid var(--paper)}
@@ -360,6 +378,7 @@
         <div class="timeval"><span id="timeNum"></span><span class="timeunit" id="timeUnit"></span></div>
         <input type="range" id="timeRange" min="1" max="60" step="1" value="5" aria-label="時間（分）">
         <div class="timeticks"><span>1</span><span>15</span><span>30</span><span>45</span><span>60</span></div>
+        <div class="tpresets" id="timePresets"></div>
       </div>
     </div>
     <div class="group">
@@ -407,6 +426,7 @@
     <div class="ek">一息</div>
     <p data-t="endmsg">からだを左右にやさしくゆらし、足をほぐして、合掌一礼。
 また、いつでも。</p>
+    <div id="zengo"><div class="zk" id="zengoK"></div><div class="zt" id="zengoT"></div></div>
     <div class="endbtns">
       <button class="again" id="againBtn" data-t="again">もう一度</button>
       <button class="out" id="outBtn" data-t="out">堂を出る</button>
@@ -711,7 +731,10 @@ try{ Object.assign(sel, JSON.parse(store.get('issoku_sel')||'{}')); }catch(e){}
 const $ = s => document.querySelector(s);
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   $('#'+id).classList.add('on'); $('#exitBtn').style.display = (id==='session')?'block':'none';
-  if(id==='setup'){ const c=$('#globe'); if(c) presence.startGlobe(c); } else { presence.stopGlobe(); }
+  if(id==='setup'){ const c=$('#globe'); if(c){ presence.startGlobe(c);
+    if(!window.__globeHinted){ window.__globeHinted=true; c.classList.add('hint');
+      setTimeout(()=>c.classList.remove('hint'), 3400); } } } else { presence.stopGlobe(); }
+  if(id==='end') renderZengo();
   updatePresence(); }
 
 /* YouTube表口（坐雲堂チャンネル）URL。設定すると入口に導線が出る。未設定なら非表示。
@@ -733,6 +756,8 @@ function applyLang(){
   buildOpts();
   updatePresence();
   renderTimeUnit();
+  if(typeof labelTPresets==='function') labelTPresets();
+  if(typeof renderZengo==='function' && $('#end').classList.contains('on')) renderZengo();
   document.querySelectorAll('.ytlink').forEach(a=>{ if(YT_LIVE_URL){ a.href=YT_LIVE_URL; a.hidden=false; } else { a.hidden=true; } });
   const sup=$('#supportLink'); if(sup){ if(SUPPORT_URL){ sup.href=SUPPORT_URL; sup.textContent=SUPPORT_T[lang]||SUPPORT_T.en; sup.hidden=false; } else sup.hidden=true; }
 }
@@ -1207,9 +1232,32 @@ const presence = (() => {
 async function updatePresence(){
   const t=T[lang], nf=new Intl.NumberFormat(NF_LOCALE[lang]||'en-US');
   const n=await presence.sits24h();
-  const txt=(n && n>0) ? (COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}', nf.format(n)) : t.p_open;
-  document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt);
+  if(n && n>0){
+    /* 数字は手書きの毛筆数字（?countページと同じ d0-9.png）でブランドの筆致をここでも */
+    const digits=String(n).split('').map(d=>'<img src="assets/brush/d'+d+'.png" alt="'+d+'">').join('');
+    const html=(COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}','<span class="pnum">'+digits+'</span>');
+    document.querySelectorAll('.presence .ptext').forEach(e=>{ e.innerHTML=html; });
+  }else{
+    document.querySelectorAll('.presence .ptext').forEach(e=>{ e.textContent=t.p_open; });
+  }
 }
+/* ---------- 今日の禅語（日替わり・9言語の一言つき） ----------
+   バリエーションは相談のうえ拡張予定。将来は k を毛筆画像に差し替える（assets/brush/zengo-*.png 想定）。 */
+const ZENGO=[
+ {k:'日日是好日', t:{ja:'毎日が、そのまま良い日。', en:'Every day is a good day.', 'zh-Hans':'每一天都是好日子。', 'zh-Hant':'每一天都是好日子。', ko:'하루하루가 그대로 좋은 날.', es:'Cada día es un buen día.', fr:'Chaque jour est un bon jour.', de:'Jeder Tag ist ein guter Tag.', pt:'Cada dia é um bom dia.'}},
+ {k:'行雲流水', t:{ja:'行く雲、流れる水のように、とどまらず。', en:'Like drifting clouds and flowing water — never clinging.', 'zh-Hans':'如行云流水，不滞不留。', 'zh-Hant':'如行雲流水，不滯不留。', ko:'떠가는 구름, 흐르는 물처럼 머무르지 않고.', es:'Como nubes que pasan y agua que fluye, sin aferrarse.', fr:'Comme les nuages qui passent et l’eau qui coule, sans s’attacher.', de:'Wie ziehende Wolken und fließendes Wasser — ohne Anhaften.', pt:'Como nuvens que passam e água que corre, sem se prender.'}},
+ {k:'一期一会', t:{ja:'この出会いは、一生に一度。', en:'This meeting happens only once in a lifetime.', 'zh-Hans':'此会一生仅有一次。', 'zh-Hant':'此會一生僅有一次。', ko:'이 만남은 일생에 단 한 번.', es:'Este encuentro ocurre una sola vez en la vida.', fr:'Cette rencontre n’a lieu qu’une fois dans la vie.', de:'Diese Begegnung gibt es nur einmal im Leben.', pt:'Este encontro acontece só uma vez na vida.'}},
+ {k:'放下著', t:{ja:'手放しなさい、その手の中のものも。', en:'Let it go — even that which you hold.', 'zh-Hans':'放下——连手中之物也放下。', 'zh-Hant':'放下——連手中之物也放下。', ko:'내려놓으세요, 손안의 것마저도.', es:'Suéltalo, incluso lo que llevas en la mano.', fr:'Lâche prise — même ce que tu tiens.', de:'Lass los — auch das, was du hältst.', pt:'Solte — até o que você segura.'}},
+ {k:'本来無一物', t:{ja:'もともと、何ひとつ持っていない。', en:'From the beginning, not a single thing.', 'zh-Hans':'本来无一物。', 'zh-Hant':'本來無一物。', ko:'본래 아무것도 없다.', es:'Desde el origen, ni una sola cosa.', fr:'À l’origine, pas une seule chose.', de:'Von Anfang an — kein einziges Ding.', pt:'Desde a origem, nem uma única coisa.'}},
+ {k:'平常心是道', t:{ja:'ふだんの心、そのままが道。', en:'Ordinary mind is the way.', 'zh-Hans':'平常心是道。', 'zh-Hant':'平常心是道。', ko:'평상심이 곧 길이다.', es:'La mente cotidiana es el camino.', fr:'L’esprit ordinaire est la voie.', de:'Der alltägliche Geist ist der Weg.', pt:'A mente comum é o caminho.'}},
+ {k:'喫茶去', t:{ja:'まあ、お茶をおあがり。', en:'Go, have a cup of tea.', 'zh-Hans':'吃茶去。', 'zh-Hant':'吃茶去。', ko:'차나 한잔 들고 가시게.', es:'Ve a tomar una taza de té.', fr:'Va boire une tasse de thé.', de:'Geh, trink eine Tasse Tee.', pt:'Vá tomar uma xícara de chá.'}}
+];
+function renderZengo(){
+  const z=ZENGO[Math.floor(Date.now()/86400000)%ZENGO.length];
+  const k=$('#zengoK'), t=$('#zengoT'); if(!k) return;
+  k.textContent=z.k; t.textContent=z.t[lang]||z.t.en;
+}
+
 /* 地球儀に触れる（マウスオン／タップ）と「坐を分かちあっている」ことばに数秒だけ替わる */
 (function(){
   const cv=$('#globe'); if(!cv) return;
@@ -1368,7 +1416,17 @@ function renderTimeUnit(){
   else { el.textContent=(T[lang]&&T[lang].min)||'min'; }
 }
 timeRange.value=sel.time; renderTimeNum(sel.time); renderTimeUnit();
-timeRange.oninput=()=>{ sel.time=+timeRange.value; renderTimeNum(sel.time); save(); };
+const TPRESETS=[5,10,20,40];
+function refreshTPresets(){ document.querySelectorAll('#timePresets button').forEach(b=>b.classList.toggle('sel', +b.dataset.m===sel.time)); }
+(function(){ const w=$('#timePresets'); if(!w) return;
+  TPRESETS.forEach(m=>{ const b=document.createElement('button'); b.dataset.m=m;
+    b.onclick=()=>{ sel.time=m; timeRange.value=m; renderTimeNum(m); save(); refreshTPresets(); };
+    w.append(b); });
+})();
+function labelTPresets(){ const u=(T[lang]&&T[lang].min)||'min';
+  document.querySelectorAll('#timePresets button').forEach(b=>{ b.textContent=b.dataset.m+' '+u; });
+  refreshTPresets(); }
+timeRange.oninput=()=>{ sel.time=+timeRange.value; renderTimeNum(sel.time); save(); refreshTPresets(); };
 
 /* 在室の気配を実データで（入退室は通知せず、数だけ静かに反映） */
 presence.onChange(updatePresence);
@@ -1496,6 +1554,11 @@ if(COUNT){
 }
 
 applyLang();
+
+/* ---------- オフライン対応（Service Worker）----------
+   一度開けば圏外でも坐れる「いつでも開いている堂」。index.htmlはnetwork-first
+   （更新が即届く）、画像等はcache-first。外部（fonts/esm.sh/supabase）は素通し。 */
+if('serviceWorker' in navigator){ addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }); }
 </script>
 </body>
 </html>
