@@ -1156,20 +1156,22 @@ const presence = (() => {
     if(sh>0.02){
       const ux=svx/sh, uy=-svy/sh;                                               // 画面上の太陽の向き
       const gd=x.createLinearGradient(cx+R*ux, cy+R*uy, cx-R*ux, cy-R*uy);
-      gd.addColorStop(0,'rgba(196,220,246,'+(0.09*(1-tN)).toFixed(3)+')');       // 昼のふち：ほのかに明るく
-      gd.addColorStop(0.46,'rgba(0,0,0,0)');
-      gd.addColorStop(1,'rgba(3,7,20,'+(0.15+0.28*tN).toFixed(3)+')');           // 夜のふち：やわらかく沈む
+      const nA=0.34+0.30*tN;                                                     // 夜の濃さ
+      gd.addColorStop(0,'rgba(205,228,252,'+(0.05+0.16*(1-tN)).toFixed(3)+')');  // 昼のふち：明るく
+      gd.addColorStop(0.40,'rgba(0,0,0,0)');
+      gd.addColorStop(0.60,'rgba(3,7,20,'+(nA*0.55).toFixed(3)+')');             // 明暗境界を少しくっきり
+      gd.addColorStop(1,'rgba(3,7,20,'+nA.toFixed(3)+')');                       // 夜のふち：しっかり沈む
       x.fillStyle=gd; x.fillRect(cx-R,cy-R,2*R,2*R);
     }else{
-      x.fillStyle = svz>0 ? 'rgba(196,220,246,0.05)' : 'rgba(3,7,20,0.38)';      // 太陽がほぼ正面/真裏
+      x.fillStyle = svz>0 ? 'rgba(205,228,252,0.10)' : 'rgba(3,7,20,0.52)';      // 太陽がほぼ正面/真裏
       x.fillRect(cx-R,cy-R,2*R,2*R);
     }
     x.restore();
-    /* 地球の地（淡い背景点・人ではない）。夜側は淡く＝明暗がほんわり伝わる */
+    /* 地球の地（淡い背景点・人ではない）。夜側ははっきり淡く＝明暗が伝わる */
     x.shadowBlur=0;
     for(const p of land){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
       const depth=0.45+0.55*q.z, k=Math.max(0,Math.min(1, lit(p.lat,p.lng)*1.6+0.5));
-      x.beginPath(); x.fillStyle='rgba(148,176,210,'+((0.05+0.10*depth)*(0.45+0.55*k)).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
+      x.beginPath(); x.fillStyle='rgba(148,176,210,'+((0.05+0.10*depth)*(0.25+0.75*k)).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
     /* 過去24時間に坐った人の灯り（数は本物・位置はおおまかな気配。人が増えたぶんだけ灯りが増える） */
     for(const p of sitLights){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
       const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0022+(p.lng+p.lat)));
