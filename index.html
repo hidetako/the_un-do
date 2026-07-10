@@ -109,6 +109,8 @@
   /* world presence — 静かな共在感（地球の灯り） */
   .presence{font-size:12px; letter-spacing:.12em; line-height:1.7; color:var(--soft); opacity:.82;
     display:flex; align-items:center; justify-content:center; gap:9px; margin:0; max-width:330px}
+  .presence .ptext{transition:opacity .26s ease}
+  .lobby canvas{cursor:pointer}
   .presence .pdot{flex:none; width:6px; height:6px; border-radius:50%; background:var(--gold);
     box-shadow:0 0 9px 2px rgba(194,163,94,.55); animation:pdotpulse 3.4s ease-in-out infinite}
   @keyframes pdotpulse{0%,100%{opacity:.45} 50%{opacity:1}}
@@ -431,6 +433,7 @@ const T = {
     p_open:"世界の坐雲堂は、いつでも開いています",
     p_alone:"いま この堂にいるのは あなたひとり",
     p_count:"いま {c} の地域から、{p}人がこの堂に",
+    globe_msg:"この星のどこかで、いっしょに坐っています",
     confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
     scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
@@ -447,6 +450,7 @@ const T = {
     p_open:"The hall is open — anywhere, anytime",
     p_alone:"You are the only one in the hall right now",
     p_count:"{p} people from {c} regions are in the hall now",
+    globe_msg:"Somewhere on this earth, we sit together",
     confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
   },
@@ -463,6 +467,7 @@ const T = {
     p_open:"世界各地的坐云堂，随时为你敞开",
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，来自 {c} 个地区的 {p} 人正在堂中",
+    globe_msg:"在这颗星球的某处，我们一同静坐",
     confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
   },
@@ -479,6 +484,7 @@ const T = {
     p_open:"世界各地的坐雲堂，隨時為你敞開",
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，來自 {c} 個地區的 {p} 人正在堂中",
+    globe_msg:"在這顆星球的某處，我們一同靜坐",
     confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
   },
@@ -495,6 +501,7 @@ const T = {
     p_open:"세계의 좌운당은, 언제나 열려 있습니다",
     p_alone:"지금 이 당에 있는 사람은 당신 혼자입니다",
     p_count:"지금 {c}개 지역에서 {p}명이 이 당에 있습니다",
+    globe_msg:"이 별 어딘가에서, 함께 앉아 있습니다",
     confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
     scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
   },
@@ -511,6 +518,7 @@ const T = {
     p_open:"La sala está abierta, en cualquier lugar y a cualquier hora",
     p_alone:"Ahora mismo eres la única persona en la sala",
     p_count:"Ahora hay {p} personas de {c} regiones en la sala",
+    globe_msg:"En algún lugar de esta Tierra, nos sentamos juntos",
     confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
     scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
   },
@@ -527,6 +535,7 @@ const T = {
     p_open:"La salle est ouverte, partout et à toute heure",
     p_alone:"Vous êtes seul·e dans la salle en ce moment",
     p_count:"{p} personnes de {c} régions sont dans la salle",
+    globe_msg:"Quelque part sur cette Terre, nous sommes assis ensemble",
     confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
     scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
   },
@@ -543,6 +552,7 @@ const T = {
     p_open:"Die Halle ist offen – überall und jederzeit",
     p_alone:"Im Moment bist du allein in der Halle",
     p_count:"{p} Menschen aus {c} Regionen sind jetzt in der Halle",
+    globe_msg:"Irgendwo auf dieser Erde sitzen wir gemeinsam",
     confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
     scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
   },
@@ -559,6 +569,7 @@ const T = {
     p_open:"O salão está aberto — em qualquer lugar, a qualquer hora",
     p_alone:"Neste momento, você é a única pessoa no salão",
     p_count:"Agora há {p} pessoas de {c} regiões no salão",
+    globe_msg:"Em algum lugar desta Terra, sentamos juntos",
     confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
     scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
   }
@@ -1197,6 +1208,21 @@ async function updatePresence(){
   const txt=(n && n>0) ? (COUNT24_TPL[lang]||COUNT24_TPL.en).replace('{n}', nf.format(n)) : t.p_open;
   document.querySelectorAll('.presence .ptext').forEach(e=>e.textContent=txt);
 }
+/* 地球儀に触れる（マウスオン／タップ）と「坐を分かちあっている」ことばに数秒だけ替わる */
+(function(){
+  const cv=$('#globe'); if(!cv) return;
+  let tmr=null;
+  function showShare(){
+    const el=document.querySelector('#presenceHall .ptext'); if(!el) return;
+    el.style.opacity=0;
+    setTimeout(()=>{ el.textContent=(T[lang]&&T[lang].globe_msg)||T.ja.globe_msg; el.style.opacity=''; }, 260);
+    clearTimeout(tmr);
+    tmr=setTimeout(()=>{ el.style.opacity=0;
+      setTimeout(()=>{ updatePresence(); el.style.opacity=''; }, 260); }, 4600);
+  }
+  cv.addEventListener('mouseenter', showShare);
+  cv.addEventListener('click', showShare);   // タップも click で拾う
+})();
 
 /* ---------- session flow ---------- */
 let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
