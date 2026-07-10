@@ -131,7 +131,12 @@
   .support.end{ margin-top:14px }
   /* よろづソリューションズ クレジット（控えめ） */
   .credit{position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:10.5px;
-    letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em}
+    letter-spacing:.32em; color:var(--soft); opacity:.4; padding-left:.32em;
+    pointer-events:none}   /* 装飾のみ＝重なっても下のボタンのタップを奪わない */
+  /* 低い画面（iPhone横向き・小型機）ではクレジットを通常フローに落とし、ボタンとの重なり自体を無くす */
+  @media (max-height:760px){
+    #splash .credit{position:static; margin-top:20px; bottom:auto}
+  }
   .credit img{width:min(42vw,168px); height:auto; display:block; margin:0 auto; opacity:.6}
   .lobby{width:min(86vw,360px); margin:8px auto 2px; display:flex; flex-direction:column; align-items:center; gap:8px}
   .lobby canvas{width:104px; height:104px; display:block}
