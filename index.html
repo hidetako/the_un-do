@@ -1106,8 +1106,16 @@ const presence = (() => {
     x.shadowBlur=0;
   }
   /* 集計のみ（個人情報なし）：座った延べ回数を +1／過去24時間の合計を取得 */
-  async function bumpSit(){ try{ if(client) await client.rpc('zaundo_bump_sit'); }catch(e){} }
-  async function sits24h(){ try{ if(client){ const r=await client.rpc('zaundo_sits_24h'); if(!r.error) return Number(r.data)||0; } }catch(e){} return null; }
+  /* 集計は supabase-js（esm.sh）に依存させず素の fetch で叩く。
+     旧実装は if(client) ガードのため、esm.sh の読み込みが遅い/失敗する環境
+     （モバイル回線・広告ブロッカー等）で加算が黙って失われていた。 */
+  function rpc(name){ return fetch(SB_URL+'/rest/v1/rpc/'+name, { method:'POST',
+    headers:{ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' }, body:'{}' }); }
+  async function bumpSit(){
+    try{ const r=await rpc('zaundo_bump_sit'); if(r.ok) return; }catch(e){}
+    setTimeout(()=>{ rpc('zaundo_bump_sit').catch(()=>{}); }, 4000);   // 一度だけ再試行（回線の瞬断対策）
+  }
+  async function sits24h(){ try{ const r=await rpc('zaundo_sits_24h'); if(r.ok) return Number(await r.json())||0; }catch(e){} return null; }
   return { connect, setSitting, leave, compute, startGlobe, stopGlobe, bumpSit, sits24h, onChange:(f)=>{onChange=f;} };
 })();
 /* アプリ入口の在室表示も、配信・?count と集計方法を統一：「過去24時間の延べ着席数」。
