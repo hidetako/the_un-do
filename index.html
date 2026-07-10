@@ -1105,9 +1105,12 @@ const presence = (() => {
     raf=requestAnimationFrame(loop);
   }
   function stopGlobe(){ cancelAnimationFrame(raf); raf=null; if(satTimer){ clearInterval(satTimer); satTimer=null; } }
+  /* 地軸の傾き23.4°。北極を画面右上に傾け、傾いた軸のまわりを自転する（地球らしさ） */
+  const TILT=23.4*D2R, CT=Math.cos(TILT), ST=Math.sin(TILT);
   function project(lat,lng,cx,cy,R){
-    const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la), z=cl*Math.cos(lo);
-    return { sx:cx+R*cl*Math.sin(lo), sy:cy-R*Math.sin(la), z };
+    const la=lat*D2R, lo=lng*D2R+rot, cl=Math.cos(la);
+    const x3=cl*Math.sin(lo), y3=Math.sin(la), z=cl*Math.cos(lo);
+    return { sx:cx+R*(x3*CT + y3*ST), sy:cy-R*(y3*CT - x3*ST), z };
   }
   function draw(t){
     const W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.42;
@@ -1126,11 +1129,36 @@ const presence = (() => {
     arc(eq,'rgba(160,190,225,0.15)');                                   // 赤道（少し明るめ）
     for(let lo=0;lo<360;lo+=45){ const m=[]; for(let la=-84;la<=84;la+=4) m.push([la,lo]);
       arc(m,'rgba(160,190,225,0.09)'); }                                // 経線45°毎（ごく淡く）
-    /* 地球の地（淡い背景点・人ではない） */
+    /* 昼と夜：実時刻の太陽直下点（黄道傾斜23.44°・均時差は無視の近似）から、
+       夜側をほんわり沈め、昼側をほのかに明るく。境界（明暗境界線）はなだらかに。 */
+    const now=new Date();
+    const doy=(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate())-Date.UTC(now.getUTCFullYear(),0,0))/86400000;
+    const sla=-23.44*Math.cos(6.2832*(doy+10)/365)*D2R;
+    const uh=now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600;
+    const slo=(180-15*uh)*D2R+rot, scl=Math.cos(sla);
+    const s3={x:scl*Math.sin(slo), y:Math.sin(sla), z:scl*Math.cos(slo)};        // 太陽方向（回転系）
+    const lit=(la,lo)=>{ const l=la*D2R, o=lo*D2R+rot, c=Math.cos(l);
+      return c*Math.sin(o)*s3.x + Math.sin(l)*s3.y + c*Math.cos(o)*s3.z; };      // >0=昼
+    const svx=s3.x*CT+s3.y*ST, svy=s3.y*CT-s3.x*ST, svz=s3.z, sh=Math.hypot(svx,svy);
+    const tN=(1-svz)/2;                                                          // 0=正面が真昼〜1=正面が真夜中
+    x.save(); x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.clip();
+    if(sh>0.02){
+      const ux=svx/sh, uy=-svy/sh;                                               // 画面上の太陽の向き
+      const gd=x.createLinearGradient(cx+R*ux, cy+R*uy, cx-R*ux, cy-R*uy);
+      gd.addColorStop(0,'rgba(196,220,246,'+(0.09*(1-tN)).toFixed(3)+')');       // 昼のふち：ほのかに明るく
+      gd.addColorStop(0.46,'rgba(0,0,0,0)');
+      gd.addColorStop(1,'rgba(3,7,20,'+(0.15+0.28*tN).toFixed(3)+')');           // 夜のふち：やわらかく沈む
+      x.fillStyle=gd; x.fillRect(cx-R,cy-R,2*R,2*R);
+    }else{
+      x.fillStyle = svz>0 ? 'rgba(196,220,246,0.05)' : 'rgba(3,7,20,0.38)';      // 太陽がほぼ正面/真裏
+      x.fillRect(cx-R,cy-R,2*R,2*R);
+    }
+    x.restore();
+    /* 地球の地（淡い背景点・人ではない）。夜側は淡く＝明暗がほんわり伝わる */
     x.shadowBlur=0;
     for(const p of land){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
-      const depth=0.45+0.55*q.z;
-      x.beginPath(); x.fillStyle='rgba(148,176,210,'+(0.05+0.10*depth).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
+      const depth=0.45+0.55*q.z, k=Math.max(0,Math.min(1, lit(p.lat,p.lng)*1.6+0.5));
+      x.beginPath(); x.fillStyle='rgba(148,176,210,'+((0.05+0.10*depth)*(0.45+0.55*k)).toFixed(3)+')'; x.arc(q.sx,q.sy,0.9,0,6.2832); x.fill(); }
     /* 過去24時間に坐った人の灯り（数は本物・位置はおおまかな気配。人が増えたぶんだけ灯りが増える） */
     for(const p of sitLights){ const q=project(p.lat,p.lng,cx,cy,R); if(q.z<=0) continue;
       const depth=0.45+0.55*q.z, tw=reduced?1:(0.72+0.28*Math.sin(t*0.0022+(p.lng+p.lat)));
