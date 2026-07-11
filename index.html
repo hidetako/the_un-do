@@ -791,7 +791,7 @@ function ensureCtx(){
   if(ac.state==='suspended') ac.resume();
   return ac;
 }
-function bell(delay=0, gain=0.82){
+function bell(delay=0, gain=0.5){   /* 音量は控えめに（大きすぎる指摘を受け 0.82→0.5） */
   if(!ensureCtx()) return;
   const t0 = ac.currentTime + delay;
   /* [harmonic, gain, decay s] — long, deep, lingering 余韻 */
@@ -1316,7 +1316,7 @@ function startIncense(durMs){
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ clearTimeout(endTimer); $('#status').classList.remove('show'); bell(0,0.9); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
 function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
@@ -1475,9 +1475,9 @@ function startBcast(o){
       setTimeout(rot, Math.max(250, next-Date.now())); })();
   }
   startSmoke();
-  if(o.sound) bell(0,0.9);
+  if(o.sound) bell(0,0.55);
   (function ring(){ const now=Date.now(), next=Math.ceil((now+1)/o.periodMs)*o.periodMs;
-    setTimeout(()=>{ if(o.sound) bell(0,0.9); ring(); }, next-now); })();
+    setTimeout(()=>{ if(o.sound) bell(0,0.55); ring(); }, next-now); })();
   (function burn(){ const p=(Date.now()%o.periodMs)/o.periodMs;
     $('#stick').style.height=(280*(1-p)).toFixed(1)+'px'; bcastRAF=requestAnimationFrame(burn); })();
   document.body.classList.add('playing');
