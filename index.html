@@ -231,6 +231,16 @@
   #session[data-scene="neko"] #status{bottom:22%}   /* 眠る猫と文字が重ならないよう上へ逃がす */
 
   /* 坐禅中の中断/継続 確認 */
+  /* 長い坐の開始時アナウンス：「暗くなるが眠らない・鐘は時間どおり」 */
+  #dimNote{position:absolute; top:calc(64px + env(safe-area-inset-top,0px)); left:0; right:0; z-index:6;
+    text-align:center; font-size:12px; letter-spacing:.1em; line-height:1.8; color:var(--soft);
+    padding:0 28px; opacity:0; transition:opacity 1.2s ease; pointer-events:none;
+    text-shadow:0 1px 4px rgba(0,0,0,.6)}
+  #dimNote.show{opacity:.85}
+  /* 坐禅中の墨色の暗幕：画面は点けたまま（Wake Lock維持＝鐘は確実）ほぼ黒に沈めて省電力（OLEDで特に有効）。
+     タップでふっと戻り、しばらくするとまた沈む。 */
+  #dimmer{position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity .9s ease}
+  #dimmer.on{opacity:.94; pointer-events:auto; transition:opacity 4s ease}
   #confirm{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
     background:rgba(16,13,9,.66); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:12; padding:34px}
   #confirm.show{display:flex}
@@ -410,6 +420,8 @@
       <button class="obtn" id="orientNext"></button>
     </div>
 
+    <div id="dimNote" aria-live="polite"></div>
+    <div id="dimmer" aria-hidden="true"></div>
     <div id="confirm">
       <div>
         <div class="cmsg" id="confirmMsg"></div>
@@ -454,6 +466,7 @@ const T = {
     p_alone:"いま この堂にいるのは あなたひとり",
     p_count:"いま {c} の地域から、{p}人がこの堂に",
     globe_msg:"この星のどこかで、いっしょに坐っています",
+    dim_note:"画面はやがて暗くなりますが、眠りません。鐘は時間どおりに鳴ります",
     confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
     scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
   },
@@ -471,6 +484,7 @@ const T = {
     p_alone:"You are the only one in the hall right now",
     p_count:"{p} people from {c} regions are in the hall now",
     globe_msg:"Somewhere on this earth, we sit together",
+    dim_note:"The screen will dim but stay awake — the bell will ring on time",
     confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
   },
@@ -488,6 +502,7 @@ const T = {
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，来自 {c} 个地区的 {p} 人正在堂中",
     globe_msg:"在这颗星球的某处，我们一同静坐",
+    dim_note:"屏幕会变暗但不会休眠，钟声将准时响起",
     confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
   },
@@ -505,6 +520,7 @@ const T = {
     p_alone:"此刻，堂中只有你一人",
     p_count:"此刻，來自 {c} 個地區的 {p} 人正在堂中",
     globe_msg:"在這顆星球的某處，我們一同靜坐",
+    dim_note:"螢幕會變暗但不會休眠，鐘聲將準時響起",
     confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
   },
@@ -522,6 +538,7 @@ const T = {
     p_alone:"지금 이 당에 있는 사람은 당신 혼자입니다",
     p_count:"지금 {c}개 지역에서 {p}명이 이 당에 있습니다",
     globe_msg:"이 별 어딘가에서, 함께 앉아 있습니다",
+    dim_note:"화면은 어두워지지만 잠들지 않습니다. 종은 제시간에 울립니다",
     confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
     scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
   },
@@ -539,6 +556,7 @@ const T = {
     p_alone:"Ahora mismo eres la única persona en la sala",
     p_count:"Ahora hay {p} personas de {c} regiones en la sala",
     globe_msg:"En algún lugar de esta Tierra, nos sentamos juntos",
+    dim_note:"La pantalla se atenuará pero seguirá activa; la campana sonará a tiempo",
     confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
     scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
   },
@@ -556,6 +574,7 @@ const T = {
     p_alone:"Vous êtes seul·e dans la salle en ce moment",
     p_count:"{p} personnes de {c} régions sont dans la salle",
     globe_msg:"Quelque part sur cette Terre, nous sommes assis ensemble",
+    dim_note:"L’écran s’assombrira mais restera éveillé ; la cloche sonnera à l’heure",
     confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
     scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
   },
@@ -573,6 +592,7 @@ const T = {
     p_alone:"Im Moment bist du allein in der Halle",
     p_count:"{p} Menschen aus {c} Regionen sind jetzt in der Halle",
     globe_msg:"Irgendwo auf dieser Erde sitzen wir gemeinsam",
+    dim_note:"Der Bildschirm wird dunkel, schläft aber nicht — die Glocke läutet pünktlich",
     confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
     scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
   },
@@ -590,6 +610,7 @@ const T = {
     p_alone:"Neste momento, você é a única pessoa no salão",
     p_count:"Agora há {p} pessoas de {c} regiões no salão",
     globe_msg:"Em algum lugar desta Terra, sentamos juntos",
+    dim_note:"A tela escurecerá, mas não dormirá; o sino tocará na hora certa",
     confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
     scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
   }
@@ -1307,11 +1328,20 @@ function runOrient(done){
 }
 function beginSitting(){
   if(ac && ac.state==='suspended') ac.resume();
+  /* 2分以上の坐は開始時に一言：暗くなるが眠らない＝鐘は時間どおり（電池への安心）。
+     暗転は開始90秒後なので、2分以上ならほぼ確実に暗転を経験する */
+  if(sel.time>=2){ const dn=$('#dimNote');
+    dn.textContent=T[lang].dim_note; dn.classList.add('show');
+    setTimeout(()=>dn.classList.remove('show'), 8000); }
   $('#status').textContent=T[lang].sitting;
   setTimeout(()=>$('#status').classList.add('show'), 400);
   startSmoke();
   ring3(()=> startIncense(sel.time*60*1000));
 }
+/* 坐り始めて90秒で暗幕を下ろす（呼吸が整うのを待ってから）。タップで戻し、また90秒で沈む。終了・中断で解除 */
+const DIM_MS=90000; let dimTimer=null;
+function armDim(){ clearTimeout(dimTimer); dimTimer=setTimeout(()=>{ const d=$('#dimmer'); if(d && timerActive) d.classList.add('on'); }, DIM_MS); }
+function undim(rearm){ clearTimeout(dimTimer); const d=$('#dimmer'); if(d) d.classList.remove('on'); if(rearm && timerActive) armDim(); }
 function startIncense(durMs){
   const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
   /* 終了の鐘は実時間（setTimeout）で鳴らす。requestAnimationFrame は裏タブ／画面ロックで
@@ -1325,10 +1355,11 @@ function startIncense(durMs){
     timerRAF=requestAnimationFrame(loop);
   }
   timerRAF=requestAnimationFrame(loop);
+  armDim();
 }
-function endSession(){ clearTimeout(endTimer); releaseWake(); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
@@ -1405,9 +1436,10 @@ function showConfirm(){
 }
 $('#contBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); };
 $('#stopBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); abort(); };
+$('#dimmer').addEventListener('click',(e)=>{ e.stopPropagation(); undim(true); });
 $('#session').addEventListener('click',(e)=>{
   if(document.body.classList.contains('broadcast')) return;   // 配信専用モードでは中断確認を出さない
-  if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')) return;
+  if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')||e.target.id==='dimmer') return;
   showConfirm();
 });
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
