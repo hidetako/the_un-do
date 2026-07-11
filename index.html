@@ -1275,6 +1275,15 @@ function renderZengo(){
 })();
 
 /* ---------- session flow ---------- */
+/* 坐禅中は画面を眠らせない（Screen Wake Lock）。自動スリープするとページごと停止し
+   終了の鐘が鳴らない（特にiOS）。終了・中断で解放。非対応ブラウザは従来どおり。
+   ※電源ボタンで手動ロックした場合は防げない＝復帰時に遅れて鳴る。 */
+let wakeLock=null;
+async function keepAwake(){ try{ if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen'); }catch(e){} }
+function releaseWake(){ try{ if(wakeLock) wakeLock.release(); }catch(e){} wakeLock=null; }
+document.addEventListener('visibilitychange', ()=>{   // 一時的に隠れると自動解放されるため復帰時に再取得
+  if(document.visibilityState==='visible' && $('#session').classList.contains('on')) keepAwake();
+});
 let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
@@ -1282,6 +1291,7 @@ function enterSession(){
   $('#status').textContent=''; $('#status').classList.remove('show');
   show('session');
   presence.setSitting(true);
+  keepAwake();
   presence.bumpSit();   // 「過去24時間に座った延べ回数」を集計（個人情報なし）
   if(soundOn) ambient.start(sel.scene);
   if(sel.orient){ runOrient(beginSitting); } else { beginSitting(); }
@@ -1316,9 +1326,9 @@ function startIncense(durMs){
   }
   timerRAF=requestAnimationFrame(loop);
 }
-function endSession(){ clearTimeout(endTimer); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); releaseWake(); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
