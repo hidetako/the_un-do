@@ -1328,8 +1328,9 @@ function runOrient(done){
 }
 function beginSitting(){
   if(ac && ac.state==='suspended') ac.resume();
-  /* 長い坐（15分以上）は開始時に一言：暗くなるが眠らない＝鐘は時間どおり（電池への安心） */
-  if(sel.time>=15){ const dn=$('#dimNote');
+  /* 2分以上の坐は開始時に一言：暗くなるが眠らない＝鐘は時間どおり（電池への安心）。
+     暗転は開始90秒後なので、2分以上ならほぼ確実に暗転を経験する */
+  if(sel.time>=2){ const dn=$('#dimNote');
     dn.textContent=T[lang].dim_note; dn.classList.add('show');
     setTimeout(()=>dn.classList.remove('show'), 8000); }
   $('#status').textContent=T[lang].sitting;
@@ -1337,8 +1338,8 @@ function beginSitting(){
   startSmoke();
   ring3(()=> startIncense(sel.time*60*1000));
 }
-/* 坐り始めて30秒で暗幕を下ろす。タップで戻し、また30秒で沈む。終了・中断で解除 */
-const DIM_MS=30000; let dimTimer=null;
+/* 坐り始めて90秒で暗幕を下ろす（呼吸が整うのを待ってから）。タップで戻し、また90秒で沈む。終了・中断で解除 */
+const DIM_MS=90000; let dimTimer=null;
 function armDim(){ clearTimeout(dimTimer); dimTimer=setTimeout(()=>{ const d=$('#dimmer'); if(d && timerActive) d.classList.add('on'); }, DIM_MS); }
 function undim(rearm){ clearTimeout(dimTimer); const d=$('#dimmer'); if(d) d.classList.remove('on'); if(rearm && timerActive) armDim(); }
 function startIncense(durMs){
