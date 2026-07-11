@@ -231,6 +231,10 @@
   #session[data-scene="neko"] #status{bottom:22%}   /* 眠る猫と文字が重ならないよう上へ逃がす */
 
   /* 坐禅中の中断/継続 確認 */
+  /* 坐禅中の墨色の暗幕：画面は点けたまま（Wake Lock維持＝鐘は確実）ほぼ黒に沈めて省電力（OLEDで特に有効）。
+     タップでふっと戻り、しばらくするとまた沈む。 */
+  #dimmer{position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity .9s ease}
+  #dimmer.on{opacity:.94; pointer-events:auto; transition:opacity 4s ease}
   #confirm{position:absolute; inset:0; display:none; align-items:center; justify-content:center;
     background:rgba(16,13,9,.66); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); z-index:12; padding:34px}
   #confirm.show{display:flex}
@@ -410,6 +414,7 @@
       <button class="obtn" id="orientNext"></button>
     </div>
 
+    <div id="dimmer" aria-hidden="true"></div>
     <div id="confirm">
       <div>
         <div class="cmsg" id="confirmMsg"></div>
@@ -1312,6 +1317,10 @@ function beginSitting(){
   startSmoke();
   ring3(()=> startIncense(sel.time*60*1000));
 }
+/* 坐り始めて30秒で暗幕を下ろす。タップで戻し、また30秒で沈む。終了・中断で解除 */
+const DIM_MS=30000; let dimTimer=null;
+function armDim(){ clearTimeout(dimTimer); dimTimer=setTimeout(()=>{ const d=$('#dimmer'); if(d && timerActive) d.classList.add('on'); }, DIM_MS); }
+function undim(rearm){ clearTimeout(dimTimer); const d=$('#dimmer'); if(d) d.classList.remove('on'); if(rearm && timerActive) armDim(); }
 function startIncense(durMs){
   const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
   /* 終了の鐘は実時間（setTimeout）で鳴らす。requestAnimationFrame は裏タブ／画面ロックで
@@ -1325,10 +1334,11 @@ function startIncense(durMs){
     timerRAF=requestAnimationFrame(loop);
   }
   timerRAF=requestAnimationFrame(loop);
+  armDim();
 }
-function endSession(){ clearTimeout(endTimer); releaseWake(); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
@@ -1405,9 +1415,10 @@ function showConfirm(){
 }
 $('#contBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); };
 $('#stopBtn').onclick=(e)=>{ e.stopPropagation(); $('#confirm').classList.remove('show'); abort(); };
+$('#dimmer').addEventListener('click',(e)=>{ e.stopPropagation(); undim(true); });
 $('#session').addEventListener('click',(e)=>{
   if(document.body.classList.contains('broadcast')) return;   // 配信専用モードでは中断確認を出さない
-  if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')) return;
+  if(e.target.closest('.bar')||e.target.closest('#orient')||e.target.closest('#confirm')||e.target.id==='dimmer') return;
   showConfirm();
 });
 $('#againBtn').onclick=()=>{ $('#stick').style.height='280px'; show('setup'); };
