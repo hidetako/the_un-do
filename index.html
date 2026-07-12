@@ -269,7 +269,8 @@
   /* 今日の禅語（日替わり）。将来 .zk を毛筆画像 <img> に差し替える前提の器 */
   #zengo{margin-top:26px; text-align:center}
   #zengo .zk{font-family:var(--brush); font-size:32px; color:var(--paper); letter-spacing:.14em; opacity:.95}
-  #zengo .zk img{width:min(44vw,172px); height:auto; display:block; margin:0 auto; border-radius:3px;
+  #zengo .zk img{max-width:min(44vw,172px); max-height:min(38vh,330px); width:auto; height:auto;
+    display:block; margin:0 auto; border-radius:3px;
     box-shadow:0 4px 18px rgba(0,0,0,.45), 0 0 0 1px rgba(239,233,220,.08)}
   #zengo .zt{font-size:12.5px; color:var(--soft); margin-top:9px; letter-spacing:.08em; line-height:1.8; opacity:.85}
   .endbtns{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center}
@@ -1271,7 +1272,7 @@ const ZENGO=[
  {k:'行雲流水', img:'assets/brush/zengo-kouunryuusui.jpg', t:{ja:'行く雲、流れる水のように、とどまらず。', en:'Like drifting clouds and flowing water — never clinging.', 'zh-Hans':'如行云流水，不滞不留。', 'zh-Hant':'如行雲流水，不滯不留。', ko:'떠가는 구름, 흐르는 물처럼 머무르지 않고.', es:'Como nubes que pasan y agua que fluye, sin aferrarse.', fr:'Comme les nuages qui passent et l’eau qui coule, sans s’attacher.', de:'Wie ziehende Wolken und fließendes Wasser — ohne Anhaften.', pt:'Como nuvens que passam e água que corre, sem se prender.'}},
  {k:'一期一会', t:{ja:'この出会いは、一生に一度。', en:'This meeting happens only once in a lifetime.', 'zh-Hans':'此会一生仅有一次。', 'zh-Hant':'此會一生僅有一次。', ko:'이 만남은 일생에 단 한 번.', es:'Este encuentro ocurre una sola vez en la vida.', fr:'Cette rencontre n’a lieu qu’une fois dans la vie.', de:'Diese Begegnung gibt es nur einmal im Leben.', pt:'Este encontro acontece só uma vez na vida.'}},
  {k:'放下着', t:{ja:'手放しなさい、その手の中のものも。',   /* 読みは「ほうげじゃく」。原典は「放下著」、日本では異体字「着」が通例 */ en:'Let it go — even that which you hold.', 'zh-Hans':'放下——连手中之物也放下。', 'zh-Hant':'放下——連手中之物也放下。', ko:'내려놓으세요, 손안의 것마저도.', es:'Suéltalo, incluso lo que llevas en la mano.', fr:'Lâche prise — même ce que tu tiens.', de:'Lass los — auch das, was du hältst.', pt:'Solte — até o que você segura.'}},
- {k:'本来無一物', t:{ja:'もともと、何ひとつ持っていない。', en:'From the beginning, not a single thing.', 'zh-Hans':'本来无一物。', 'zh-Hant':'本來無一物。', ko:'본래 아무것도 없다.', es:'Desde el origen, ni una sola cosa.', fr:'À l’origine, pas une seule chose.', de:'Von Anfang an — kein einziges Ding.', pt:'Desde a origem, nem uma única coisa.'}},
+ {k:'本来無一物', img:'assets/brush/zengo-honraimuichimotsu.jpg', t:{ja:'もともと、何ひとつ持っていない。', en:'From the beginning, not a single thing.', 'zh-Hans':'本来无一物。', 'zh-Hant':'本來無一物。', ko:'본래 아무것도 없다.', es:'Desde el origen, ni una sola cosa.', fr:'À l’origine, pas une seule chose.', de:'Von Anfang an — kein einziges Ding.', pt:'Desde a origem, nem uma única coisa.'}},
  {k:'平常心是道', t:{ja:'ふだんの心、そのままが道。', en:'Ordinary mind is the way.', 'zh-Hans':'平常心是道。', 'zh-Hant':'平常心是道。', ko:'평상심이 곧 길이다.', es:'La mente cotidiana es el camino.', fr:'L’esprit ordinaire est la voie.', de:'Der alltägliche Geist ist der Weg.', pt:'A mente comum é o caminho.'}},
  {k:'喫茶去', img:'assets/brush/zengo-kissako.jpg', t:{ja:'まあ、お茶をおあがり。', en:'Go, have a cup of tea.', 'zh-Hans':'吃茶去。', 'zh-Hant':'吃茶去。', ko:'차나 한잔 들고 가시게.', es:'Ve a tomar una taza de té.', fr:'Va boire une tasse de thé.', de:'Geh, trink eine Tasse Tee.', pt:'Vá tomar uma xícara de chá.'}},
  {k:'無思量', img:'assets/brush/zengo-mushiryou.jpg', t:{ja:'思いはからいを、はなれて坐る。', en:'Sitting beyond all measuring thought.', 'zh-Hans':'放下思虑而坐。', 'zh-Hant':'放下思慮而坐。', ko:'헤아림을 떠나, 그저 앉다.', es:'Sentarse más allá de todo pensamiento.', fr:'S’asseoir au-delà de toute pensée.', de:'Sitzen jenseits allen Abwägens.', pt:'Sentar além de todo pensamento.'}},
