@@ -1327,7 +1327,7 @@ function releaseWake(){ try{ if(wakeLock) wakeLock.release(); }catch(e){} wakeLo
 document.addEventListener('visibilitychange', ()=>{   // 一時的に隠れると自動解放されるため復帰時に再取得
   if(document.visibilityState==='visible' && $('#session').classList.contains('on')) keepAwake();
 });
-let timerRAF, timerActive=false, ringTimer=null, endTimer=null;
+let timerRAF, timerActive=false, ringTimer=null, endTimer=null, statusTimer=null;
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#session').setAttribute('data-scene', sel.scene);   // 背景は付けず、文字位置/色の出し分け用
@@ -1357,6 +1357,9 @@ function beginSitting(){
     setTimeout(()=>dn.classList.remove('show'), 8000); }
   $('#status').textContent=T[lang].sitting;
   setTimeout(()=>$('#status').classList.add('show'), 400);
+  /* 「ただ、座る」は30秒でしずかに消える（暗転より先に、言葉から静けさへ） */
+  clearTimeout(statusTimer);
+  statusTimer=setTimeout(()=>$('#status').classList.remove('show'), 30400);
   startSmoke();
   ring3(()=> startIncense(sel.time*60*1000));
 }
@@ -1382,13 +1385,14 @@ function startIncense(durMs){
 function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false);
   zengoCur=(parseInt(store.get('issoku_zengo_idx'),10)||0);
   store.set('issoku_zengo_idx', String((zengoCur+1)%ZENGO.length));   /* 次の坐で次の書へ */
+  clearTimeout(statusTimer);
   $('#status').classList.remove('show');
   bell(0,0.55);
   presence.setSitting(false);
   /* 鐘とともに暗転が解け、坐の締めくくりに「合掌」がしずかに浮かぶ */
   setTimeout(()=>{ const st=$('#status'); st.textContent=(T[lang]&&T[lang].closing)||'合掌'; st.classList.add('show'); }, 900);
   setTimeout(()=>{ $('#status').classList.remove('show'); stopSmoke(); ambient.stop(1.4); show('end'); }, 5600); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); clearTimeout(statusTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */
