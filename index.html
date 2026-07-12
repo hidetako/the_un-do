@@ -1278,10 +1278,13 @@ const ZENGO=[
  {k:'無思量', img:'assets/brush/zengo-mushiryou.jpg', t:{ja:'思いはからいを、はなれて坐る。', en:'Sitting beyond all measuring thought.', 'zh-Hans':'放下思虑而坐。', 'zh-Hant':'放下思慮而坐。', ko:'헤아림을 떠나, 그저 앉다.', es:'Sentarse más allá de todo pensamiento.', fr:'S’asseoir au-delà de toute pensée.', de:'Sitzen jenseits allen Abwägens.', pt:'Sentar além de todo pensamento.'}},
  {k:'円相', img:'assets/brush/zengo-enso.jpg', t:{ja:'はじめも、おわりもなく。', en:'No beginning, no end — complete as it is.', 'zh-Hans':'无始无终，圆满如是。', 'zh-Hant':'無始無終，圓滿如是。', ko:'시작도 끝도 없이, 그대로 온전하다.', es:'Sin principio ni fin — completo tal como es.', fr:'Sans commencement ni fin — complet tel quel.', de:'Ohne Anfang, ohne Ende — vollkommen, wie es ist.', pt:'Sem começo nem fim — completo assim como é.'}},
  {k:'瀧', img:'assets/brush/zengo-taki.jpg', t:{ja:'細く、長く、息のように流れつづける。', en:'Thin and long — falling like a quiet breath.', 'zh-Hans':'细而长，如呼吸般长流不息。', 'zh-Hant':'細而長，如呼吸般長流不息。', ko:'가늘고 길게, 숨결처럼 흐른다.', es:'Fina y larga, fluye como la respiración.', fr:'Mince et longue, elle coule comme le souffle.', de:'Dünn und lang — fließend wie der Atem.', pt:'Fino e longo, flui como a respiração.'}},
- {k:'松無古今色', img:'assets/brush/zengo-shoumukokon.jpg', t:{ja:'松の緑は、時代を経ても変わらない。', en:'The pine\u2019s green stays unchanged through the ages.', 'zh-Hans':'松色历经古今而不变。', 'zh-Hant':'松色歷經古今而不變。', ko:'소나무의 푸름은 시대가 지나도 변하지 않는다.', es:'El verde del pino permanece inmutable a través de los tiempos.', fr:'Le vert du pin demeure inchangé à travers les âges.', de:'Das Grün der Kiefer bleibt durch die Zeiten unverändert.', pt:'O verde do pinheiro permanece imutável através dos tempos.'}}
+ {k:'松無古今色', img:'assets/brush/zengo-shoumukokon.jpg', t:{ja:'松に古今の色なし。あなたの今日の坐禅も、これまでの坐禅も、色あせない。', en:'The pine never fades, year after year \u2014 nor does your sitting today, nor any before.', 'zh-Hans':'松色四季不褪。你今日的坐禅，与以往的每一坐，同样不会褪色。', 'zh-Hant':'松色四季不褪。你今日的坐禪，與以往的每一坐，同樣不會褪色。', ko:'소나무는 사철 빛바래지 않는다. 오늘의 좌선도, 지금까지의 좌선도, 빛바래지 않는다.', es:'El pino nunca pierde su color; tampoco tu zazen de hoy, ni ninguno de los anteriores.', fr:'Le pin ne se fane jamais \u2014 ni ton zazen d\u2019aujourd\u2019hui, ni tous ceux d\u2019avant.', de:'Die Kiefer verblasst nie \u2014 ebenso wenig dein Zazen von heute und all deine fr\u00fcheren.', pt:'O pinheiro nunca desbota; tampouco o teu zazen de hoje, nem os anteriores.'}}
 ];
+/* 書の掛け替えは「順繰り」：坐り終えるたびに次の書へ（端末ごとに記憶）。
+   周りに何が掛かっているかは互いに見えないため、日替わり共有ではなく一人ずつ巡る方式。 */
+let zengoCur = parseInt(store.get('issoku_zengo_idx'),10)||0;
 function renderZengo(){
-  const z=ZENGO[Math.floor(Date.now()/86400000)%ZENGO.length];
+  const z=ZENGO[zengoCur%ZENGO.length];
   const k=$('#zengoK'), t=$('#zengoT'); if(!k) return;
   if(z.img){ k.innerHTML='<img src="'+z.img+'" alt="'+z.k+'">'; }   /* 毛筆作品は色紙として飾る */
   else k.textContent=z.k;
@@ -1366,7 +1369,9 @@ function startIncense(durMs){
   timerRAF=requestAnimationFrame(loop);
   armDim();
 }
-function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false); $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
+function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false);
+  zengoCur=(parseInt(store.get('issoku_zengo_idx'),10)||0);
+  store.set('issoku_zengo_idx', String((zengoCur+1)%ZENGO.length));   // 次の坐で次の書へ $('#status').classList.remove('show'); bell(0,0.55); presence.setSitting(false);
   setTimeout(()=>{ stopSmoke(); ambient.stop(1.4); show('end'); }, 4000); }
 function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
