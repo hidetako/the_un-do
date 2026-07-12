@@ -269,6 +269,8 @@
   /* 今日の禅語（日替わり）。将来 .zk を毛筆画像 <img> に差し替える前提の器 */
   #zengo{margin-top:26px; text-align:center}
   #zengo .zk{font-family:var(--brush); font-size:32px; color:var(--paper); letter-spacing:.14em; opacity:.95}
+  #zengo .zk img{width:min(44vw,172px); height:auto; display:block; margin:0 auto; border-radius:3px;
+    box-shadow:0 4px 18px rgba(0,0,0,.45), 0 0 0 1px rgba(239,233,220,.08)}
   #zengo .zt{font-size:12.5px; color:var(--soft); margin-top:9px; letter-spacing:.08em; line-height:1.8; opacity:.85}
   .endbtns{display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; justify-content:center}
   .endbtns button{font-family:var(--serif); font-size:15px; letter-spacing:.16em; border-radius:999px;
@@ -1266,17 +1268,21 @@ async function updatePresence(){
    バリエーションは相談のうえ拡張予定。将来は k を毛筆画像に差し替える（assets/brush/zengo-*.png 想定）。 */
 const ZENGO=[
  {k:'日日是好日', t:{ja:'毎日が、そのまま良い日。', en:'Every day is a good day.', 'zh-Hans':'每一天都是好日子。', 'zh-Hant':'每一天都是好日子。', ko:'하루하루가 그대로 좋은 날.', es:'Cada día es un buen día.', fr:'Chaque jour est un bon jour.', de:'Jeder Tag ist ein guter Tag.', pt:'Cada dia é um bom dia.'}},
- {k:'行雲流水', t:{ja:'行く雲、流れる水のように、とどまらず。', en:'Like drifting clouds and flowing water — never clinging.', 'zh-Hans':'如行云流水，不滞不留。', 'zh-Hant':'如行雲流水，不滯不留。', ko:'떠가는 구름, 흐르는 물처럼 머무르지 않고.', es:'Como nubes que pasan y agua que fluye, sin aferrarse.', fr:'Comme les nuages qui passent et l’eau qui coule, sans s’attacher.', de:'Wie ziehende Wolken und fließendes Wasser — ohne Anhaften.', pt:'Como nuvens que passam e água que corre, sem se prender.'}},
+ {k:'行雲流水', img:'assets/brush/zengo-kouunryuusui.jpg', t:{ja:'行く雲、流れる水のように、とどまらず。', en:'Like drifting clouds and flowing water — never clinging.', 'zh-Hans':'如行云流水，不滞不留。', 'zh-Hant':'如行雲流水，不滯不留。', ko:'떠가는 구름, 흐르는 물처럼 머무르지 않고.', es:'Como nubes que pasan y agua que fluye, sin aferrarse.', fr:'Comme les nuages qui passent et l’eau qui coule, sans s’attacher.', de:'Wie ziehende Wolken und fließendes Wasser — ohne Anhaften.', pt:'Como nuvens que passam e água que corre, sem se prender.'}},
  {k:'一期一会', t:{ja:'この出会いは、一生に一度。', en:'This meeting happens only once in a lifetime.', 'zh-Hans':'此会一生仅有一次。', 'zh-Hant':'此會一生僅有一次。', ko:'이 만남은 일생에 단 한 번.', es:'Este encuentro ocurre una sola vez en la vida.', fr:'Cette rencontre n’a lieu qu’une fois dans la vie.', de:'Diese Begegnung gibt es nur einmal im Leben.', pt:'Este encontro acontece só uma vez na vida.'}},
- {k:'放下著', t:{ja:'手放しなさい、その手の中のものも。', en:'Let it go — even that which you hold.', 'zh-Hans':'放下——连手中之物也放下。', 'zh-Hant':'放下——連手中之物也放下。', ko:'내려놓으세요, 손안의 것마저도.', es:'Suéltalo, incluso lo que llevas en la mano.', fr:'Lâche prise — même ce que tu tiens.', de:'Lass los — auch das, was du hältst.', pt:'Solte — até o que você segura.'}},
+ {k:'放下着', t:{ja:'手放しなさい、その手の中のものも。',   /* 読みは「ほうげじゃく」。原典は「放下著」、日本では異体字「着」が通例 */ en:'Let it go — even that which you hold.', 'zh-Hans':'放下——连手中之物也放下。', 'zh-Hant':'放下——連手中之物也放下。', ko:'내려놓으세요, 손안의 것마저도.', es:'Suéltalo, incluso lo que llevas en la mano.', fr:'Lâche prise — même ce que tu tiens.', de:'Lass los — auch das, was du hältst.', pt:'Solte — até o que você segura.'}},
  {k:'本来無一物', t:{ja:'もともと、何ひとつ持っていない。', en:'From the beginning, not a single thing.', 'zh-Hans':'本来无一物。', 'zh-Hant':'本來無一物。', ko:'본래 아무것도 없다.', es:'Desde el origen, ni una sola cosa.', fr:'À l’origine, pas une seule chose.', de:'Von Anfang an — kein einziges Ding.', pt:'Desde a origem, nem uma única coisa.'}},
  {k:'平常心是道', t:{ja:'ふだんの心、そのままが道。', en:'Ordinary mind is the way.', 'zh-Hans':'平常心是道。', 'zh-Hant':'平常心是道。', ko:'평상심이 곧 길이다.', es:'La mente cotidiana es el camino.', fr:'L’esprit ordinaire est la voie.', de:'Der alltägliche Geist ist der Weg.', pt:'A mente comum é o caminho.'}},
- {k:'喫茶去', t:{ja:'まあ、お茶をおあがり。', en:'Go, have a cup of tea.', 'zh-Hans':'吃茶去。', 'zh-Hant':'吃茶去。', ko:'차나 한잔 들고 가시게.', es:'Ve a tomar una taza de té.', fr:'Va boire une tasse de thé.', de:'Geh, trink eine Tasse Tee.', pt:'Vá tomar uma xícara de chá.'}}
+ {k:'喫茶去', t:{ja:'まあ、お茶をおあがり。', en:'Go, have a cup of tea.', 'zh-Hans':'吃茶去。', 'zh-Hant':'吃茶去。', ko:'차나 한잔 들고 가시게.', es:'Ve a tomar una taza de té.', fr:'Va boire une tasse de thé.', de:'Geh, trink eine Tasse Tee.', pt:'Vá tomar uma xícara de chá.'}},
+ {k:'無思量', img:'assets/brush/zengo-mushiryou.jpg', t:{ja:'思いはからいを、はなれて坐る。', en:'Sitting beyond all measuring thought.', 'zh-Hans':'放下思虑而坐。', 'zh-Hant':'放下思慮而坐。', ko:'헤아림을 떠나, 그저 앉다.', es:'Sentarse más allá de todo pensamiento.', fr:'S’asseoir au-delà de toute pensée.', de:'Sitzen jenseits allen Abwägens.', pt:'Sentar além de todo pensamento.'}},
+ {k:'円相', img:'assets/brush/zengo-enso.jpg', t:{ja:'はじめも、おわりもなく。', en:'No beginning, no end — complete as it is.', 'zh-Hans':'无始无终，圆满如是。', 'zh-Hant':'無始無終，圓滿如是。', ko:'시작도 끝도 없이, 그대로 온전하다.', es:'Sin principio ni fin — completo tal como es.', fr:'Sans commencement ni fin — complet tel quel.', de:'Ohne Anfang, ohne Ende — vollkommen, wie es ist.', pt:'Sem começo nem fim — completo assim como é.'}}
 ];
 function renderZengo(){
   const z=ZENGO[Math.floor(Date.now()/86400000)%ZENGO.length];
   const k=$('#zengoK'), t=$('#zengoT'); if(!k) return;
-  k.textContent=z.k; t.textContent=z.t[lang]||z.t.en;
+  if(z.img){ k.innerHTML='<img src="'+z.img+'" alt="'+z.k+'">'; }   /* 毛筆作品は色紙として飾る */
+  else k.textContent=z.k;
+  t.textContent=z.t[lang]||z.t.en;
 }
 
 /* 地球儀に触れる（マウスオン／タップ）と「坐を分かちあっている」ことばに数秒だけ替わる */
