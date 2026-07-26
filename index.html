@@ -1324,10 +1324,23 @@ function renderZengo(){
 let wakeLock=null;
 async function keepAwake(){ try{ if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen'); }catch(e){} }
 function releaseWake(){ try{ if(wakeLock) wakeLock.release(); }catch(e){} wakeLock=null; }
-document.addEventListener('visibilitychange', ()=>{   // 一時的に隠れると自動解放されるため復帰時に再取得
-  if(document.visibilityState==='visible' && $('#session').classList.contains('on')) keepAwake();
-});
-let timerRAF, timerActive=false, ringTimer=null, endTimer=null, statusTimer=null;
+let timerRAF, timerActive=false, ringTimer=null, endTimer=null, statusTimer=null, endAt=0;
+function finishSit(){ if(!timerActive) return; timerActive=false; cancelAnimationFrame(timerRAF); endSession(); }
+/* 復帰時の立て直し：iPad等がスリープするとJSタイマー(setTimeout)も凍る＝45分後の終了鐘が来ない。
+   そこで終了予定を「実時刻(endAt)」でも持ち、画面が戻った瞬間に精算する：
+   もう過ぎていれば その場で鐘＋合掌、まだなら残り時間でタイマーを引き直す（凍結でずれた分を補正）。音源も起こし直す。 */
+function onResume(){
+  if(document.visibilityState!=='visible') return;
+  if(!$('#session').classList.contains('on')) return;
+  keepAwake();                                   /* スリープ復帰で自動解放された画面ロックを再取得 */
+  if(!timerActive || !endAt) return;
+  if(ac && ac.state==='suspended') ac.resume();  /* スリープ中に止まった鐘の音源を起こす */
+  const remain = endAt - Date.now();
+  if(remain<=0){ finishSit(); }                  /* スリープ中に坐が終わっていた→いま鐘を鳴らして締める */
+  else { clearTimeout(endTimer); endTimer=setTimeout(finishSit, remain); }   /* 凍結でずれた分を補正 */
+}
+document.addEventListener('visibilitychange', onResume);
+window.addEventListener('pageshow', onResume);
 function enterSession(){
   $('#scene').className=''; $('#scene').classList.add('scene-'+sel.scene);
   $('#session').setAttribute('data-scene', sel.scene);   // 背景は付けず、文字位置/色の出し分け用
@@ -1371,8 +1384,8 @@ function startIncense(durMs){
   const stick=$('#stick'), full=280, start=performance.now(); timerActive=true;
   /* 終了の鐘は実時間（setTimeout）で鳴らす。requestAnimationFrame は裏タブ／画面ロックで
      停止・スロットルされるため、それに依存すると数分後の終了鐘が鳴らない。rAFは線香の描画のみ。 */
-  clearTimeout(endTimer);
-  endTimer=setTimeout(()=>{ if(!timerActive) return; timerActive=false; cancelAnimationFrame(timerRAF); endSession(); }, durMs);
+  clearTimeout(endTimer); endAt = Date.now()+durMs;   /* 実時刻での終了予定（スリープ復帰時の精算に使う） */
+  endTimer=setTimeout(finishSit, durMs);
   function loop(now){ if(!timerActive) return;
     let p=(now-start)/durMs; if(p>1)p=1;
     stick.style.height=(full*(1-p))+'px';
@@ -1382,7 +1395,7 @@ function startIncense(durMs){
   timerRAF=requestAnimationFrame(loop);
   armDim();
 }
-function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false);
+function endSession(){ clearTimeout(endTimer); endAt=0; releaseWake(); undim(false);
   zengoCur=(parseInt(store.get('issoku_zengo_idx'),10)||0);
   store.set('issoku_zengo_idx', String((zengoCur+1)%ZENGO.length));   /* 次の坐で次の書へ */
   clearTimeout(statusTimer);
@@ -1392,7 +1405,7 @@ function endSession(){ clearTimeout(endTimer); releaseWake(); undim(false);
   /* 鐘とともに暗転が解け、坐の締めくくりに「合掌」がしずかに浮かぶ */
   setTimeout(()=>{ const st=$('#status'); st.textContent=(T[lang]&&T[lang].closing)||'合掌'; st.classList.add('show'); }, 900);
   setTimeout(()=>{ $('#status').classList.remove('show'); stopSmoke(); ambient.stop(1.4); show('end'); }, 5600); }
-function abort(){ timerActive=false; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); clearTimeout(statusTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
+function abort(){ timerActive=false; endAt=0; cancelAnimationFrame(timerRAF); clearTimeout(ringTimer); clearTimeout(endTimer); clearTimeout(statusTimer); releaseWake(); undim(false); stopSmoke(); ambient.stop(0.4); presence.setSitting(false);
   $('#confirm').classList.remove('show'); $('#orient').style.display='none'; $('#stick').style.height='280px'; show('setup'); }
 
 /* ---------- wire up ---------- */

@@ -22,6 +22,7 @@
 - **リポジトリは `hidetako/the_un-do`。push が実際に届いたか必ずPR一覧で確認**。**複数セッションを並行させない**こと。
 - 画像で見せる時は**軽いJPEG（数百px）**。大きい画像を貼ると "リクエストが大きすぎます(32MB)" エラー。
 - ユーザーが貼った画像はディスクに無い。**会話ログ jsonl**（`/root/.claude/projects/.../<session>.jsonl`）から base64 を抽出して保存する（既存の抽出スクリプトのパターン参照）。
+- **文字列置換でワンライナー関数に行コメント（`//`）を差し込むと行末のコードを飲み込む**（PR #45で終了の鐘がコメントアウトされ本番退行。実際に起きた）。コメントは `/* */` を使い、置換後は必ず挙動テスト。
 - ローカル検証: `python3 -m http.server` ＋ Playwright（`/opt/node22/lib/node_modules/playwright`＝CommonJS なので `import pkg from ...; const {chromium}=pkg`、Chromium は `/opt/pw-browsers/chromium-*/chrome-linux/chrome`）。esm.sh/Google Fonts はオフラインで失敗するが CJK フォールバックで描画確認は可。スクショ確認後にコミット。
 
 ## セキュリティ（ヨロヅヤ診断基準 v2.2 準拠・`SECURITY.md`）
@@ -41,6 +42,13 @@
 - **`?count` 専用ページ**：在席数を手書き数字で全画面表示＋「過去24時間に N人が坐りました」（多言語・60秒更新）。**1人は数字にせず「いま、ひとりが坐雲堂にいます」（9言語 COUNT_ONE）／24h=0は行ごと非表示**。観測者接続で自分は数えない。アプリUIからはリンクしない（配信オーバーレイ／単体リンク用）。
 - **お布施**: 終わりの画面の `#supportLink`＝**有効化済みStripe** Payment Link（`https://buy.stripe.com/fZu7sL7fB2nRa2A7GE6J200`）。Stripeアカウント（個人事業主・よろづソリューションズ）の本人確認・セキュリティ自己申告書の入力サポート済み。
 - **YouTubeライブ配信 開始済み（2026-07-02）**。チャンネルID `UCqzoMItMT74uC--y67S1-AQ`／ハンドル **`@Issoku_The_un_do`**（@The-un_doは未取得のまま終了・ハンドル404事故を受けアプリ導線は**恒久ID版** `/channel/<ID>/live`）。配信はユーザーPCのOBS（ブラウザソース `?live=rotate&bell=30`・音声はOBS制御）。**アプリ更新を配信に反映するにはOBSのブラウザソース再読み込み＋▶再クリックが必要**。初回配信 https://youtube.com/live/wOBMywDsKG8
+- **集計は3面統一（2026-07-10）**：アプリ入口・配信上帯・`?count` すべて「過去24時間の延べ着席数」（`zaundo_sits_24h` ローリング24h・60秒更新）。配信上帯は「今日、世界で N人が坐りました / N sat today」。**カウントは fetch 直叩き**（`/rest/v1/rpc/` へ直接POST・esm.sh/supabase-js 非依存）＋失敗時4秒後1回再試行＝**取りこぼすより多少の重複を許容**する方針。
+- **地球儀刷新**：TZ名→代表都市表（約60都市・±1.5°）で**自分の灯りは必ず点灯**＋自分の経度を正面に。24h集計ぶんの灯り（`sitLights`・上限48・位置は大陸に散らす気配）。赤道＋45°経線・**地軸-23.4°**・実時刻の**昼夜**（夜側くっきり暗く）。タッチ/ホバーで「この星のどこかで、いっしょに坐っています」（`globe_msg` 9言語・在室行が4.6秒替わる）。入堂時に一度だけ金の明滅ヒント。
+- **坐禅セッション体験**：Wake Lock で坐禅中は眠らせない。ただし **iPad/Chrome for iOS は `navigator.wakeLock` を出さず自動ロック→スリープでき、その間 `setTimeout` も凍る**（＝45分後の終了鐘が来ない事故）。対策＝終了予定を**実時刻 `endAt` でも保持**し、**復帰（`visibilitychange`/`pageshow`）した瞬間に精算**する `onResume`／`finishSit`：過ぎていればその場で鐘＋合掌、まだなら残り時間でタイマー引き直し＋`ac.resume()`。線香開始90秒で**墨色の暗幕**（opacity .94・タップで復帰・背景だけ沈み線香は残る＝仕様）。2分以上の坐は開始時に `dim_note` アナウンス（9言語）。「ただ、座る」は**30秒でフェードアウト**。**終了＝鐘→暗転解除→「合掌」**（ja/中文=合掌・韓=합장・欧文=合掌 · gasshō）**が5.6秒浮かんで end 画面へ**。終了トリガーは実時間 `endTimer`（rAF非依存＝裏タブ/ロックでも時間どおり）。
+- **禅語（end画面）**：**順繰り12句**（坐り終えるたび次へ・`issoku_zengo_idx` 端末記憶・言語切替では進まない）。**毛筆8点**＝行雲流水/無思量/円相/きっさこ/本来無一物/瀧/松無古今色/無（`assets/brush/zengo-*.jpg`・色紙/掛軸/短冊として表示・`.zk` は img 差し替え式）。フォント4句＝日日是好日/一期一会/**放下着**（表記は着）/平常心是道。無の一言=「力を抜いて。なにも、しなくていい。」、松無古今色=「あなたの坐禅も色あせない」系（9言語）。
+- **PWA**：`manifest.json`＋`assets/icons/`（**紙地×墨の円相**・maskable対応。墨地×白は小サイズで黒四角に見えたため反転済み）＋`sw.js`（オフライン対応：index=network-first・同一オリジン資産=cache-first・外部素通し）。⚠️ **Chromeはインストール時にアイコンをキャッシュ**＝アイコン更新は再インストールが必要。
+- **UI**：表紙タグライン「24時間、世界のどこからでも。**坐って、ひといき、つきましょう。**」（9言語）。設定画面はスクロールほぼ不要（余白圧縮・地球儀104px）。座処チップは**3列グリッド固定**（全言語で上3下3）。時間プリセット5/10/20/40分。iOSセーフエリア対応。在室行の数字は毛筆数字（d0-9）。
+- **音**：環境音は座処ごとに作り分け（**波のうねりは海岸だけ**・本堂=胴鳴り・枯山水=風+鹿威し・月夜=夜気+鈴虫・猫=7.4秒周期の寝息+喉鳴り・調息=定常）。**離散音は「まれに・不規則に・やわらかく」が原則**（短周期の繰り返しは拍になり集中を遮る）。鐘の音量は控えめ（三声0.5・終了/配信0.55）。
 
 ## 次にやること（pending）— 配信は開始済み。残りはチャンネルの化粧（すべてユーザー手作業）
 1. **チャンネル名とアイコン差し替え**：現状は名前「admin Yorozuya」＋個人写真のまま。Studio「カスタマイズ」→ 名前を「一息 — 坐雲堂 ｜ Issoku / The Un-do」、アイコン `assets/youtube/avatar.png`・バナー `banner.png`・透かし `watermark.png` へ。
@@ -49,5 +57,7 @@
 4. **公開範囲の確認**：限定公開のままなら「公開」へ（Studio「コンテンツ」→ライブ配信タブ）。
 
 ## 主要ファイル
-- `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール（`bumpSit`/`sits24h` 含む）、`startBcast`（rotate対応）/`updateLiveCount`/`updateCount`/`update24h`、`T`/`ORIENT` 辞書、`applyLang`、`#splashFx`。
+- `index.html` … アプリ全体。定数 `YT_LIVE_URL`/`SUPPORT_URL`/`SUPPORT_T`、`presence` モジュール（`bumpSit`/`sits24h`＝fetch直叩き・`sitLights`/`TZ_CITY`/globe描画）、`startBcast`（rotate対応）/`updateLiveCount`/`updateCount`/`update24h`/`updatePresence`、`ZENGO`/`renderZengo`（順繰り）、`keepAwake`/`releaseWake`（Wake Lock）、`armDim`/`undim`（暗幕）、`endSession`（鐘→合掌→end）、`T`/`ORIENT` 辞書（`globe_msg`/`dim_note`/`closing` 含む）、`applyLang`、`#splashFx`。
+- `manifest.json`／`sw.js`（PWA・オフライン。**資産差し替え時は sw.js の V を上げる**）／`assets/icons/`（アプリアイコン）。
+- `assets/brush/zengo-*.jpg` … 毛筆禅語8点（ユーザー揮毫。追加時は jsonl から抽出→560px級JPEG→ZENGO配列に img 紐づけ）。
 - `youtube.md`（YouTube連携・コピー・チャンネルID・**配信URLの選択肢**）、`配信手順.md`（**別PCでの配信立ち上げ手順書**・つまずき早見表つき・`.vercelignore`で非配信）、`SECURITY.md`（24h集計の追記あり）、`企画書.md`、`vercel.json`、`_headers`、`.vercelignore`。
