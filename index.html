@@ -216,12 +216,8 @@
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
   .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:486px; pointer-events:none}
+  /* 未燃部（茶色・下から縮む）。火点・灰・落下灰片は #smoke キャンバスに描く */
   .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
-  .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
-    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55);
-    animation:emberglow 4.5s ease-in-out infinite}
-  @keyframes emberglow{0%,100%{opacity:.9; box-shadow:0 0 9px 2px rgba(224,99,43,.42)}
-    50%{opacity:1; box-shadow:0 0 14px 4px rgba(224,99,43,.62)}}
   .bowl{width:96px; height:20px; background:#2a2620; border-radius:0 0 50px 50px; margin-top:-3px}
   .bowl::before{content:""; display:block; width:96px; height:11px; background:#39342c; border-radius:50%; transform:translateY(-6px)}
   .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
@@ -412,7 +408,7 @@
     <div class="censer">
       <div class="incense-wrap">
         <canvas class="smoke" id="smoke" width="140" height="486"></canvas>
-        <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
+        <div class="stick" id="stick" style="height:280px"></div>
       </div>
       <div class="bowl"></div>
     </div>
@@ -470,6 +466,8 @@ const T = {
     p_count:"いま {c} の地域から、{p}人がこの堂に",
     globe_msg:"この星のどこかで、いっしょに坐っています",
     dim_note:"画面はやがて暗くなりますが、眠りません。鐘は時間どおりに鳴ります",
+    dim_sleep:"画面はやがて暗くなります（省電力）。端末がスリープしても、戻れば鐘は鳴ります",
+    install_tip:"スリープを防ぐには、ホーム画面に追加してお使いください",
     closing:"合掌",
     confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
     scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
@@ -489,6 +487,8 @@ const T = {
     p_count:"{p} people from {c} regions are in the hall now",
     globe_msg:"Somewhere on this earth, we sit together",
     dim_note:"The screen will dim but stay awake — the bell will ring on time",
+    dim_sleep:"The screen will dim to save power. If your device sleeps, the bell rings the moment you return",
+    install_tip:"To keep it from sleeping, add this app to your home screen",
     closing:"合掌 · gasshō",
     confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
     scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
@@ -508,6 +508,8 @@ const T = {
     p_count:"此刻，来自 {c} 个地区的 {p} 人正在堂中",
     globe_msg:"在这颗星球的某处，我们一同静坐",
     dim_note:"屏幕会变暗但不会休眠，钟声将准时响起",
+    dim_sleep:"屏幕会变暗以省电。即使设备休眠，回来时钟声也会响起",
+    install_tip:"为防止休眠，请添加到主屏幕后使用",
     closing:"合掌",
     confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
@@ -527,6 +529,8 @@ const T = {
     p_count:"此刻，來自 {c} 個地區的 {p} 人正在堂中",
     globe_msg:"在這顆星球的某處，我們一同靜坐",
     dim_note:"螢幕會變暗但不會休眠，鐘聲將準時響起",
+    dim_sleep:"螢幕會變暗以省電。即使裝置休眠，回來時鐘聲也會響起",
+    install_tip:"為避免休眠，請加入主畫面後使用",
     closing:"合掌",
     confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
     scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
@@ -546,6 +550,8 @@ const T = {
     p_count:"지금 {c}개 지역에서 {p}명이 이 당에 있습니다",
     globe_msg:"이 별 어딘가에서, 함께 앉아 있습니다",
     dim_note:"화면은 어두워지지만 잠들지 않습니다. 종은 제시간에 울립니다",
+    dim_sleep:"화면은 절전을 위해 어두워집니다. 기기가 잠들어도 돌아오면 종이 울립니다",
+    install_tip:"잠자기를 막으려면 홈 화면에 추가해 사용하세요",
     closing:"합장",
     confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
     scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
@@ -565,6 +571,8 @@ const T = {
     p_count:"Ahora hay {p} personas de {c} regiones en la sala",
     globe_msg:"En algún lugar de esta Tierra, nos sentamos juntos",
     dim_note:"La pantalla se atenuará pero seguirá activa; la campana sonará a tiempo",
+    dim_sleep:"La pantalla se atenuará para ahorrar batería. Si el dispositivo se suspende, la campana sonará al volver",
+    install_tip:"Para evitar la suspensión, añádela a tu pantalla de inicio",
     closing:"合掌 · gasshō",
     confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
     scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
@@ -584,6 +592,8 @@ const T = {
     p_count:"{p} personnes de {c} régions sont dans la salle",
     globe_msg:"Quelque part sur cette Terre, nous sommes assis ensemble",
     dim_note:"L’écran s’assombrira mais restera éveillé ; la cloche sonnera à l’heure",
+    dim_sleep:"L’écran s’assombrira pour économiser la batterie. Si l’appareil se met en veille, la cloche sonnera à votre retour",
+    install_tip:"Pour éviter la veille, ajoutez l’app à l’écran d’accueil",
     closing:"合掌 · gasshō",
     confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
     scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
@@ -603,6 +613,8 @@ const T = {
     p_count:"{p} Menschen aus {c} Regionen sind jetzt in der Halle",
     globe_msg:"Irgendwo auf dieser Erde sitzen wir gemeinsam",
     dim_note:"Der Bildschirm wird dunkel, schläft aber nicht — die Glocke läutet pünktlich",
+    dim_sleep:"Der Bildschirm wird dunkler, um Strom zu sparen. Falls das Gerät einschläft, läutet die Glocke, sobald du zurückkehrst",
+    install_tip:"Um den Ruhezustand zu vermeiden, füge die App zum Startbildschirm hinzu",
     closing:"合掌 · gasshō",
     confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
     scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
@@ -622,6 +634,8 @@ const T = {
     p_count:"Agora há {p} pessoas de {c} regiões no salão",
     globe_msg:"Em algum lugar desta Terra, sentamos juntos",
     dim_note:"A tela escurecerá, mas não dormirá; o sino tocará na hora certa",
+    dim_sleep:"A tela escurecerá para poupar bateria. Se o aparelho dormir, o sino tocará ao voltar",
+    install_tip:"Para evitar a suspensão, adicione à tela inicial",
     closing:"合掌 · gasshō",
     confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
     scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
@@ -856,8 +870,60 @@ function startSmoke(){
   let RGB='226,221,210';
   const calcRGB = () => { const dark=(sel.scene==='honden'||sel.scene==='tsuki'||sel.scene==='cho'); RGB = dark?'226,221,210':'66,55,45'; };
   calcRGB();
-  /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
-  const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
+  /* 線香本体：火点（縦長のほんのり赤み）＋その上に残る灰（線香形・白寄りの灰色）＋左右へ折れて落ちる灰片。
+     火点は下方へ燃え進み、燃えた分は上に灰として残り、最大でも元の長さの1/6を超えない不定サイズでときどき折れ落ちる。 */
+  const full0=280, stickW=4, emberLen=Math.round(stickW*2.2), maxAsh=full0/8;   /* 太さ:長さ＝1:2.2／灰の最大長＝元長の1/8 */
+  let ashTop=full0, prevSH=null; const ashBits=[];              /* ashTop＝灰柱の上端(基部からの長さ)／ashBits＝落下中の灰片 */
+  const clampv=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function rr(px,py,w,h,r){ r=Math.min(r,w/2,h/2); x.beginPath(); x.moveTo(px+r,py);
+    x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r);
+    x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); }
+  /* 煙は火点の最上部から出る（基部 H から 未燃長＋火点長 ぶん上） */
+  const emberY = () => H - ((parseFloat(stick.style.height)||0) + emberLen);
+  function drawIncense(dt){
+    const sh=clampv(parseFloat(stick.style.height)||0, 0, full0);
+    if(prevSH!==null && sh>prevSH+3){ ashTop=full0; ashBits.length=0; }   /* 線香が伸びた＝新品（配信の周期／再開）→灰リセット */
+    prevSH=sh;
+    const baseX=W/2, emberTpY=H-(sh+emberLen);
+    ashTop=clampv(ashTop, sh+emberLen, full0);
+    const ashLen=ashTop-(sh+emberLen);
+    /* 灰（火点の上・線香形・白寄りの灰色。横の節でそれらしく） */
+    if(ashLen>1){ const aTopY=H-ashTop, aBotY=emberTpY, w=stickW+0.3;
+      const g=x.createLinearGradient(0,aTopY,0,aBotY);
+      g.addColorStop(0,'rgba(190,186,178,0.96)'); g.addColorStop(1,'rgba(162,156,146,0.96)');   /* 白寄りの灰色（明度は控えめ） */
+      rr(baseX-w/2,aTopY,w,aBotY-aTopY,1.6); x.fillStyle=g; x.fill();
+      x.strokeStyle='rgba(132,126,117,0.34)'; x.lineWidth=0.6;
+      for(let yy=aTopY+6; yy<aBotY-2; yy+=7){ x.beginPath(); x.moveTo(baseX-w/2+0.4,yy); x.lineTo(baseX+w/2-0.4,yy+0.5); x.stroke(); } }
+    /* 火点（縦長・明度を落としたほんのりした赤み・微かな明滅） */
+    const pulse=reduced?1:(0.9+0.1*Math.sin(t*2.2));
+    const eTop=emberTpY-2, eH=emberLen+2, ew=stickW;
+    const eg=x.createLinearGradient(0,eTop,0,eTop+eH);
+    eg.addColorStop(0,   'rgba(150,52,40,'+(0.85*pulse).toFixed(2)+')');   /* 上（灰側）やや暗い */
+    eg.addColorStop(0.5, 'rgba(182,66,46,'+(0.98*pulse).toFixed(2)+')');   /* 中央がいちばん赤い */
+    eg.addColorStop(1,   'rgba(120,42,32,'+(0.80*pulse).toFixed(2)+')');   /* 下（未燃側）暗い */
+    x.save(); x.shadowColor='rgba(178,66,46,'+(0.5*pulse).toFixed(2)+')'; x.shadowBlur=6;
+    rr(baseX-ew/2,eTop,ew,eH,ew/2); x.fillStyle=eg; x.fill(); x.restore();
+    /* 灰の最大長は元長の1/8。そこまで伸びると（またはときどき手前で）不定サイズで折れ、左右いずれかへ落ちる */
+    if(reduced){
+      if(ashLen>maxAsh) ashTop=sh+emberLen+maxAsh;   /* 動きは出さず、1/8を超えないよう静かに抑える */
+    } else if(ashBits.length<5 && (ashLen>=maxAsh || (ashLen>maxAsh*0.55 && Math.random()<(dt*0.001)/11))){
+      const chunk=Math.min(ashLen*0.85, maxAsh*0.4 + Math.random()*(maxAsh*0.45));   /* 不定サイズ（最大でも1/8以内） */
+      const dir=Math.random()<0.5?-1:1;
+      ashBits.push({x:baseX+(Math.random()*1.4-0.7), y:H-ashTop, w:stickW+0.2, h:chunk,
+        vx:dir*(10+Math.random()*24), vy:6+Math.random()*10, rot:Math.random()*0.4-0.2,
+        vr:dir*(0.6+Math.random()*1.2), life:1});
+      ashTop-=chunk;
+    }
+    /* 落下中の灰片（重力＋回転＋フェード） */
+    for(let i=ashBits.length-1;i>=0;i--){ const b=ashBits[i], s=dt*0.001;
+      b.vy+=55*s; b.x+=b.vx*s; b.y+=b.vy*s; b.rot+=b.vr*s; b.life-=s/2.2;
+      if(b.life<=0 || b.y>H+24){ ashBits.splice(i,1); continue; }
+      x.save(); x.translate(b.x,b.y); x.rotate(b.rot); x.globalAlpha=Math.max(0,b.life);
+      const g=x.createLinearGradient(0,-b.h/2,0,b.h/2);
+      g.addColorStop(0,'rgba(186,181,172,0.95)'); g.addColorStop(1,'rgba(158,151,141,0.95)');
+      rr(-b.w/2,-b.h/2,b.w,b.h,1.2); x.fillStyle=g; x.fill(); x.restore(); }
+    x.globalAlpha=1;
+  }
   const R=(a,b)=>a+Math.random()*(b-a);
   /* 毎セッション乱択の個体差。TR＝幹、BR＝枝 */
   const TR={ f1:1.9+R(0,0.9), f2:4.0+R(0,1.5), v1:0.65+R(0,0.4), v2:1.05+R(0,0.5),
@@ -937,6 +1003,7 @@ function startSmoke(){
       }
       x.shadowBlur=0;
     }
+    drawIncense(dt);   /* 火点・灰・落下灰片は煙の手前に（灰が煙の根元を隠し、煙は灰の上から立つ） */
     smokeRAF=requestAnimationFrame(loop);
   }
   smokeRAF=requestAnimationFrame(loop);
@@ -1363,11 +1430,18 @@ function runOrient(done){
 }
 function beginSitting(){
   if(ac && ac.state==='suspended') ac.resume();
-  /* 2分以上の坐は開始時に一言：暗くなるが眠らない＝鐘は時間どおり（電池への安心）。
-     暗転は開始90秒後なので、2分以上ならほぼ確実に暗転を経験する */
+  /* 2分以上の坐は開始時に一言（暗転は開始90秒後なので、2分以上ならほぼ確実に経験する）。
+     Wake Lock が使える端末＝「暗くなるが眠らない」と正直に言える。使えない端末（Chrome for iOS 等は
+     navigator.wakeLock を出さない）＝スリープし得るので言い換え、未インストールならホーム画面追加を勧める
+     （インストール＝Safariの「ホーム画面に追加」でWebKit標準に載り Wake Lock が効く／タブ破棄もされにくい）。 */
   if(sel.time>=2){ const dn=$('#dimNote');
-    dn.textContent=T[lang].dim_note; dn.classList.add('show');
-    setTimeout(()=>dn.classList.remove('show'), 8000); }
+    const canWake = ('wakeLock' in navigator);
+    const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true;
+    let lines = [ canWake ? T[lang].dim_note : T[lang].dim_sleep ];
+    if(!canWake && !standalone) lines.push(T[lang].install_tip);
+    dn.innerHTML = lines.map(s=>s.replace(/</g,'&lt;')).join('<br>');   /* 自前の定数文字列だが念のためエスケープ */
+    dn.classList.add('show');
+    setTimeout(()=>dn.classList.remove('show'), lines.length>1 ? 9500 : 8000); }
   $('#status').textContent=T[lang].sitting;
   setTimeout(()=>$('#status').classList.add('show'), 400);
   /* 「ただ、座る」は30秒でしずかに消える（暗転より先に、言葉から静けさへ） */
