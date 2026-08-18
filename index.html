@@ -909,15 +909,16 @@ function startSmoke(){
     if(reduced){
       if(ashLen>maxAsh) ashTop=sh+emberLen+maxAsh;   /* 動きは出さず、1/8を超えないよう静かに抑える */
     } else if(ashBits.length<4 && ashLen>4 && (ashLen>=maxAsh || (ashLen>maxAsh*0.55 && Math.random()<(dt*0.001)/11))){
-      ashBits.push({ph:0, dir:(Math.random()<0.5?-1:1), L:ashLen, w:stickW+0.2, theta:0.08, omega:0});
+      ashBits.push({ph:0, dir:(Math.random()<0.5?-1:1), L:ashLen, w:stickW+0.2, theta:0.03, omega:0, age:0});
       ashTop=sh+emberLen;   /* 灰は根こそぎ倒れて落ちる→火点の上はいったん無くなり、また伸び始める */
     }
     /* 灰片：ph0＝ヒンジ（根元＝火点に固定、重力トルクで倒れ込む）／60度で解放→ph1＝自由落下。
        中心＝根元＋(L/2)×棒方向。解放時に回転で得た中心速度を引き継ぐので跳ねずになめらかに落ちる。 */
-    const HINGE=Math.PI/3, GA=9.0, GF=500;
+    const HINGE=Math.PI/3, GA=7.0, GF=500, EASE=0.5;   /* GA=傾きの角加速度／EASE=倒れ始めのトルク立ち上げ秒（ふわっと） */
     for(let i=ashBits.length-1;i>=0;i--){ const b=ashBits[i], s=dt*0.001; let cx,cy;
       if(b.ph===0){
-        b.omega += GA*Math.sin(b.theta)*s; b.theta += b.omega*s;
+        b.age+=s; const ease=b.age<EASE ? b.age/EASE : 1;   /* 最初のEASE秒はトルクを0→満へ徐々に＝ふわっとした倒れ始め */
+        b.omega += GA*Math.sin(b.theta)*ease*s; b.theta += b.omega*s;
         const px=baseX, py=H-(sh+emberLen);                          /* 根元＝いまの火点最上部（火点から離れない） */
         cx=px + (b.L/2)*Math.sin(b.theta)*b.dir; cy=py - (b.L/2)*Math.cos(b.theta);
         if(b.theta>=HINGE){                                          /* 解放：倒れた勢いは引き継ぐが、横は弱めて“そのまま真下に落ちる” */
