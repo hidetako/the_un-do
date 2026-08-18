@@ -904,27 +904,36 @@ function startSmoke(){
     eg.addColorStop(1,   'rgba(120,42,32,'+(0.80*pulse).toFixed(2)+')');   /* 下（未燃側）暗い */
     x.save(); x.shadowColor='rgba(178,66,46,'+(0.5*pulse).toFixed(2)+')'; x.shadowBlur=6;
     rr(baseX-ew/2,eTop,ew,eH,ew/2); x.fillStyle=eg; x.fill(); x.restore();
-    /* 灰の最大長は元長の1/8。そこまで伸びると（またはときどき手前で）不定サイズで折れ、左右いずれかへ落ちる */
+    /* 灰は火点を根元にして倒れる：最大1/8まで伸びると（またはときどき手前で）根元が火点に付いたまま
+       重力で傾き（跳ね上がらない）、60度を過ぎたら根元が離れて そのまま自由落下する。 */
     if(reduced){
       if(ashLen>maxAsh) ashTop=sh+emberLen+maxAsh;   /* 動きは出さず、1/8を超えないよう静かに抑える */
-    } else if(ashBits.length<5 && (ashLen>=maxAsh || (ashLen>maxAsh*0.55 && Math.random()<(dt*0.001)/11))){
-      const chunk=Math.min(ashLen*0.85, maxAsh*0.4 + Math.random()*(maxAsh*0.45));   /* 不定サイズ（最大でも1/8以内） */
-      const dir=Math.random()<0.5?-1:1;
-      /* 折れた位置（放物線の頂点）から。横へはあまり飛ばさず、線香の近くをかすめて落ちる程度 */
-      ashBits.push({x:baseX+dir*2.5, y:H-ashTop, w:stickW+0.2, h:chunk,
-        vx:dir*(6+Math.random()*6), vy:Math.random()*4, rot:Math.random()*0.4-0.2,
-        vr:dir*(0.5+Math.random()*1.0)});
-      ashTop-=chunk;
+    } else if(ashBits.length<4 && ashLen>4 && (ashLen>=maxAsh || (ashLen>maxAsh*0.55 && Math.random()<(dt*0.001)/11))){
+      ashBits.push({ph:0, dir:(Math.random()<0.5?-1:1), L:ashLen, w:stickW+0.2, theta:0.08, omega:0});
+      ashTop=sh+emberLen;   /* 灰は根こそぎ倒れて落ちる→火点の上はいったん無くなり、また伸び始める */
     }
-    /* 落下中の灰片：小さな放物線を描いて自由落下（重力は自然な速さ）。途中で消えず、
-       皿＝キャンバス下端まで落ちてから淵に隠れて見えなくなる（下端より下は描画されない） */
-    for(let i=ashBits.length-1;i>=0;i--){ const b=ashBits[i], s=dt*0.001;
-      b.vy+=300*s; b.x+=b.vx*s; b.y+=b.vy*s; b.rot+=b.vr*s;
-      if(b.y-b.h/2 > H){ ashBits.splice(i,1); continue; }   /* 皿の中へ落ちきった＝淵に隠れて消える */
-      x.save(); x.translate(b.x,b.y); x.rotate(b.rot); x.globalAlpha=0.95;
-      const g=x.createLinearGradient(0,-b.h/2,0,b.h/2);
+    /* 灰片：ph0＝ヒンジ（根元＝火点に固定、重力トルクで倒れ込む）／60度で解放→ph1＝自由落下。
+       中心＝根元＋(L/2)×棒方向。解放時に回転で得た中心速度を引き継ぐので跳ねずになめらかに落ちる。 */
+    const HINGE=Math.PI/3, GA=9.0, GF=500;
+    for(let i=ashBits.length-1;i>=0;i--){ const b=ashBits[i], s=dt*0.001; let cx,cy;
+      if(b.ph===0){
+        b.omega += GA*Math.sin(b.theta)*s; b.theta += b.omega*s;
+        const px=baseX, py=H-(sh+emberLen);                          /* 根元＝いまの火点最上部（火点から離れない） */
+        cx=px + (b.L/2)*Math.sin(b.theta)*b.dir; cy=py - (b.L/2)*Math.cos(b.theta);
+        if(b.theta>=HINGE){                                          /* 解放：倒れた勢いは引き継ぐが、横は弱めて“そのまま真下に落ちる” */
+          b.cx=cx; b.cy=cy;
+          b.vx=b.omega*(b.L/2)*Math.cos(b.theta)*b.dir*0.35; b.vy=b.omega*(b.L/2)*Math.sin(b.theta);
+          b.omega*=0.45; b.ph=1;                                     /* 落下中はゆっくり回るだけ（暴れない） */
+        }
+      } else {
+        b.vy+=GF*s; b.cx+=b.vx*s; b.cy+=b.vy*s; b.theta+=b.omega*s; cx=b.cx; cy=b.cy;
+        if(cy-b.L/2 > H){ ashBits.splice(i,1); continue; }           /* 皿まで落ちきった＝淵に隠れて消える */
+      }
+      x.save(); x.translate(cx,cy); x.rotate(b.dir*b.theta); x.globalAlpha=0.95;
+      const g=x.createLinearGradient(0,-b.L/2,0,b.L/2);
       g.addColorStop(0,'rgba(186,181,172,0.95)'); g.addColorStop(1,'rgba(158,151,141,0.95)');
-      rr(-b.w/2,-b.h/2,b.w,b.h,1.2); x.fillStyle=g; x.fill(); x.restore(); }
+      rr(-b.w/2,-b.L/2,b.w,b.L,1.2); x.fillStyle=g; x.fill(); x.restore();
+    }
     x.globalAlpha=1;
   }
   const R=(a,b)=>a+Math.random()*(b-a);
