@@ -872,7 +872,7 @@ function startSmoke(){
   calcRGB();
   /* 線香本体：火点（縦長のほんのり赤み）＋その上に残る灰（線香形・白寄りの灰色）＋左右へ折れて落ちる灰片。
      火点は下方へ燃え進み、燃えた分は上に灰として残り、最大でも元の長さの1/6を超えない不定サイズでときどき折れ落ちる。 */
-  const full0=280, stickW=4, emberLen=Math.round(stickW*2.2);   /* 太さ:長さ＝1:2.2 */
+  const full0=280, stickW=4, emberLen=Math.round(stickW*2.2), maxAsh=full0/8;   /* 太さ:長さ＝1:2.2／灰の最大長＝元長の1/8 */
   let ashTop=full0, prevSH=null; const ashBits=[];              /* ashTop＝灰柱の上端(基部からの長さ)／ashBits＝落下中の灰片 */
   const clampv=(v,a,b)=>Math.max(a,Math.min(b,v));
   function rr(px,py,w,h,r){ r=Math.min(r,w/2,h/2); x.beginPath(); x.moveTo(px+r,py);
@@ -890,9 +890,9 @@ function startSmoke(){
     /* 灰（火点の上・線香形・白寄りの灰色。横の節でそれらしく） */
     if(ashLen>1){ const aTopY=H-ashTop, aBotY=emberTpY, w=stickW+0.3;
       const g=x.createLinearGradient(0,aTopY,0,aBotY);
-      g.addColorStop(0,'rgba(228,225,218,0.96)'); g.addColorStop(1,'rgba(198,191,181,0.96)');
+      g.addColorStop(0,'rgba(190,186,178,0.96)'); g.addColorStop(1,'rgba(162,156,146,0.96)');   /* 白寄りの灰色（明度は控えめ） */
       rr(baseX-w/2,aTopY,w,aBotY-aTopY,1.6); x.fillStyle=g; x.fill();
-      x.strokeStyle='rgba(150,144,135,0.32)'; x.lineWidth=0.6;
+      x.strokeStyle='rgba(132,126,117,0.34)'; x.lineWidth=0.6;
       for(let yy=aTopY+6; yy<aBotY-2; yy+=7){ x.beginPath(); x.moveTo(baseX-w/2+0.4,yy); x.lineTo(baseX+w/2-0.4,yy+0.5); x.stroke(); } }
     /* 火点（縦長・明度を落としたほんのりした赤み・微かな明滅） */
     const pulse=reduced?1:(0.9+0.1*Math.sin(t*2.2));
@@ -903,10 +903,11 @@ function startSmoke(){
     eg.addColorStop(1,   'rgba(120,42,32,'+(0.80*pulse).toFixed(2)+')');   /* 下（未燃側）暗い */
     x.save(); x.shadowColor='rgba(178,66,46,'+(0.5*pulse).toFixed(2)+')'; x.shadowBlur=6;
     rr(baseX-ew/2,eTop,ew,eH,ew/2); x.fillStyle=eg; x.fill(); x.restore();
-    /* ときどき・不定サイズ（最大 full0/6）で灰が折れ、左右いずれかへ落ちる */
-    if(!reduced && ashBits.length<4 && ashLen>full0/9 && Math.random() < (dt*0.001)/12){
-      let chunk=full0/18 + Math.random()*(full0/6 - full0/18);
-      chunk=Math.min(chunk, ashLen*0.7);
+    /* 灰の最大長は元長の1/8。そこまで伸びると（またはときどき手前で）不定サイズで折れ、左右いずれかへ落ちる */
+    if(reduced){
+      if(ashLen>maxAsh) ashTop=sh+emberLen+maxAsh;   /* 動きは出さず、1/8を超えないよう静かに抑える */
+    } else if(ashBits.length<5 && (ashLen>=maxAsh || (ashLen>maxAsh*0.55 && Math.random()<(dt*0.001)/11))){
+      const chunk=Math.min(ashLen*0.85, maxAsh*0.4 + Math.random()*(maxAsh*0.45));   /* 不定サイズ（最大でも1/8以内） */
       const dir=Math.random()<0.5?-1:1;
       ashBits.push({x:baseX+(Math.random()*1.4-0.7), y:H-ashTop, w:stickW+0.2, h:chunk,
         vx:dir*(10+Math.random()*24), vy:6+Math.random()*10, rot:Math.random()*0.4-0.2,
@@ -919,7 +920,7 @@ function startSmoke(){
       if(b.life<=0 || b.y>H+24){ ashBits.splice(i,1); continue; }
       x.save(); x.translate(b.x,b.y); x.rotate(b.rot); x.globalAlpha=Math.max(0,b.life);
       const g=x.createLinearGradient(0,-b.h/2,0,b.h/2);
-      g.addColorStop(0,'rgba(222,218,210,0.95)'); g.addColorStop(1,'rgba(190,183,173,0.95)');
+      g.addColorStop(0,'rgba(186,181,172,0.95)'); g.addColorStop(1,'rgba(158,151,141,0.95)');
       rr(-b.w/2,-b.h/2,b.w,b.h,1.2); x.fillStyle=g; x.fill(); x.restore(); }
     x.globalAlpha=1;
   }
