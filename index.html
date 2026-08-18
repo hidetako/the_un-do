@@ -216,12 +216,8 @@
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
   .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:486px; pointer-events:none}
+  /* 未燃部（茶色・下から縮む）。火点・灰・落下灰片は #smoke キャンバスに描く */
   .stick{width:4px; background:linear-gradient(180deg,#8a7252,#6d5840); border-radius:2px; position:relative; transition:height .25s linear}
-  .ember{position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:8px; height:8px;
-    border-radius:50%; background:#e0631f; box-shadow:0 0 12px 3px rgba(224,99,43,.55);
-    animation:emberglow 4.5s ease-in-out infinite}
-  @keyframes emberglow{0%,100%{opacity:.9; box-shadow:0 0 9px 2px rgba(224,99,43,.42)}
-    50%{opacity:1; box-shadow:0 0 14px 4px rgba(224,99,43,.62)}}
   .bowl{width:96px; height:20px; background:#2a2620; border-radius:0 0 50px 50px; margin-top:-3px}
   .bowl::before{content:""; display:block; width:96px; height:11px; background:#39342c; border-radius:50%; transform:translateY(-6px)}
   .status{position:absolute; bottom:9%; left:0; right:0; text-align:center; font-size:14px;
@@ -412,7 +408,7 @@
     <div class="censer">
       <div class="incense-wrap">
         <canvas class="smoke" id="smoke" width="140" height="486"></canvas>
-        <div class="stick" id="stick" style="height:280px"><div class="ember"></div></div>
+        <div class="stick" id="stick" style="height:280px"></div>
       </div>
       <div class="bowl"></div>
     </div>
@@ -874,8 +870,59 @@ function startSmoke(){
   let RGB='226,221,210';
   const calcRGB = () => { const dark=(sel.scene==='honden'||sel.scene==='tsuki'||sel.scene==='cho'); RGB = dark?'226,221,210':'66,55,45'; };
   calcRGB();
-  /* 火種の先端 y（キャンバス座標）。下端 H が基部、現在の線香高ぶん上が先端。 */
-  const emberY = () => H - ((parseFloat(stick.style.height)||0) + 3);
+  /* 線香本体：火点（縦長のほんのり赤み）＋その上に残る灰（線香形・白寄りの灰色）＋左右へ折れて落ちる灰片。
+     火点は下方へ燃え進み、燃えた分は上に灰として残り、最大でも元の長さの1/6を超えない不定サイズでときどき折れ落ちる。 */
+  const full0=280, stickW=4, emberLen=Math.round(stickW*2.2);   /* 太さ:長さ＝1:2.2 */
+  let ashTop=full0, prevSH=null; const ashBits=[];              /* ashTop＝灰柱の上端(基部からの長さ)／ashBits＝落下中の灰片 */
+  const clampv=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function rr(px,py,w,h,r){ r=Math.min(r,w/2,h/2); x.beginPath(); x.moveTo(px+r,py);
+    x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r);
+    x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); }
+  /* 煙は火点の最上部から出る（基部 H から 未燃長＋火点長 ぶん上） */
+  const emberY = () => H - ((parseFloat(stick.style.height)||0) + emberLen);
+  function drawIncense(dt){
+    const sh=clampv(parseFloat(stick.style.height)||0, 0, full0);
+    if(prevSH!==null && sh>prevSH+3){ ashTop=full0; ashBits.length=0; }   /* 線香が伸びた＝新品（配信の周期／再開）→灰リセット */
+    prevSH=sh;
+    const baseX=W/2, emberTpY=H-(sh+emberLen);
+    ashTop=clampv(ashTop, sh+emberLen, full0);
+    const ashLen=ashTop-(sh+emberLen);
+    /* 灰（火点の上・線香形・白寄りの灰色。横の節でそれらしく） */
+    if(ashLen>1){ const aTopY=H-ashTop, aBotY=emberTpY, w=stickW+0.3;
+      const g=x.createLinearGradient(0,aTopY,0,aBotY);
+      g.addColorStop(0,'rgba(228,225,218,0.96)'); g.addColorStop(1,'rgba(198,191,181,0.96)');
+      rr(baseX-w/2,aTopY,w,aBotY-aTopY,1.6); x.fillStyle=g; x.fill();
+      x.strokeStyle='rgba(150,144,135,0.32)'; x.lineWidth=0.6;
+      for(let yy=aTopY+6; yy<aBotY-2; yy+=7){ x.beginPath(); x.moveTo(baseX-w/2+0.4,yy); x.lineTo(baseX+w/2-0.4,yy+0.5); x.stroke(); } }
+    /* 火点（縦長・明度を落としたほんのりした赤み・微かな明滅） */
+    const pulse=reduced?1:(0.9+0.1*Math.sin(t*2.2));
+    const eTop=emberTpY-2, eH=emberLen+2, ew=stickW;
+    const eg=x.createLinearGradient(0,eTop,0,eTop+eH);
+    eg.addColorStop(0,   'rgba(150,52,40,'+(0.85*pulse).toFixed(2)+')');   /* 上（灰側）やや暗い */
+    eg.addColorStop(0.5, 'rgba(182,66,46,'+(0.98*pulse).toFixed(2)+')');   /* 中央がいちばん赤い */
+    eg.addColorStop(1,   'rgba(120,42,32,'+(0.80*pulse).toFixed(2)+')');   /* 下（未燃側）暗い */
+    x.save(); x.shadowColor='rgba(178,66,46,'+(0.5*pulse).toFixed(2)+')'; x.shadowBlur=6;
+    rr(baseX-ew/2,eTop,ew,eH,ew/2); x.fillStyle=eg; x.fill(); x.restore();
+    /* ときどき・不定サイズ（最大 full0/6）で灰が折れ、左右いずれかへ落ちる */
+    if(!reduced && ashBits.length<4 && ashLen>full0/9 && Math.random() < (dt*0.001)/12){
+      let chunk=full0/18 + Math.random()*(full0/6 - full0/18);
+      chunk=Math.min(chunk, ashLen*0.7);
+      const dir=Math.random()<0.5?-1:1;
+      ashBits.push({x:baseX+(Math.random()*1.4-0.7), y:H-ashTop, w:stickW+0.2, h:chunk,
+        vx:dir*(10+Math.random()*24), vy:6+Math.random()*10, rot:Math.random()*0.4-0.2,
+        vr:dir*(0.6+Math.random()*1.2), life:1});
+      ashTop-=chunk;
+    }
+    /* 落下中の灰片（重力＋回転＋フェード） */
+    for(let i=ashBits.length-1;i>=0;i--){ const b=ashBits[i], s=dt*0.001;
+      b.vy+=55*s; b.x+=b.vx*s; b.y+=b.vy*s; b.rot+=b.vr*s; b.life-=s/2.2;
+      if(b.life<=0 || b.y>H+24){ ashBits.splice(i,1); continue; }
+      x.save(); x.translate(b.x,b.y); x.rotate(b.rot); x.globalAlpha=Math.max(0,b.life);
+      const g=x.createLinearGradient(0,-b.h/2,0,b.h/2);
+      g.addColorStop(0,'rgba(222,218,210,0.95)'); g.addColorStop(1,'rgba(190,183,173,0.95)');
+      rr(-b.w/2,-b.h/2,b.w,b.h,1.2); x.fillStyle=g; x.fill(); x.restore(); }
+    x.globalAlpha=1;
+  }
   const R=(a,b)=>a+Math.random()*(b-a);
   /* 毎セッション乱択の個体差。TR＝幹、BR＝枝 */
   const TR={ f1:1.9+R(0,0.9), f2:4.0+R(0,1.5), v1:0.65+R(0,0.4), v2:1.05+R(0,0.5),
@@ -955,6 +1002,7 @@ function startSmoke(){
       }
       x.shadowBlur=0;
     }
+    drawIncense(dt);   /* 火点・灰・落下灰片は煙の手前に（灰が煙の根元を隠し、煙は灰の上から立つ） */
     smokeRAF=requestAnimationFrame(loop);
   }
   smokeRAF=requestAnimationFrame(loop);
