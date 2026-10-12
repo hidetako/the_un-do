@@ -162,6 +162,7 @@
   /* 座処は全言語で「上3・下3」に固定（折返し任せだと4+2などに崩れる） */
   #sceneOpts{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:min(92vw,520px); margin:0 auto}
   #sceneOpts .opt{min-width:0; padding-left:6px; padding-right:6px}
+  #sceneOpts .opt:nth-child(7){grid-column:2}   /* 7つ目（素）は3段目の中央に */
   .opt{flex:0 1 auto; min-width:94px; background:rgba(239,233,220,.04); color:var(--paper);
     border:1px solid rgba(239,233,220,.16); border-radius:14px; padding:10px 15px; cursor:pointer;
     font-family:var(--serif); font-size:14.5px; letter-spacing:.04em; transition:all .35s ease}
@@ -209,11 +210,14 @@
   .scene-tsuki{background:#0a1022 url(assets/brush/tsuki.jpg) center/cover no-repeat}
   .scene-neko{background:#d8c8a6 url(assets/brush/neko.jpg) center/cover no-repeat}
   .scene-cho{background:#2a2118 url(assets/brush/cho.jpg) center/cover no-repeat}
+  .scene-su{background:#0d0b08}   /* 素：無地の墨色。背景写真なし・線香が主役 */
   /* 全6座処を実写写真の全画面背景に（assets/brush/honden|kare|umi|tsuki|neko|cho.jpg） */
 
   /* incense — tucked into the corner, understated */
   .censer{position:absolute; right:6.5vw; bottom:0; transform:scale(.8); transform-origin:bottom center;
     display:flex; flex-direction:column; align-items:center; z-index:2; opacity:.9}
+  /* 素：線香を画面の真ん中に（少し大きく）。他座処は従来どおり右下 */
+  #session[data-scene="su"] .censer{right:50%; transform:translateX(50%) scale(.9)}
   .incense-wrap{width:140px; height:300px; position:relative; display:flex; align-items:flex-end; justify-content:center}
   .smoke{position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:140px; height:486px; pointer-events:none}
   /* 未燃部（茶色・下から縮む）。火点・灰・落下灰片は #smoke キャンバスに描く。
@@ -471,7 +475,7 @@ const T = {
     install_tip:"スリープを防ぐには、ホーム画面に追加してお使いください",
     closing:"合掌",
     confirm_msg:"坐を、つづけますか？", confirm_cont:"つづける", confirm_stop:"やめる",
-    scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額"}
+    scenes:{honden:"本堂",kare:"枯山水",umi:"海岸",tsuki:"夜の月",neko:"寝ている猫の横",cho:"調息の額",su:"素"}
   },
   en:{
     tagline:"Anytime, from anywhere.<br>Sit, and take a breath.",
@@ -492,7 +496,7 @@ const T = {
     install_tip:"To keep it from sleeping, add this app to your home screen",
     closing:"合掌 · gasshō",
     confirm_msg:"Continue sitting?", confirm_cont:"Continue", confirm_stop:"End",
-    scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque"}
+    scenes:{honden:"Main hall",kare:"Dry garden",umi:"Seashore",tsuki:"Moonlit night",neko:"Beside a sleeping cat",cho:"“Chosoku” plaque",su:"Plain"}
   },
   "zh-Hans":{
     tagline:"全天候，从世界任何角落。<br>坐下来，歇口气吧。",
@@ -513,7 +517,7 @@ const T = {
     install_tip:"为防止休眠，请添加到主屏幕后使用",
     closing:"合掌",
     confirm_msg:"继续坐禅吗？", confirm_cont:"继续", confirm_stop:"结束",
-    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额"}
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡猫旁",cho:"「调息」匾额",su:"素"}
   },
   "zh-Hant":{
     tagline:"全天候，從世界任何角落。<br>坐下來，歇口氣吧。",
@@ -534,7 +538,7 @@ const T = {
     install_tip:"為避免休眠，請加入主畫面後使用",
     closing:"合掌",
     confirm_msg:"繼續坐禪嗎？", confirm_cont:"繼續", confirm_stop:"結束",
-    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額"}
+    scenes:{honden:"正殿",kare:"枯山水",umi:"海岸",tsuki:"夜月",neko:"睡貓旁",cho:"「調息」匾額",su:"素"}
   },
   ko:{
     tagline:"24시간, 세계 어디에서나.<br>앉아서, 한 호흡 쉬어 가요.",
@@ -555,7 +559,7 @@ const T = {
     install_tip:"잠자기를 막으려면 홈 화면에 추가해 사용하세요",
     closing:"합장",
     confirm_msg:"좌선을 계속할까요?", confirm_cont:"계속", confirm_stop:"그만",
-    scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액"}
+    scenes:{honden:"본당",kare:"고산수 정원",umi:"해안",tsuki:"밤의 달",neko:"잠든 고양이 곁",cho:"‘조식’ 편액",su:"여백"}
   },
   es:{
     tagline:"A toda hora, desde cualquier lugar.<br>Siéntate y toma un respiro.",
@@ -576,7 +580,7 @@ const T = {
     install_tip:"Para evitar la suspensión, añádela a tu pantalla de inicio",
     closing:"合掌 · gasshō",
     confirm_msg:"¿Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Terminar",
-    scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»"}
+    scenes:{honden:"Sala principal",kare:"Jardín seco",umi:"Orilla del mar",tsuki:"Noche de luna",neko:"Junto a un gato dormido",cho:"Placa «Chōsoku»",su:"Sencillo"}
   },
   fr:{
     tagline:"À toute heure, où que vous soyez.<br>Asseyez-vous et respirez un instant.",
@@ -597,7 +601,7 @@ const T = {
     install_tip:"Pour éviter la veille, ajoutez l’app à l’écran d’accueil",
     closing:"合掌 · gasshō",
     confirm_msg:"Continuer à méditer ?", confirm_cont:"Continuer", confirm_stop:"Terminer",
-    scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »"}
+    scenes:{honden:"Salle principale",kare:"Jardin sec",umi:"Bord de mer",tsuki:"Nuit de lune",neko:"Près d’un chat endormi",cho:"Plaque « Chōsoku »",su:"Épuré"}
   },
   de:{
     tagline:"Jederzeit, von überall.<br>Setz dich und atme einmal durch.",
@@ -618,7 +622,7 @@ const T = {
     install_tip:"Um den Ruhezustand zu vermeiden, füge die App zum Startbildschirm hinzu",
     closing:"合掌 · gasshō",
     confirm_msg:"Weiter sitzen?", confirm_cont:"Weiter", confirm_stop:"Beenden",
-    scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel"}
+    scenes:{honden:"Haupthalle",kare:"Trockengarten",umi:"Meeresküste",tsuki:"Mondnacht",neko:"Neben einer schlafenden Katze",cho:"„Chōsoku“-Tafel",su:"Schlicht"}
   },
   pt:{
     tagline:"A qualquer hora, de qualquer lugar.<br>Sente-se e respire fundo.",
@@ -639,7 +643,7 @@ const T = {
     install_tip:"Para evitar a suspensão, adicione à tela inicial",
     closing:"合掌 · gasshō",
     confirm_msg:"Continuar sentado?", confirm_cont:"Continuar", confirm_stop:"Encerrar",
-    scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»"}
+    scenes:{honden:"Salão principal",kare:"Jardim seco",umi:"Beira-mar",tsuki:"Noite de luar",neko:"Ao lado de um gato dormindo",cho:"Placa «Chōsoku»",su:"Simples"}
   }
 };
 const ORIENT = {
@@ -810,7 +814,8 @@ function applyLang(){
   const sup=$('#supportLink'); if(sup){ if(SUPPORT_URL){ sup.href=SUPPORT_URL; sup.textContent=SUPPORT_T[lang]||SUPPORT_T.en; sup.hidden=false; } else sup.hidden=true; }
 }
 
-const SCENES = ['honden','kare','umi','tsuki','neko','cho'];
+const SCENES = ['honden','kare','umi','tsuki','neko','cho'];        /* 実写6座処＝配信rotateの巡回対象 */
+const SEAT_SCENES = [...SCENES,'su'];                               /* 座処チップには「素」（無地・線香中央）も並べる */
 function chip(label,sub,selected,onclick){
   const b=document.createElement('button'); b.className='opt'+(selected?' sel':'');
   b.innerHTML=label+(sub?`<small>${sub}</small>`:''); b.onclick=onclick; return b;
@@ -821,7 +826,7 @@ function buildOpts(){
   po.append(chip(t.floor,t.floor_s,sel.posture==='floor',()=>{sel.posture='floor';save();buildOpts();}));
   po.append(chip(t.chair,t.chair_s,sel.posture==='chair',()=>{sel.posture='chair';save();buildOpts();}));
   const so=$('#sceneOpts'); so.innerHTML='';
-  SCENES.forEach(s=> so.append(chip(t.scenes[s],'',sel.scene===s,()=>{sel.scene=s;save();buildOpts();})));
+  SEAT_SCENES.forEach(s=> so.append(chip(t.scenes[s],'',sel.scene===s,()=>{sel.scene=s;save();buildOpts();})));
   const oo=$('#orientOpts'); oo.innerHTML='';
   oo.append(chip(t.on,'',sel.orient===true,()=>{sel.orient=true;save();buildOpts();}));
   oo.append(chip(t.off,'',sel.orient===false,()=>{sel.orient=false;save();buildOpts();}));
@@ -869,7 +874,7 @@ function startSmoke(){
   /* 背景の明暗で煙色を変える：暗い座処＝白煙／明るい座処＝ねずみ色（同化を防ぐ）。
      ローテーション配信で座処が変わっても追従するよう、毎フレーム再計算する。 */
   let RGB='226,221,210';
-  const calcRGB = () => { const dark=(sel.scene==='honden'||sel.scene==='tsuki'||sel.scene==='cho'); RGB = dark?'226,221,210':'66,55,45'; };
+  const calcRGB = () => { const dark=(sel.scene==='honden'||sel.scene==='tsuki'||sel.scene==='cho'||sel.scene==='su'); RGB = dark?'226,221,210':'66,55,45'; };
   calcRGB();
   /* 線香本体：火点（縦長のほんのり赤み）＋その上に残る灰（線香形・白寄りの灰色）＋左右へ折れて落ちる灰片。
      火点は下方へ燃え進み、燃えた分は上に灰として残り、最大でも元の長さの1/6を超えない不定サイズでときどき折れ落ちる。 */
@@ -1116,6 +1121,12 @@ const ambient = (() => {
     cho(){
       const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=220;
       const g=ac.createGain(); g.gain.value=0.03;                 // 定常。ゆらさない
+      s.connect(lp); lp.connect(g); g.connect(master); s.start();
+    },
+    /* 素：無地の間。調息よりさらに微かな空気の床だけ（定常・ほとんど無音） */
+    su(){
+      const s=noise(), lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=180;
+      const g=ac.createGain(); g.gain.value=0.016;
       s.connect(lp); lp.connect(g); g.connect(master); s.start();
     }
   };
